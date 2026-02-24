@@ -1,0 +1,107 @@
+<main class="tracking-page">
+  <section class="tracking-hero">
+    <div class="tracking-hero-inner">
+      <div class="tracking-hero-grid">
+        <div class="tracking-hero-left">
+          <h1 class="tracking-title">Rastrear Pedido</h1>
+          <p class="tracking-subtitle">
+            Informe o código de rastreio para acompanhar sua carga em tempo real,
+            assim como você vê em grandes marketplaces.
+          </p>
+
+          <form class="tracking-form" (ngSubmit)="search()">
+            <input
+              type="text"
+              [(ngModel)]="trackingCode"
+              name="trackingCode"
+              class="tracking-input"
+              placeholder="Ex: {{ exampleCodes[0]?.code }}"
+              maxlength="30"
+            />
+            <button type="submit" class="tracking-btn">Rastrear</button>
+          </form>
+
+          <p class="helper-text">
+            Não tem um código ainda? Teste com um dos exemplos ao lado.
+          </p>
+
+          <div class="badges-row">
+            <span class="badge">Envios Maputo ↔ África do Sul</span>
+            <span class="badge">Atualizações em cada etapa</span>
+          </div>
+        </div>
+
+        <div class="tracking-hero-right">
+          <div class="simulation-card">
+            <div class="simulation-header">
+              <div>
+                <h2>Simule o rastreio</h2>
+                <p>Escolha um código de exemplo para ver o passo a passo.</p>
+              </div>
+              <img
+                class="simulation-illustration"
+                src="https://images.unsplash.com/photo-1582456891925-a53965520520?w=600&q=80"
+                alt="Ilustração de camião a transportar carga no corredor Maputo–África do Sul"
+                loading="lazy"
+              />
+            </div>
+
+            <div class="example-codes">
+              @for (example of exampleCodes; track example.code) {
+                <button
+                  type="button"
+                  class="example-card"
+                  [class.active]="example.code === selectedExampleCode"
+                  (click)="selectExample(example.code)"
+                >
+                  <div class="example-card-main">
+                    <span class="example-code">{{ example.code }}</span>
+                    <span class="example-status">{{ example.status }}</span>
+                  </div>
+                  <span class="example-route">{{ example.route }}</span>
+                </button>
+              }
+            </div>
+
+            @if (selectedExample) {
+              <div class="example-timeline">
+                <h3 class="mini-title">Linha do tempo simulada</h3>
+                <div class="tracking-timeline compact">
+                  @for (step of selectedExample.steps; track step.label) {
+                    <div class="timeline-item" [class.done]="step.done">
+                      <div class="timeline-marker"></div>
+                      <div class="timeline-content">
+                        <strong>{{ step.label }}</strong>
+                        <span>{{ step.date }} • {{ step.location }}</span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  @if (searched) {
+    <section class="tracking-result">
+      <div class="tracking-result-inner">
+        <h2 class="result-title">Status da entrega</h2>
+        <p class="result-status">{{ mockStatus }}</p>
+        <div class="tracking-timeline">
+          @for (step of mockSteps; track step.label) {
+            <div class="timeline-item" [class.done]="step.done">
+              <div class="timeline-marker"></div>
+              <div class="timeline-content">
+                <strong>{{ step.label }}</strong>
+                <span>{{ step.date }}<ng-container *ngIf="step.location"> • {{ step.location }}</ng-container></span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+</main>

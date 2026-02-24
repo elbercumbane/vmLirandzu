@@ -1,0 +1,31 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #fff;
+  color: #1a1a24;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
