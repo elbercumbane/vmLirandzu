@@ -1,0 +1,57 @@
+<main class="quote-page">
+  <section class="quote-hero">
+    <div class="quote-hero-inner">
+      <h1 class="quote-title">Solicitar Orçamento</h1>
+      <p class="quote-subtitle">Preencha os dados e nossa equipe retornará em até 24 horas.</p>
+    </div>
+  </section>
+  <section class="quote-form-section">
+    <div class="quote-form-inner">
+      @if (!submitted) {
+        <form class="quote-form" (ngSubmit)="onSubmit()" #f="ngForm">
+          <div class="form-row">
+            <label for="name">Nome completo</label>
+            <input id="name" type="text" [(ngModel)]="form.name" name="name" required />
+          </div>
+          <div class="form-row">
+            <label for="email">E-mail</label>
+            <input id="email" type="email" [(ngModel)]="form.email" name="email" required />
+          </div>
+          <div class="form-row">
+            <label for="phone">Telefone</label>
+            <input id="phone" type="tel" [(ngModel)]="form.phone" name="phone" />
+          </div>
+          <div class="form-row">
+            <label for="origin">Origem (cidade/estado)</label>
+            <input id="origin" type="text" [(ngModel)]="form.origin" name="origin" required />
+          </div>
+          <div class="form-row">
+            <label for="destination">Destino (cidade/estado)</label>
+            <input id="destination" type="text" [(ngModel)]="form.destination" name="destination" required />
+          </div>
+          <div class="form-row">
+            <label for="cargoType">Tipo de carga</label>
+            <select id="cargoType" [(ngModel)]="form.cargoType" name="cargoType">
+              <option value="">Selecione</option>
+              <option value="geral">Carga geral</option>
+              <option value="fragil">Carga frágil</option>
+              <option value="refrigerada">Carga refrigerada</option>
+              <option value="perigosa">Carga perigosa</option>
+            </select>
+          </div>
+          <div class="form-row full">
+            <label for="message">Observações</label>
+            <textarea id="message" [(ngModel)]="form.message" name="message" rows="4"></textarea>
+          </div>
+          <button type="submit" class="quote-submit">Enviar solicitação</button>
+        </form>
+      } @else {
+        <div class="quote-success">
+          <span class="success-icon">✓</span>
+          <h2>Solicitação enviada</h2>
+          <p>Retornaremos em até 24 horas com o orçamento.</p>
+        </div>
+      }
+    </div>
+  </section>
+</main>

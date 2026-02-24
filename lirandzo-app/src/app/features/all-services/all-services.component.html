@@ -1,0 +1,47 @@
+<div class="page all-services-page">
+  <header class="page-header">
+    <a routerLink="/" class="back-link">← Voltar</a>
+    <h1 class="page-title">Todos os Serviços</h1>
+    <p class="page-intro">O que fazemos e projetos que já realizámos no corredor Joanesburgo–Maputo.</p>
+  </header>
+
+  <section class="section section--what-we-do">
+    <h2 class="section-title">O que fazemos</h2>
+    <div class="services-grid">
+      @for (svc of services; track svc.title) {
+        <article class="service-tile">
+          <div class="service-tile-image" [style.backgroundImage]="'url(' + svc.image + ')'"></div>
+          <div class="service-tile-body">
+            <h3 class="service-tile-title">{{ svc.title }}</h3>
+            <p class="service-tile-desc">{{ svc.description }}</p>
+          </div>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="section section--done">
+    <h2 class="section-title">Serviços realizados</h2>
+    <p class="section-subtitle">Projetos e entregas já concluídos pelos nossos clientes.</p>
+    <ul class="done-list">
+      @for (p of completed; track p.title) {
+        <li class="done-item">
+          <div class="done-content">
+            <h3 class="done-title">{{ p.title }}</h3>
+            <p class="done-desc">{{ p.description }}</p>
+            @if (p.client || p.year) {
+              <div class="done-meta">
+                @if (p.client) { <span class="done-client">{{ p.client }}</span> }
+                @if (p.year) { <span class="done-year">{{ p.year }}</span> }
+              </div>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <div class="page-cta">
+    <a routerLink="/" fragment="contato" class="cta-btn">Pedir orçamento</a>
+  </div>
+</div>

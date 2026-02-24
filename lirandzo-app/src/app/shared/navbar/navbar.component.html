@@ -1,0 +1,28 @@
+<nav class="nav-bar" role="navigation">
+  <a routerLink="/" class="logo" (click)="closeMenu()">
+    <span class="logo-mark">VM</span>
+    <span class="logo-name">Lirandzo<br><em>Transportes</em></span>
+  </a>
+  <button class="menu-toggle" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen" aria-label="Abrir menu">
+    <span class="hamburger" [class.open]="menuOpen"></span>
+    <span class="hamburger" [class.open]="menuOpen"></span>
+    <span class="hamburger" [class.open]="menuOpen"></span>
+  </button>
+  <ul class="nav-links" [class.open]="menuOpen">
+    <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">Início</a></li>
+    <li><a routerLink="/rastreio" (click)="closeMenu()">Rastrear Pedido</a></li>
+    <li><a routerLink="/orcamento" (click)="closeMenu()">Solicitar Orçamento</a></li>
+    <li><a routerLink="/" fragment="contato" (click)="closeMenu()">Contato</a></li>
+    <li class="nav-lang-wrap">
+      <button type="button" class="nav-lang-btn" (click)="toggleLangDropdown()" [attr.aria-expanded]="langOpen" aria-haspopup="true" aria-label="Idioma">
+        <span class="nav-lang-current">{{ currentLang }}</span>
+        <span class="nav-lang-chevron">▼</span>
+      </button>
+      <div class="nav-lang-dropdown" [class.open]="langOpen">
+        <button type="button" (click)="setLang('pt'); closeLangDropdown()">Português</button>
+        <button type="button" (click)="setLang('en'); closeLangDropdown()">English</button>
+      </div>
+    </li>
+    <li><a routerLink="/login" (click)="closeMenu()" class="nav-login">Login</a></li>
+  </ul>
+</nav>
