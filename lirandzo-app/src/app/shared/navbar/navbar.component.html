@@ -11,7 +11,7 @@
   <ul class="nav-links" [class.open]="menuOpen">
     <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">Início</a></li>
     <li><a routerLink="/rastreio" (click)="closeMenu()">Rastrear Pedido</a></li>
-    <li><a routerLink="/orcamento" (click)="closeMenu()">Solicitar Orçamento</a></li>
+    <li><a routerLink="/orcamento" (click)="closeMenu()">Solicitar Cotação</a></li>
     <li><a routerLink="/" fragment="contato" (click)="closeMenu()">Contato</a></li>
     <li class="nav-lang-wrap">
       <button type="button" class="nav-lang-btn" (click)="toggleLangDropdown()" [attr.aria-expanded]="langOpen" aria-haspopup="true" aria-label="Idioma">
