@@ -1,47 +1,90 @@
-<div class="page all-services-page">
-  <header class="page-header">
-    <a routerLink="/" class="back-link">← Voltar</a>
-    <h1 class="page-title">Todos os Serviços</h1>
-    <p class="page-intro">O que fazemos e projetos que já realizámos no corredor Joanesburgo–Maputo.</p>
-  </header>
+<main class="services-page">
+  <section class="services-banner">
+    <div class="services-banner-overlay"></div>
+    <div class="services-banner-content">
+      <p class="services-banner-eyebrow">O que oferecemos</p>
+      <h1 class="services-banner-title">Nossos Serviços</h1>
+      <p class="services-banner-desc">
+        Soluções logísticas completas — do transporte rodoviário ao despacho aduaneiro.
+        Tudo num único parceiro.
+      </p>
+    </div>
+  </section>
 
-  <section class="section section--what-we-do">
-    <h2 class="section-title">O que fazemos</h2>
-    <div class="services-grid">
-      @for (svc of services; track svc.title) {
-        <article class="service-tile">
-          <div class="service-tile-image" [style.backgroundImage]="'url(' + svc.image + ')'"></div>
-          <div class="service-tile-body">
-            <h3 class="service-tile-title">{{ svc.title }}</h3>
-            <p class="service-tile-desc">{{ svc.description }}</p>
+  <section class="services-detail-section">
+    <div class="services-detail-container">
+      @for (svc of services; track svc.title; let i = $index) {
+        <article class="svc-detail-card" [attr.data-color]="svc.color">
+          <div class="svc-detail-header">
+            <div class="svc-detail-icon">
+              @switch (svc.icon) {
+                @case ('truck') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                }
+                @case ('procurement') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                }
+                @case ('tracking') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                }
+                @case ('logistics') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 16v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="12" height="12" rx="2"/><path d="M12 6h4"/><path d="M12 10h4"/></svg>
+                }
+                @case ('warehouse') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21V12h6v9"/></svg>
+                }
+                @case ('customs') {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></svg>
+                }
+              }
+            </div>
+            <span class="svc-detail-number">0{{ i + 1 }}</span>
           </div>
+          <h3 class="svc-detail-title">{{ svc.title }}</h3>
+          <p class="svc-detail-desc">{{ svc.description }}</p>
+          <ul class="svc-detail-features">
+            @for (feat of svc.features; track feat) {
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M20 6L9 17l-5-5"/></svg>
+                {{ feat }}
+              </li>
+            }
+          </ul>
         </article>
       }
     </div>
   </section>
 
-  <section class="section section--done">
-    <h2 class="section-title">Serviços realizados</h2>
-    <p class="section-subtitle">Projetos e entregas já concluídos pelos nossos clientes.</p>
-    <ul class="done-list">
-      @for (p of completed; track p.title) {
-        <li class="done-item">
-          <div class="done-content">
-            <h3 class="done-title">{{ p.title }}</h3>
-            <p class="done-desc">{{ p.description }}</p>
-            @if (p.client || p.year) {
-              <div class="done-meta">
-                @if (p.client) { <span class="done-client">{{ p.client }}</span> }
-                @if (p.year) { <span class="done-year">{{ p.year }}</span> }
-              </div>
-            }
-          </div>
-        </li>
-      }
-    </ul>
+  <section class="services-completed">
+    <div class="services-completed-container">
+      <header class="services-completed-header">
+        <p class="services-completed-eyebrow">Portfólio</p>
+        <h2 class="services-completed-title">Projectos realizados</h2>
+        <p class="services-completed-desc">Exemplos de entregas e operações concluídas com sucesso.</p>
+      </header>
+      <div class="completed-grid">
+        @for (p of completed; track p.title) {
+          <article class="completed-card">
+            <div class="completed-meta">
+              <span class="completed-year">{{ p.year }}</span>
+              <span class="completed-client">{{ p.client }}</span>
+            </div>
+            <h3 class="completed-title">{{ p.title }}</h3>
+            <p class="completed-desc">{{ p.description }}</p>
+          </article>
+        }
+      </div>
+    </div>
   </section>
 
-  <div class="page-cta">
-    <a routerLink="/orcamento" class="cta-btn">Solicitar Cotação</a>
-  </div>
-</div>
+  <section class="services-cta-section">
+    <div class="services-cta-box">
+      <h2 class="services-cta-title">Precisa de uma solução à medida?</h2>
+      <p class="services-cta-text">Fale connosco e receba uma proposta personalizada para a sua operação logística.</p>
+      <div class="services-cta-actions">
+        <a routerLink="/orcamento" class="services-cta-btn services-cta-btn--primary">Solicitar Cotação</a>
+        <a routerLink="/" fragment="contato" class="services-cta-btn services-cta-btn--outline">Contactar-nos</a>
+      </div>
+    </div>
+  </section>
+</main>

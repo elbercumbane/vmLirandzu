@@ -1,3 +1,7 @@
-<app-navbar></app-navbar>
+@if (showChrome) {
+  <app-navbar></app-navbar>
+}
 <router-outlet></router-outlet>
-<app-footer></app-footer>
+@if (showChrome) {
+  <app-footer></app-footer>
+}

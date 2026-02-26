@@ -1,0 +1,45 @@
+<main class="faq-page">
+  <section class="faq-banner">
+    <div class="faq-banner-overlay"></div>
+    <div class="faq-banner-content">
+      <p class="faq-banner-eyebrow">Apoio ao cliente</p>
+      <h1 class="faq-banner-title">Perguntas Frequentes</h1>
+      <p class="faq-banner-desc">
+        Encontre respostas rápidas sobre os nossos serviços, prazos, rastreio e muito mais.
+      </p>
+    </div>
+  </section>
+
+  <section class="faq-section">
+    <div class="faq-container">
+      <div class="faq-list">
+        @for (faq of faqs; track $index) {
+          <div class="faq-item" [class.open]="faq.open">
+            <button class="faq-question" (click)="toggle($index)">
+              <span class="faq-q-text">{{ faq.question }}</span>
+              <span class="faq-chevron">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </span>
+            </button>
+            <div class="faq-answer-wrap">
+              <p class="faq-answer">{{ faq.answer }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="faq-cta">
+    <div class="faq-cta-content">
+      <h2 class="faq-cta-title">Não encontrou o que procurava?</h2>
+      <p class="faq-cta-text">A nossa equipa está disponível para ajudar. Entre em contacto connosco.</p>
+      <div class="faq-cta-actions">
+        <a routerLink="/orcamento" class="faq-cta-btn faq-cta-btn--primary">Solicitar Cotação</a>
+        <a routerLink="/" fragment="contato" class="faq-cta-btn faq-cta-btn--outline">Contactar-nos</a>
+      </div>
+    </div>
+  </section>
+</main>

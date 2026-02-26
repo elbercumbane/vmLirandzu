@@ -33,7 +33,7 @@ export class HeroComponent implements AfterViewInit, OnDestroy {
 
   slides: Slide[] = [
     {
-      image: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=1920&q=80',
+      image: 'frota-camioes.jpg',
       title: 'Boas-vindas à VM Lirandzo Transportes',
       subtitle: 'Transporte de mercadorias da África do Sul (Joanesburgo) para Moçambique. Sua carga em boas mãos, com logística inteligente e rastreamento em tempo real.',
       index: 0,
@@ -44,7 +44,7 @@ export class HeroComponent implements AfterViewInit, OnDestroy {
       ]
     },
     {
-      image: 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=1920&q=80',
+      image: 'motorista-cabine.jpg',
       title: 'Tecnologia a Serviço da Sua Carga',
       subtitle: 'Rota Joanesburgo–Maputo e todo o corredor. Frota moderna, rotas otimizadas e segurança em cada quilômetro.',
       index: 1,
@@ -55,7 +55,7 @@ export class HeroComponent implements AfterViewInit, OnDestroy {
       ]
     },
     {
-      image: 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=1920&q=80',
+      image: 'camiao-carga-sacos.jpeg',
       title: 'Do Depósito até a Sua Porta',
       subtitle: 'Transporte e procurement África do Sul–Moçambique. Parceria que gera resultados.',
       index: 2,

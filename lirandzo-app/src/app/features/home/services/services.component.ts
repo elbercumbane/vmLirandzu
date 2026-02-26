@@ -23,22 +23,22 @@ export class ServicesComponent implements AfterViewInit {
   private el = inject(ElementRef);
   services: Service[] = [
     {
-      image: 'https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=600&q=80',
+      image: 'camiao-carga-sacos.jpeg',
       title: 'Transporte Rodoviário',
       description: 'Transporte de mercadorias no corredor Joanesburgo–Maputo e rotas regionais. Frota moderna e rastreamento 24h.'
     },
     {
-      image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80',
+      image: 'frota-camioes.jpg',
       title: 'Procurement',
       description: 'Compras e aquisição de mercadorias na África do Sul com entrega em Moçambique. Fonte única, logística integrada.'
     },
     {
-      image: 'https://images.unsplash.com/photo-1553413077-190dd305871c?w=600&q=80',
+      image: 'motorista-cabine.jpg',
       title: 'Rastreamento em Tempo Real',
       description: 'Acompanhe sua carga a qualquer momento por aplicativo ou painel web, do depósito ao destino.'
     },
     {
-      image: 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=600&q=80',
+      image: 'frota-lirandzo-armazem.jpeg',
       title: 'Logística Integrada',
       description: 'Armazenagem, picking, expedição e entrega porta a porta. África do Sul até Moçambique sob um único parceiro.'
     }

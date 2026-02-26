@@ -1,0 +1,40 @@
+<section class="coverage">
+  <div class="coverage-container">
+    <header class="coverage-header">
+      <p class="coverage-eyebrow">Onde operamos</p>
+      <h2 class="coverage-title">Áreas de Cobertura</h2>
+      <p class="coverage-desc">
+        A Lirandzo cobre as principais rotas nacionais e internacionais,
+        garantindo conectividade logística em toda a região.
+      </p>
+    </header>
+
+    <div class="coverage-grid">
+      @for (region of regions; track region.name) {
+        <div class="coverage-card" [attr.data-color]="region.color">
+          <div class="coverage-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <h3 class="coverage-card-name">{{ region.name }}</h3>
+          <ul class="coverage-cities">
+            @for (city of region.cities; track city) {
+              <li>{{ city }}</li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+
+    <div class="coverage-corridors">
+      <h3 class="corridors-title">Principais corredores logísticos</h3>
+      <div class="corridors-grid">
+        @for (corridor of corridors; track corridor.route) {
+          <div class="corridor-item">
+            <span class="corridor-badge" [attr.data-type]="corridor.type">{{ corridor.type }}</span>
+            <span class="corridor-route">{{ corridor.route }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>

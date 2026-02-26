@@ -10,8 +10,11 @@
   </button>
   <ul class="nav-links" [class.open]="menuOpen">
     <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">Início</a></li>
-    <li><a routerLink="/rastreio" (click)="closeMenu()">Rastrear Pedido</a></li>
+    <li><a routerLink="/sobre" routerLinkActive="active" (click)="closeMenu()">Sobre nós</a></li>
+    <li><a routerLink="/servicos" routerLinkActive="active" (click)="closeMenu()">Serviços</a></li>
+    <li><a routerLink="/rastreio" routerLinkActive="active" (click)="closeMenu()">Rastrear Pedido</a></li>
     <li><a routerLink="/orcamento" (click)="closeMenu()">Solicitar Cotação</a></li>
+    <li><a routerLink="/faq" routerLinkActive="active" (click)="closeMenu()">FAQ</a></li>
     <li><a routerLink="/" fragment="contato" (click)="closeMenu()">Contato</a></li>
     <li class="nav-lang-wrap">
       <button type="button" class="nav-lang-btn" (click)="toggleLangDropdown()" [attr.aria-expanded]="langOpen" aria-haspopup="true" aria-label="Idioma">
@@ -23,6 +26,6 @@
         <button type="button" (click)="setLang('en'); closeLangDropdown()">English</button>
       </div>
     </li>
-    <li><a routerLink="/login" (click)="closeMenu()" class="nav-login">Login</a></li>
+    <li><a routerLink="/area-cliente" routerLinkActive="active" (click)="closeMenu()" class="nav-login">Área do Cliente</a></li>
   </ul>
 </nav>
