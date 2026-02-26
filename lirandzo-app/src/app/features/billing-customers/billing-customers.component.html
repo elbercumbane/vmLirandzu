@@ -1,0 +1,376 @@
+<app-billing-sidebar [isOpen]="sidebarOpen" (toggleSidebar)="toggleSidebar()"></app-billing-sidebar>
+<button type="button" class="billing-sidebar-toggle" [class.sidebar-open]="sidebarOpen" (click)="toggleSidebar()" [attr.aria-label]="sidebarOpen ? 'Fechar menu' : 'Abrir menu'">
+  <span class="billing-sidebar-toggle-icon">{{ sidebarOpen ? '✕' : '☰' }}</span>
+</button>
+
+<section class="customers-page">
+  <div class="customers-page-inner">
+    <!-- Header -->
+    <header class="customers-header">
+      <div>
+        <h1 class="customers-title">GESTÃO DE CLIENTES</h1>
+        <p class="customers-subtitle">{{ totalCustomers }} clientes registados — Janeiro 2025</p>
+      </div>
+      <button type="button" class="customers-new-button">
+        <span class="customers-new-icon">＋</span>
+        <span>Novo Cliente</span>
+      </button>
+    </header>
+
+    <!-- KPI Cards -->
+    <section class="customers-kpi-grid">
+      <div class="customers-kpi-card customers-kpi-orange">
+        <div class="customers-kpi-icon">👥</div>
+        <div class="customers-kpi-content">
+          <div class="customers-kpi-value">{{ totalCustomers }}</div>
+          <div class="customers-kpi-label">Total de Clientes</div>
+          <div class="customers-kpi-subtext">clientes registados</div>
+        </div>
+      </div>
+
+      <div class="customers-kpi-card customers-kpi-red">
+        <div class="customers-kpi-icon">⚠</div>
+        <div class="customers-kpi-content">
+          <div class="customers-kpi-value">{{ customersWithDebt }}</div>
+          <div class="customers-kpi-label">Clientes com Dívida</div>
+          <div class="customers-kpi-subtext">pagamentos pendentes</div>
+        </div>
+      </div>
+
+      <div class="customers-kpi-card customers-kpi-yellow">
+        <div class="customers-kpi-icon">⭐</div>
+        <div class="customers-kpi-content">
+          <div class="customers-kpi-value customers-kpi-value-text">{{ customerOfMonth }}</div>
+          <div class="customers-kpi-label">Cliente do Mês</div>
+          <div class="customers-kpi-subtext">maior volume — 52.000 MZN</div>
+        </div>
+      </div>
+
+      <div class="customers-kpi-card customers-kpi-red">
+        <div class="customers-kpi-icon">📉</div>
+        <div class="customers-kpi-content">
+          <div class="customers-kpi-value">{{ totalDebt | number: '1.0-0' }} MZN</div>
+          <div class="customers-kpi-label">Total em Dívida</div>
+          <div class="customers-kpi-subtext">valor por receber</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filters -->
+    <section class="customers-filters-card">
+      <div class="customers-filters-row">
+        <div class="customers-filter-group customers-filter-search">
+          <div class="customers-input-wrapper">
+            <span class="customers-input-icon">🔍</span>
+            <input
+              type="text"
+              class="customers-input"
+              placeholder="Pesquisar por nome, telefone ou email..."
+              [(ngModel)]="searchTerm"
+            />
+          </div>
+        </div>
+        <div class="customers-filter-group">
+          <select class="customers-select" [(ngModel)]="filter">
+            <option value="ALL">Todos os Clientes</option>
+            <option value="WITH_DEBT">Com Dívida</option>
+            <option value="NO_DEBT">Sem Dívida</option>
+            <option value="FREQUENT">Cliente Frequente</option>
+          </select>
+        </div>
+        <div class="customers-filter-actions">
+          <button type="button" class="customers-clear-filters" (click)="clearFilters()" *ngIf="searchTerm || filter !== 'ALL' || sortOption !== 'RECENT'">
+            ✕ Limpar
+          </button>
+        </div>
+      </div>
+      <div class="customers-filters-quick-row">
+        <button
+          type="button"
+          class="customers-quick-sort"
+          [class.active]="sortOption === 'RECENT'"
+          (click)="sortOption = 'RECENT'"
+        >
+          Mais Recentes
+        </button>
+        <button
+          type="button"
+          class="customers-quick-sort"
+          [class.active]="sortOption === 'DEBT'"
+          (click)="sortOption = 'DEBT'"
+        >
+          Maior Dívida
+        </button>
+        <button
+          type="button"
+          class="customers-quick-sort"
+          [class.active]="sortOption === 'ORDERS'"
+          (click)="sortOption = 'ORDERS'"
+        >
+          Mais Encomendas
+        </button>
+        <button
+          type="button"
+          class="customers-quick-sort"
+          [class.active]="sortOption === 'ALPHABETICAL'"
+          (click)="sortOption = 'ALPHABETICAL'"
+        >
+          A-Z
+        </button>
+      </div>
+    </section>
+
+    <!-- Customers Grid -->
+    <section class="customers-grid">
+      <article
+        *ngFor="let customer of filteredCustomers"
+        class="customer-card"
+        [style.border-color]="getCustomerBorderColor(customer.name)"
+      >
+        <!-- Top: Avatar and Info -->
+        <div class="customer-top">
+          <div class="customer-avatar" [style.background]="getCustomerColor(customer.name)" [style.border-color]="getCustomerBorderColor(customer.name)">
+            {{ getCustomerInitials(customer.name) }}
+          </div>
+          <div class="customer-info">
+            <h3 class="customer-name">{{ customer.name }}</h3>
+            <div class="customer-contact">
+              <span class="customer-phone">📞 {{ customer.phone }}</span>
+              <span class="customer-email" *ngIf="customer.email">✉ {{ customer.email }}</span>
+            </div>
+            <div class="customer-badges">
+              <span class="customer-badge customer-badge-frequent" *ngIf="customer.isFrequent">Cliente Frequente</span>
+              <span class="customer-badge customer-badge-debt" *ngIf="customer.debt > 0">Com Dívida</span>
+              <span class="customer-badge customer-badge-new" *ngIf="customer.isNew && !customer.isFrequent">Novo Cliente</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Middle: Metrics -->
+        <div class="customer-metrics">
+          <div class="customer-metric">
+            <span class="customer-metric-label">Total encomendas</span>
+            <span class="customer-metric-value">{{ customer.totalOrders }}</span>
+          </div>
+          <div class="customer-metric">
+            <span class="customer-metric-label">Total gasto</span>
+            <span class="customer-metric-value">{{ customer.totalSpent | number: '1.0-0' }} MZN</span>
+          </div>
+          <div class="customer-metric">
+            <span class="customer-metric-label">Última encomenda</span>
+            <span class="customer-metric-value">{{ customer.lastOrderDate }}</span>
+          </div>
+          <div class="customer-metric">
+            <span class="customer-metric-label">Dívida actual</span>
+            <span class="customer-metric-value" [class.customer-debt]="customer.debt > 0" [class.customer-no-debt]="customer.debt === 0">
+              {{ customer.debt > 0 ? (customer.debt | number: '1.0-0') + ' MZN' : '—' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Payment Rate Bar -->
+        <div class="customer-payment-rate">
+          <div class="customer-payment-rate-header">
+            <span class="customer-payment-rate-label">Taxa de pagamento</span>
+            <span class="customer-payment-rate-value" [style.color]="getPaymentRateColor(customer.paymentRate)">
+              {{ customer.paymentRate }}%
+            </span>
+          </div>
+          <div class="customer-payment-rate-bar">
+            <div
+              class="customer-payment-rate-fill"
+              [style.width.%]="customer.paymentRate"
+              [style.background]="getPaymentRateColor(customer.paymentRate)"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Bottom: Actions -->
+        <div class="customer-actions">
+          <button type="button" class="customer-action-button customer-action-history" (click)="openHistoryModal(customer)">
+            🕐 Ver Histórico
+          </button>
+          <button type="button" class="customer-action-button customer-action-order">
+            ➕ Registar Encomenda
+          </button>
+          <button
+            type="button"
+            class="customer-action-button customer-action-charge"
+            *ngIf="customer.debt > 0"
+            (click)="openChargeModal(customer)"
+          >
+            💰 Cobrar
+          </button>
+        </div>
+      </article>
+    </section>
+  </div>
+</section>
+
+<!-- History Modal -->
+<div class="customers-modal-backdrop" *ngIf="historyModalOpen" (click)="closeHistoryModal()">
+  <div class="customers-modal customers-modal-large" (click)="$event.stopPropagation()">
+    <header class="customers-modal-header">
+      <div class="customers-modal-header-content">
+        <div class="customers-modal-avatar" [style.background]="selectedCustomer ? getCustomerColor(selectedCustomer.name) : ''" [style.border-color]="selectedCustomer ? getCustomerBorderColor(selectedCustomer.name) : ''">
+          {{ selectedCustomer ? getCustomerInitials(selectedCustomer.name) : '' }}
+        </div>
+        <div>
+          <h3 class="customers-modal-title">{{ selectedCustomer?.name }}</h3>
+          <p class="customers-modal-subtitle">
+            📞 {{ selectedCustomer?.phone }}
+            <span *ngIf="selectedCustomer?.email"> | ✉ {{ selectedCustomer?.email }}</span>
+          </p>
+        </div>
+      </div>
+      <button type="button" class="customers-modal-close" (click)="closeHistoryModal()">✕</button>
+    </header>
+    <div class="customers-modal-kpis">
+      <div class="customers-modal-kpi">
+        <span class="customers-modal-kpi-label">Total Encomendas</span>
+        <span class="customers-modal-kpi-value">{{ selectedCustomer?.totalOrders }}</span>
+      </div>
+      <div class="customers-modal-kpi">
+        <span class="customers-modal-kpi-label">Total Gasto</span>
+        <span class="customers-modal-kpi-value">{{ selectedCustomer?.totalSpent | number: '1.0-0' }} MZN</span>
+      </div>
+      <div class="customers-modal-kpi">
+        <span class="customers-modal-kpi-label">Dívida Actual</span>
+        <span class="customers-modal-kpi-value">{{ selectedCustomer?.debt | number: '1.0-0' }} MZN</span>
+      </div>
+      <div class="customers-modal-kpi">
+        <span class="customers-modal-kpi-label">Taxa Pagamento</span>
+        <span class="customers-modal-kpi-value">{{ selectedCustomer?.paymentRate }}%</span>
+      </div>
+    </div>
+    <div class="customers-modal-tabs">
+      <button
+        type="button"
+        class="customers-modal-tab"
+        [class.active]="activeTab === 'ORDERS'"
+        (click)="activeTab = 'ORDERS'"
+      >
+        Encomendas
+      </button>
+      <button
+        type="button"
+        class="customers-modal-tab"
+        [class.active]="activeTab === 'PAYMENTS'"
+        (click)="activeTab = 'PAYMENTS'"
+      >
+        Pagamentos
+      </button>
+      <button
+        type="button"
+        class="customers-modal-tab"
+        [class.active]="activeTab === 'NOTES'"
+        (click)="activeTab = 'NOTES'"
+      >
+        Notas
+      </button>
+    </div>
+    <div class="customers-modal-body">
+      <div *ngIf="activeTab === 'ORDERS'" class="customers-modal-tab-content">
+        <table class="customers-modal-table">
+          <thead>
+            <tr>
+              <th>Nº</th>
+              <th>Produto</th>
+              <th>Data</th>
+              <th>Valor</th>
+              <th>Pago</th>
+              <th>Dívida</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>VML-2025-0001</td>
+              <td>iPhone 15 Pro 256GB</td>
+              <td>02/01</td>
+              <td>45.200 MZN</td>
+              <td>45.200 MZN</td>
+              <td>0</td>
+              <td><span class="status-paid">PAGO</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="activeTab === 'PAYMENTS'" class="customers-modal-tab-content">
+        <div class="customers-payments-list">
+          <div class="customers-payment-item">
+            <div class="customers-payment-date">02/01/2025</div>
+            <div class="customers-payment-amount">45.200 MZN</div>
+            <div class="customers-payment-method">M-Pesa</div>
+            <div class="customers-payment-order">VML-2025-0001</div>
+            <div class="customers-payment-registrar">Ana Silva</div>
+          </div>
+        </div>
+        <div class="customers-payments-total">
+          <strong>Total pago: {{ selectedCustomer?.totalSpent | number: '1.0-0' }} MZN</strong>
+        </div>
+      </div>
+      <div *ngIf="activeTab === 'NOTES'" class="customers-modal-tab-content">
+        <textarea class="customers-notes-input" placeholder="Adicionar nota sobre este cliente..."></textarea>
+        <button type="button" class="customers-notes-save">Guardar Nota</button>
+        <div class="customers-notes-list">
+          <div class="customers-note-item">
+            <div class="customers-note-date">25/01/2025 — Ana Silva</div>
+            <div class="customers-note-text">Cliente muito satisfeito com o serviço.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer class="customers-modal-footer">
+      <button type="button" class="customers-modal-button customers-modal-button-primary">
+        Nova Encomenda para este Cliente
+      </button>
+      <button type="button" class="customers-modal-button" (click)="closeHistoryModal()">Fechar</button>
+    </footer>
+  </div>
+</div>
+
+<!-- Charge Modal -->
+<div class="customers-modal-backdrop" *ngIf="chargeModalOpen" (click)="closeChargeModal()">
+  <div class="customers-modal" (click)="$event.stopPropagation()">
+    <header class="customers-modal-header">
+      <div>
+        <h3 class="customers-modal-title">Registar Cobrança — {{ selectedCustomer?.name }}</h3>
+        <p class="customers-modal-subtitle">Dívida total: {{ selectedCustomer?.debt | number: '1.0-0' }} MZN</p>
+      </div>
+      <button type="button" class="customers-modal-close" (click)="closeChargeModal()">✕</button>
+    </header>
+    <div class="customers-modal-body">
+      <div class="customers-charge-orders">
+        <div class="customers-charge-order-item">
+          <input type="checkbox" checked />
+          <div class="customers-charge-order-info">
+            <span class="customers-charge-order-number">VML-2025-0003</span>
+            <span class="customers-charge-order-debt">{{ selectedCustomer?.debt | number: '1.0-0' }} MZN</span>
+          </div>
+        </div>
+      </div>
+      <div class="customers-modal-field">
+        <label>Valor a cobrar agora</label>
+        <input type="number" class="customers-modal-input" [value]="selectedCustomer?.debt" />
+      </div>
+      <div class="customers-modal-field">
+        <label>Forma de pagamento</label>
+        <select class="customers-modal-select">
+          <option>Dinheiro</option>
+          <option>M-Pesa</option>
+          <option>e-Mola</option>
+          <option>Transferência Bancária</option>
+        </select>
+      </div>
+      <div class="customers-modal-field">
+        <label>Observações</label>
+        <textarea class="customers-modal-textarea" placeholder="Notas sobre esta cobrança..."></textarea>
+      </div>
+    </div>
+    <footer class="customers-modal-footer">
+      <button type="button" class="customers-modal-button" (click)="closeChargeModal()">Cancelar</button>
+      <button type="button" class="customers-modal-button customers-modal-button-primary">Confirmar Cobrança</button>
+    </footer>
+  </div>
+</div>

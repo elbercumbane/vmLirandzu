@@ -21,7 +21,8 @@ export class AppComponent {
     this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe(e => {
-        this.showChrome = !e.urlAfterRedirects.startsWith('/area-cliente');
+        const url = e.urlAfterRedirects;
+        this.showChrome = !url.startsWith('/area-cliente') && !url.startsWith('/billing');
       });
   }
 }

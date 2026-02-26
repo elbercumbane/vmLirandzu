@@ -1,0 +1,34 @@
+<div class="billing-sidebar-overlay" [class.open]="isOpen" (click)="onToggle()"></div>
+<aside class="billing-sidebar" [class.open]="isOpen">
+  <div class="billing-sidebar-header">
+    <div class="billing-sidebar-logo">
+      <span class="billing-sidebar-logo-mark">VM</span>
+      <span class="billing-sidebar-logo-name">Lirandzo<br><em>Facturação</em></span>
+    </div>
+    <button type="button" class="billing-sidebar-close" (click)="onToggle()" aria-label="Fechar menu">
+      ✕
+    </button>
+  </div>
+  <nav class="billing-sidebar-nav">
+    <ul class="billing-sidebar-menu">
+      <li *ngFor="let item of menuItems">
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.route === '/billing' }"
+          class="billing-sidebar-menu-item"
+          (click)="onToggle()"
+        >
+          <span class="billing-sidebar-menu-icon">{{ item.icon }}</span>
+          <span class="billing-sidebar-menu-label">{{ item.label }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <div class="billing-sidebar-footer">
+    <a routerLink="/" class="billing-sidebar-back-link">
+      <span class="billing-sidebar-back-icon">←</span>
+      <span>Voltar ao Portal</span>
+    </a>
+  </div>
+</aside>

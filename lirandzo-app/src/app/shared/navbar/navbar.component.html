@@ -16,6 +16,8 @@
     <li><a routerLink="/orcamento" (click)="closeMenu()">Solicitar Cotação</a></li>
     <li><a routerLink="/faq" routerLinkActive="active" (click)="closeMenu()">FAQ</a></li>
     <li><a routerLink="/" fragment="contato" (click)="closeMenu()">Contato</a></li>
+    <li><a routerLink="/billing" (click)="closeMenu()">Sistema de Gestão de Facturas</a></li>
+    <li><a routerLink="/billing/encomendas" (click)="closeMenu()">Encomendas</a></li>
     <li class="nav-lang-wrap">
       <button type="button" class="nav-lang-btn" (click)="toggleLangDropdown()" [attr.aria-expanded]="langOpen" aria-haspopup="true" aria-label="Idioma">
         <span class="nav-lang-current">{{ currentLang }}</span>

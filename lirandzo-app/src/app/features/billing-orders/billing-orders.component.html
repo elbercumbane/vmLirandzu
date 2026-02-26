@@ -1,0 +1,443 @@
+<app-billing-sidebar [isOpen]="sidebarOpen" (toggleSidebar)="toggleSidebar()"></app-billing-sidebar>
+<button type="button" class="billing-sidebar-toggle" [class.sidebar-open]="sidebarOpen" (click)="toggleSidebar()" [attr.aria-label]="sidebarOpen ? 'Fechar menu' : 'Abrir menu'">
+  <span class="billing-sidebar-toggle-icon">{{ sidebarOpen ? '✕' : '☰' }}</span>
+</button>
+<section class="orders-page">
+  <div class="orders-page-inner" [class.sidebar-open]="sidebarOpen">
+    <!-- Header -->
+    <header class="orders-header">
+      <div>
+        <h1 class="orders-title">Gestão de Encomendas</h1>
+        <p class="orders-subtitle">{{ totalCount }} encomendas registadas — Janeiro 2025</p>
+      </div>
+      <button type="button" class="orders-new-button">
+        <span class="orders-new-icon">＋</span>
+        <span>Nova Encomenda</span>
+      </button>
+    </header>
+
+    <!-- Filters -->
+    <section class="orders-filters-card">
+      <div class="orders-filters-row">
+        <div class="orders-filter-group orders-filter-search">
+          <label class="orders-filter-label">Pesquisa</label>
+          <div class="orders-input-wrapper">
+            <span class="orders-input-icon">🔍</span>
+            <input
+              type="text"
+              [(ngModel)]="searchTerm"
+              class="orders-input"
+              placeholder="Pesquisar por cliente, nº encomenda ou produto..."
+            />
+          </div>
+        </div>
+
+        <div class="orders-filter-group">
+          <label class="orders-filter-label">Status</label>
+          <select [(ngModel)]="statusFilter" class="orders-select">
+            <option value="ALL">Todos os Status</option>
+            <option value="PAID">Pago</option>
+            <option value="PARTIAL">Parcial</option>
+            <option value="UNPAID">Não Pago</option>
+            <option value="CANCELLED">Cancelado</option>
+          </select>
+        </div>
+
+        <div class="orders-filter-group orders-filter-period">
+          <label class="orders-filter-label">Período</label>
+          <div class="orders-period-inputs">
+            <input type="date" [(ngModel)]="dateFrom" class="orders-input" />
+            <span class="orders-period-separator">até</span>
+            <input type="date" [(ngModel)]="dateTo" class="orders-input" />
+          </div>
+        </div>
+
+        <div class="orders-filter-group">
+          <label class="orders-filter-label">Gestor</label>
+          <select [(ngModel)]="managerFilter" class="orders-select">
+            <option value="ALL">Todos</option>
+            <option value="Ana Silva">Ana Silva</option>
+            <option value="Carlos Matos">Carlos Matos</option>
+            <option value="Maria João">Maria João</option>
+          </select>
+        </div>
+
+        <div class="orders-filter-actions" *ngIf="hasActiveFilters">
+          <button type="button" class="orders-clear-filters" (click)="clearFilters()">
+            ✕ Limpar Filtros
+          </button>
+        </div>
+      </div>
+
+      <div class="orders-filters-quick-row">
+        <button
+          type="button"
+          class="orders-quick-filter"
+          [class.active]="statusFilter === 'ALL'"
+          (click)="setQuickStatus('ALL')"
+        >
+          Todas ({{ totalCount }})
+        </button>
+        <button
+          type="button"
+          class="orders-quick-filter orders-quick-filter-paid"
+          [class.active]="statusFilter === 'PAID'"
+          (click)="setQuickStatus('PAID')"
+        >
+          ✓ Pagas ({{ paidCount }})
+        </button>
+        <button
+          type="button"
+          class="orders-quick-filter orders-quick-filter-partial"
+          [class.active]="statusFilter === 'PARTIAL'"
+          (click)="setQuickStatus('PARTIAL')"
+        >
+          ◑ Parciais ({{ partialCount }})
+        </button>
+        <button
+          type="button"
+          class="orders-quick-filter orders-quick-filter-unpaid"
+          [class.active]="statusFilter === 'UNPAID'"
+          (click)="setQuickStatus('UNPAID')"
+        >
+          ✗ Não Pagas ({{ unpaidCount }})
+        </button>
+      </div>
+    </section>
+
+    <!-- Bulk actions bar -->
+    <div class="orders-bulk-bar" *ngIf="hasSelection">
+      <div class="orders-bulk-left">
+        {{ selectedOrderNumbers.length }} encomendas seleccionadas
+      </div>
+      <div class="orders-bulk-actions">
+        <button type="button" class="orders-bulk-button">Exportar PDF</button>
+        <button type="button" class="orders-bulk-button orders-bulk-button-success">
+          Marcar como Pago
+        </button>
+        <button type="button" class="orders-bulk-button orders-bulk-button-cancel">
+          Cancelar Selecção
+        </button>
+      </div>
+    </div>
+
+    <!-- Orders table -->
+    <section class="orders-table-card">
+      <div class="orders-table-wrapper">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>
+                <input
+                  type="checkbox"
+                  [checked]="filteredOrders.length > 0 && selectedOrderNumbers.length === filteredOrders.length"
+                  (change)="toggleSelectAll($any($event.target).checked)"
+                />
+              </th>
+              <th>Nº Encomenda</th>
+              <th>Cliente</th>
+              <th>Produto(s)</th>
+              <th>ZAR</th>
+              <th>Câmbio</th>
+              <th>MZN Total</th>
+              <th>Pago</th>
+              <th>Dívida</th>
+              <th>Viagem</th>
+              <th>Status</th>
+              <th>Data</th>
+              <th>Gestor</th>
+              <th>Acções</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of filteredOrders">
+              <td>
+                <input
+                  type="checkbox"
+                  [checked]="isSelected(order)"
+                  (change)="toggleSelection(order, $any($event.target).checked)"
+                />
+              </td>
+              <td>
+                <span class="orders-code-tag">{{ order.number }}</span>
+              </td>
+              <td>
+                <div class="orders-customer-name">{{ order.customerName }}</div>
+                <div class="orders-customer-phone">{{ order.customerPhone }}</div>
+              </td>
+              <td>
+                <span class="orders-product">{{ order.product }}</span>
+              </td>
+              <td class="orders-amount">R {{ order.zarAmount | number: '1.0-0' }}</td>
+              <td class="orders-amount">{{ order.exchangeRate | number: '1.1-1' }}</td>
+              <td class="orders-amount">
+                <span class="orders-amount-strong">{{ order.totalMzn | number: '1.0-0' }} MZN</span>
+              </td>
+              <td class="orders-amount">
+                <span [class.orders-paid-full]="order.paidMzn === order.totalMzn">
+                  {{ order.paidMzn | number: '1.0-0' }} MZN
+                </span>
+              </td>
+              <td class="orders-amount">
+                <span *ngIf="order.debtMzn > 0; else noDebt" class="orders-debt">
+                  {{ order.debtMzn | number: '1.0-0' }} MZN
+                </span>
+                <ng-template #noDebt>—</ng-template>
+              </td>
+              <td>
+                <span *ngIf="order.tripId; else noTrip" class="orders-trip-badge">
+                  {{ order.tripId }}
+                </span>
+                <ng-template #noTrip>—</ng-template>
+              </td>
+              <td>
+                <span
+                  class="orders-status-badge"
+                  [ngClass]="{
+                    'status-paid': order.status === 'PAID',
+                    'status-partial': order.status === 'PARTIAL',
+                    'status-unpaid': order.status === 'UNPAID',
+                    'status-cancelled': order.status === 'CANCELLED'
+                  }"
+                >
+                  {{
+                    order.status === 'PAID'
+                      ? 'PAGO'
+                      : order.status === 'PARTIAL'
+                      ? 'PARCIAL'
+                      : order.status === 'UNPAID'
+                      ? 'NÃO PAGO'
+                      : 'CANCELADO'
+                  }}
+                </span>
+              </td>
+              <td>{{ order.date }}</td>
+              <td>
+                <div class="orders-manager">
+                  <span class="orders-manager-avatar">
+                    {{ order.manager.split(' ')[0][0] }}{{ order.manager.split(' ')[1][0] }}
+                  </span>
+                  <span class="orders-manager-name">{{ order.manager }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="orders-actions">
+                  <button
+                    type="button"
+                    class="orders-action-button"
+                    title="Ver detalhe"
+                    (click)="openDetailModal(order)"
+                  >
+                    👁
+                  </button>
+                  <button
+                    type="button"
+                    class="orders-action-button"
+                    title="Editar encomenda"
+                  >
+                    ✏
+                  </button>
+                  <button
+                    type="button"
+                    class="orders-action-button"
+                    title="Registar pagamento"
+                    (click)="openPaymentModal(order)"
+                  >
+                    💳
+                  </button>
+                  <button
+                    type="button"
+                    class="orders-action-button"
+                    title="Emitir PDF"
+                  >
+                    📄
+                  </button>
+                  <button
+                    type="button"
+                    class="orders-action-button"
+                    title="Cancelar encomenda"
+                    *ngIf="order.status !== 'PAID'"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <footer class="orders-table-footer">
+        <div class="orders-footer-left">
+          Mostrando {{ filteredOrders.length }} de {{ totalCount }} encomendas
+        </div>
+        <div class="orders-footer-middle">
+          <button type="button" class="orders-page-button disabled">&lt;</button>
+          <button type="button" class="orders-page-button active">1</button>
+          <button type="button" class="orders-page-button">2</button>
+          <button type="button" class="orders-page-button">3</button>
+          <button type="button" class="orders-page-button">4</button>
+          <button type="button" class="orders-page-button">&gt;</button>
+        </div>
+        <div class="orders-footer-right">
+          <div class="orders-page-size">
+            Por página:
+            <span class="orders-page-size-select">15 ▼</span>
+          </div>
+          <div class="orders-export">
+            Exportar página →
+            <button type="button" class="orders-export-button">CSV</button>
+            <button type="button" class="orders-export-button">PDF</button>
+          </div>
+        </div>
+      </footer>
+    </section>
+
+    <!-- Payment Modal -->
+    <div class="orders-modal-backdrop" *ngIf="isPaymentModalOpen">
+      <div class="orders-modal">
+        <header class="orders-modal-header">
+          <div>
+            <h3 class="orders-modal-title">Registar Pagamento</h3>
+            <p class="orders-modal-subtitle">
+              Encomenda {{ selectedOrder?.number }} — {{ selectedOrder?.customerName }}
+            </p>
+          </div>
+          <button type="button" class="orders-modal-close" (click)="closePaymentModal()">✕</button>
+        </header>
+        <div class="orders-modal-body" *ngIf="selectedOrder">
+          <div class="orders-modal-summary">
+            <div><strong>Produto:</strong> {{ selectedOrder.product }}</div>
+            <div><strong>Valor Total:</strong> {{ selectedOrder.totalMzn | number: '1.0-0' }} MZN</div>
+            <div><strong>Já Pago:</strong> {{ selectedOrder.paidMzn | number: '1.0-0' }} MZN</div>
+            <div class="orders-modal-debt">
+              <strong>Saldo em Dívida:</strong> {{ selectedOrder.debtMzn | number: '1.0-0' }} MZN
+            </div>
+          </div>
+
+          <div class="orders-modal-field">
+            <label>Valor a pagar agora</label>
+            <input
+              type="number"
+              [(ngModel)]="paymentAmount"
+              (ngModelChange)="updateMarkAsPaid()"
+              class="orders-input"
+              min="0"
+            />
+          </div>
+
+          <div class="orders-modal-field">
+            <label>Forma de pagamento</label>
+            <select [(ngModel)]="paymentMethod" class="orders-select">
+              <option>Dinheiro</option>
+              <option>M-Pesa</option>
+              <option>e-Mola</option>
+              <option>Transferência Bancária</option>
+            </select>
+          </div>
+
+          <div class="orders-modal-field">
+            <label>Referência / Observação</label>
+            <input type="text" [(ngModel)]="paymentReference" class="orders-input" />
+          </div>
+
+          <div class="orders-modal-field">
+            <label>Data do pagamento</label>
+            <input type="date" [(ngModel)]="paymentDate" class="orders-input" />
+          </div>
+
+          <div class="orders-modal-field orders-modal-checkbox">
+            <label>
+              <input type="checkbox" [(ngModel)]="markAsPaid" />
+              Pagamento total — marcar encomenda como PAGO
+            </label>
+          </div>
+        </div>
+
+        <footer class="orders-modal-footer">
+          <button type="button" class="orders-modal-button" (click)="closePaymentModal()">
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="orders-modal-button orders-modal-button-confirm"
+            (click)="confirmPayment()"
+          >
+            ✔ Confirmar Pagamento
+          </button>
+        </footer>
+      </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="orders-modal-backdrop" *ngIf="isDetailModalOpen">
+      <div class="orders-modal orders-modal-detail">
+        <header class="orders-modal-header">
+          <div>
+            <h3 class="orders-modal-title">Detalhe da Encomenda</h3>
+            <p class="orders-modal-subtitle">
+              {{ selectedOrder?.number }} — {{ selectedOrder?.customerName }}
+            </p>
+          </div>
+          <button type="button" class="orders-modal-close" (click)="closeDetailModal()">✕</button>
+        </header>
+        <div class="orders-modal-body" *ngIf="selectedOrder">
+          <div class="orders-detail-grid">
+            <div><strong>Cliente:</strong> {{ selectedOrder.customerName }}</div>
+            <div><strong>Telefone:</strong> {{ selectedOrder.customerPhone }}</div>
+            <div><strong>Produto(s):</strong> {{ selectedOrder.product }}</div>
+            <div><strong>Nº Encomenda:</strong> {{ selectedOrder.number }}</div>
+            <div><strong>Data:</strong> {{ selectedOrder.date }}/2025</div>
+            <div><strong>Gestor:</strong> {{ selectedOrder.manager }}</div>
+            <div><strong>Viagem:</strong> {{ selectedOrder.tripId || '—' }}</div>
+            <div>
+              <strong>Status:</strong>
+              <span
+                class="orders-status-badge"
+                [ngClass]="{
+                  'status-paid': selectedOrder.status === 'PAID',
+                  'status-partial': selectedOrder.status === 'PARTIAL',
+                  'status-unpaid': selectedOrder.status === 'UNPAID',
+                  'status-cancelled': selectedOrder.status === 'CANCELLED'
+                }"
+              >
+                {{
+                  selectedOrder.status === 'PAID'
+                    ? 'PAGO'
+                    : selectedOrder.status === 'PARTIAL'
+                    ? 'PARCIAL'
+                    : selectedOrder.status === 'UNPAID'
+                    ? 'NÃO PAGO'
+                    : 'CANCELADO'
+                }}
+              </span>
+            </div>
+          </div>
+
+          <div class="orders-detail-summary">
+            <div><strong>Valor Total:</strong> {{ selectedOrder.totalMzn | number: '1.0-0' }} MZN</div>
+            <div><strong>Já Pago:</strong> {{ selectedOrder.paidMzn | number: '1.0-0' }} MZN</div>
+            <div><strong>Dívida:</strong> {{ selectedOrder.debtMzn | number: '1.0-0' }} MZN</div>
+          </div>
+
+          <div class="orders-payments-history">
+            <h4>Histórico de Pagamentos</h4>
+            <ul>
+              <li>02/01/2025 — 20.000 MZN — M-Pesa — registado por Ana Silva</li>
+              <li>10/01/2025 — 25.200 MZN — Transferência — registado por Carlos Matos</li>
+            </ul>
+          </div>
+        </div>
+
+        <footer class="orders-modal-footer">
+          <button type="button" class="orders-modal-button">Editar</button>
+          <button type="button" class="orders-modal-button">Emitir PDF</button>
+          <button type="button" class="orders-modal-button" (click)="closeDetailModal()">
+            Fechar
+          </button>
+        </footer>
+      </div>
+    </div>
+  </div>
+</section>
+

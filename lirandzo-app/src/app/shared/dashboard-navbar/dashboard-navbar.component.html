@@ -1,0 +1,153 @@
+<nav class="dashboard-navbar">
+  <!-- Left Side: Logo + Company Name -->
+  <div class="navbar-left">
+    <div class="navbar-logo-mark">VM</div>
+    <div class="navbar-company-text">
+      <div class="navbar-company-name">VM LIRANDZU</div>
+      <div class="navbar-company-subtitle">Transportes & Logística</div>
+    </div>
+    <div class="navbar-separator"></div>
+    <div class="navbar-system-badge">
+      <span class="navbar-badge-dot"></span>
+      SISTEMA DE GESTÃO
+    </div>
+  </div>
+
+  <!-- Center: Date & Time -->
+  <div class="navbar-center">
+    <div class="navbar-time-container">
+      <div class="navbar-time">{{ currentTime }}</div>
+      <div class="navbar-date">{{ currentDate }}</div>
+    </div>
+  </div>
+
+  <!-- Right Side: Actions & Profile -->
+  <div class="navbar-right">
+    <!-- Calendar Button -->
+    <button
+      type="button"
+      class="navbar-action-button navbar-calendar-button"
+      (click)="toggleDropdown('calendario')"
+      title="Abrir Calendário"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+    </button>
+
+    <!-- Calendar Dropdown -->
+    <div
+      *ngIf="openDropdown === 'calendario'"
+      #calendarDropdown
+      class="navbar-dropdown navbar-calendar-dropdown"
+    >
+      <div class="calendar-header">
+        <button type="button" class="calendar-nav-button" (click)="navigateMonth('prev')">‹</button>
+        <div class="calendar-month-title">{{ getMonthName() }} {{ currentYear }}</div>
+        <button type="button" class="calendar-nav-button" (click)="navigateMonth('next')">›</button>
+      </div>
+      <div class="calendar-weekdays">
+        <div class="calendar-weekday">Dom</div>
+        <div class="calendar-weekday">Seg</div>
+        <div class="calendar-weekday">Ter</div>
+        <div class="calendar-weekday">Qua</div>
+        <div class="calendar-weekday">Qui</div>
+        <div class="calendar-weekday">Sex</div>
+        <div class="calendar-weekday">Sáb</div>
+      </div>
+      <div class="calendar-days-grid">
+        <button
+          *ngFor="let day of calendarDays"
+          type="button"
+          class="calendar-day"
+          [class.calendar-day-today]="isToday(day)"
+          [class.calendar-day-other-month]="day === null"
+          [class.calendar-day-has-orders]="hasOrders(day)"
+        >
+          <span *ngIf="day !== null">{{ day }}</span>
+          <span *ngIf="hasOrders(day)" class="calendar-day-dot"></span>
+        </button>
+      </div>
+      <div class="calendar-footer">
+        <div class="calendar-footer-separator"></div>
+        <div class="calendar-footer-text">{{ getMonthName() }} {{ currentYear }} — 47 encomendas</div>
+      </div>
+    </div>
+
+    <!-- Notifications Button -->
+    <button
+      type="button"
+      class="navbar-action-button navbar-notifications-button"
+      (click)="toggleDropdown('notificacoes')"
+      title="Notificações"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      </svg>
+      <span class="navbar-notification-badge">3</span>
+    </button>
+
+    <!-- Notifications Dropdown -->
+    <div
+      *ngIf="openDropdown === 'notificacoes'"
+      #notificationsDropdown
+      class="navbar-dropdown navbar-notifications-dropdown"
+    >
+      <div class="notifications-list">
+        <div *ngFor="let notification of notifications" class="notification-item">
+          <div class="notification-icon">{{ notification.type === 'debt' ? '⚠' : '🚛' }}</div>
+          <div class="notification-content">
+            <div class="notification-message">{{ notification.message }}</div>
+            <div *ngIf="notification.amount" class="notification-amount">{{ notification.amount | number: '1.0-0' }} MZN</div>
+          </div>
+        </div>
+      </div>
+      <div class="notifications-footer">
+        <a href="#" class="notifications-footer-link">Ver todos os alertas →</a>
+      </div>
+    </div>
+
+    <div class="navbar-separator"></div>
+
+    <!-- Profile Button -->
+    <button
+      type="button"
+      class="navbar-profile-button"
+      (click)="toggleDropdown('perfil')"
+    >
+      <div class="navbar-profile-avatar">{{ managerInitials }}</div>
+      <div class="navbar-profile-info">
+        <div class="navbar-profile-name">{{ managerName }}</div>
+        <div class="navbar-profile-role">{{ managerRole }}</div>
+      </div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="navbar-profile-chevron">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </button>
+
+    <!-- Profile Dropdown -->
+    <div
+      *ngIf="openDropdown === 'perfil'"
+      #profileDropdown
+      class="navbar-dropdown navbar-profile-dropdown"
+    >
+      <a href="#" class="dropdown-item">
+        <span class="dropdown-icon">👤</span>
+        <span>Meu Perfil</span>
+      </a>
+      <a href="#" class="dropdown-item" (click)="goToSettings(); $event.preventDefault()">
+        <span class="dropdown-icon">⚙️</span>
+        <span>Configurações</span>
+      </a>
+      <div class="dropdown-separator"></div>
+      <a href="#" class="dropdown-item dropdown-item-danger" (click)="logout(); $event.preventDefault()">
+        <span class="dropdown-icon">🚪</span>
+        <span>Sair</span>
+      </a>
+    </div>
+  </div>
+</nav>
