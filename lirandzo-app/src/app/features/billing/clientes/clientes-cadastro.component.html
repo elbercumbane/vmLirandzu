@@ -1,0 +1,67 @@
+<a routerLink="/billing/clientes" class="btn-back">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+    <path d="M19 12H5M12 19l-7-7 7-7"/>
+  </svg>
+  Voltar
+</a>
+
+<div class="page-header">
+  <div class="page-header-left">
+    <h1>Novo Cliente</h1>
+    <p>Preencha os dados do cliente</p>
+  </div>
+</div>
+
+<div class="card">
+  <form (ngSubmit)="salvar()">
+    <div class="form-section-title">Dados Pessoais</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" for="nome">Nome</label>
+        <input type="text" id="nome" class="form-control" placeholder="Nome completo" [(ngModel)]="cliente.nome" name="nome" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="telefone">Telefone</label>
+        <input type="text" id="telefone" class="form-control" placeholder="Ex: 84 123 4567" [(ngModel)]="cliente.telefone" name="telefone" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input type="email" id="email" class="form-control" placeholder="email@exemplo.com" [(ngModel)]="cliente.email" name="email" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="nuit">NUIT</label>
+        <input type="text" id="nuit" class="form-control" placeholder="Número de Identificação Fiscal" [(ngModel)]="cliente.nuit" name="nuit" />
+      </div>
+    </div>
+
+    <div class="form-section-title">Endereço</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" for="cidade">Cidade</label>
+        <select id="cidade" class="form-control" [(ngModel)]="cliente.cidade" name="cidade">
+          <option value="">Selecione a província</option>
+          @for (p of provincias; track p) {
+            <option [value]="p">{{ p }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group full-width">
+        <label class="form-label" for="endereco">Endereço</label>
+        <textarea id="endereco" class="form-control" placeholder="Endereço completo" [(ngModel)]="cliente.endereco" name="endereco" rows="3"></textarea>
+      </div>
+    </div>
+
+    <div class="form-section-title">Observações</div>
+    <div class="form-grid">
+      <div class="form-group full-width">
+        <label class="form-label" for="observacoes">Observações</label>
+        <textarea id="observacoes" class="form-control" placeholder="Notas ou observações sobre o cliente" [(ngModel)]="cliente.observacoes" name="observacoes" rows="4"></textarea>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a routerLink="/billing/clientes" class="btn-secondary">Cancelar</a>
+      <button type="submit" class="btn-primary">Salvar Cliente</button>
+    </div>
+  </form>
+</div>

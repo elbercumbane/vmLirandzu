@@ -1,0 +1,85 @@
+.ceo-section {
+  width: 100%;
+  padding: 4rem 2rem;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.ceo-layout {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.ceo-image-wrap {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.12);
+}
+
+.ceo-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+.ceo-content {
+  padding: 0.5rem 0;
+}
+
+.ceo-eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6366f1;
+  margin-bottom: 0.75rem;
+}
+
+.ceo-title {
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.3;
+  margin: 0 0 1.25rem;
+}
+
+.ceo-message {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: #475569;
+  margin: 0 0 1.5rem;
+}
+
+.ceo-author {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin: 0;
+}
+
+.author-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.author-role {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+@media (max-width: 768px) {
+  .ceo-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .ceo-image {
+    aspect-ratio: 4 / 3;
+    max-height: 280px;
+  }
+}

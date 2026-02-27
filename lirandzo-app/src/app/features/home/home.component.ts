@@ -6,6 +6,9 @@ import { ServicesComponent } from './services/services.component';
 import { GalleryComponent } from './gallery/gallery.component';
 import { PartnersComponent } from './partners/partners.component';
 import { TestimonialsComponent } from './testimonials/testimonials.component';
+import { CoverageComponent } from './coverage/coverage.component';
+import { FaqPreviewComponent } from './faq-preview/faq-preview.component';
+import { CeoMessageComponent } from '../../shared/ceo-message/ceo-message.component';
 
 @Component({
   selector: 'app-home',
@@ -16,8 +19,11 @@ import { TestimonialsComponent } from './testimonials/testimonials.component';
     VisionMissionValuesComponent,
     ServicesComponent,
     GalleryComponent,
+    CeoMessageComponent,
     PartnersComponent,
-    TestimonialsComponent
+    TestimonialsComponent,
+    CoverageComponent,
+    FaqPreviewComponent
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'

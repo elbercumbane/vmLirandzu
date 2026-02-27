@@ -2,3 +2,8 @@
   display: block;
   min-height: 100vh;
 }
+
+.navbar-spacer {
+  height: 5rem;
+  flex-shrink: 0;
+}

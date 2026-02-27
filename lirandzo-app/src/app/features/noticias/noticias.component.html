@@ -1,0 +1,35 @@
+<main class="noticias-page">
+  <section class="noticias-banner">
+    <div class="noticias-banner-overlay"></div>
+    <div class="noticias-banner-content">
+      <p class="noticias-banner-eyebrow">VM Lirandzo Transportes</p>
+      <h1 class="noticias-banner-title">Notícias</h1>
+      <p class="noticias-banner-desc">
+        Novidades, actualizações e novidades sobre a nossa operação, frota e serviços.
+      </p>
+    </div>
+  </section>
+
+  <section class="noticias-section">
+    <div class="noticias-container">
+      <div class="noticias-grid">
+        @for (noticia of noticias; track noticia.id) {
+          <article class="noticia-card">
+            <span class="noticia-categoria">{{ noticia.categoria }}</span>
+            <h3 class="noticia-titulo">{{ noticia.titulo }}</h3>
+            <p class="noticia-resumo">{{ noticia.resumo }}</p>
+            <time class="noticia-data">{{ formatarData(noticia.data) }}</time>
+          </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="noticias-cta">
+    <div class="noticias-cta-content">
+      <h2 class="noticias-cta-title">Precisa de uma cotação?</h2>
+      <p class="noticias-cta-text">Solicite uma cotação e a nossa equipa responderá em até 24 horas.</p>
+      <a routerLink="/orcamento" class="noticias-cta-btn">Solicitar Cotação</a>
+    </div>
+  </section>
+</main>

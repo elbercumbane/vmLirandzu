@@ -1,0 +1,12 @@
+<app-billing-sidebar [isOpen]="sidebarOpen" (toggleSidebar)="toggleSidebar()"></app-billing-sidebar>
+
+<div class="billing-shell" [class.sidebar-open]="sidebarOpen">
+  <app-dashboard-navbar
+    [sidebarOpen]="sidebarOpen"
+    (toggleSidebar)="toggleSidebar()"
+  ></app-dashboard-navbar>
+
+  <main class="billing-main">
+    <router-outlet></router-outlet>
+  </main>
+</div>

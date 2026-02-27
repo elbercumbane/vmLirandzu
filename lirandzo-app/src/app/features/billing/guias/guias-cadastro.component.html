@@ -1,0 +1,127 @@
+<div class="page-top-row">
+  <div class="page-header-left">
+    <h1>Gerar Guia de Remessa</h1>
+    <p>Documento de transporte para a viagem</p>
+  </div>
+  <a routerLink="/billing/guias" class="btn-back">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+    Voltar
+  </a>
+</div>
+
+<div class="card">
+  <div class="guia-doc-header">
+    <div>
+      <div class="guia-company">VM TRANSPORTES</div>
+      <div class="guia-company-sub">Logística e Transporte de Cargas</div>
+    </div>
+    <div class="guia-doc-title">GUIA DE REMESSA</div>
+  </div>
+
+  <form (ngSubmit)="gerarGuia()">
+    <div class="form-section-title">Dados da Guia</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" for="referencia">Referência</label>
+        <input type="text" id="referencia" class="form-control" [value]="guia.referencia" readonly />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="data">Data</label>
+        <input type="date" id="data" class="form-control" [(ngModel)]="guia.data" name="data" />
+      </div>
+    </div>
+
+    <div class="form-section-title">Atribuição</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" for="motorista">Motorista</label>
+        <select id="motorista" class="form-control" [(ngModel)]="guia.motorista" name="motorista">
+          <option value="">Selecione o motorista</option>
+          @for (m of motoristasDisponiveis; track m) {
+            <option [value]="m">{{ m }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="viatura">Viatura</label>
+        <select id="viatura" class="form-control" [(ngModel)]="guia.viatura" name="viatura">
+          <option value="">Selecione a viatura</option>
+          @for (v of viaturasDisponiveis; track v) {
+            <option [value]="v">{{ v }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="form-section-title">Rota</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" for="origem">Origem</label>
+        <input type="text" id="origem" class="form-control" placeholder="Ex: Maputo" [(ngModel)]="guia.origem" name="origem" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="destino">Destino</label>
+        <input type="text" id="destino" class="form-control" placeholder="Ex: Beira" [(ngModel)]="guia.destino" name="destino" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="kmSaida">KM Saída</label>
+        <input type="number" id="kmSaida" class="form-control" placeholder="Opcional" [(ngModel)]="guia.kmSaida" name="kmSaida" min="0" />
+      </div>
+    </div>
+
+    <div class="form-section-title">Cargas / Produtos</div>
+    @for (carga of cargas; track $index) {
+      <div class="cargo-card">
+        <div class="cargo-card-header">
+          <span class="cargo-card-title">Carga {{ $index + 1 }}</span>
+          <button type="button" class="cargo-remove-btn" (click)="removerCarga($index)" [disabled]="cargas.length <= 1" title="Remover carga">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Cliente</label>
+            <input type="text" class="form-control" placeholder="Nome do cliente" [(ngModel)]="carga.cliente" [name]="'cliente_' + $index" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ref. Encomenda</label>
+            <input type="text" class="form-control" placeholder="Ex: ENC-001" [(ngModel)]="carga.encomendaRef" [name]="'encomendaRef_' + $index" />
+          </div>
+          <div class="form-group full-width">
+            <label class="form-label">Descrição</label>
+            <input type="text" class="form-control" placeholder="Descrição da carga" [(ngModel)]="carga.descricao" [name]="'descricao_' + $index" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Quantidade</label>
+            <input type="number" class="form-control" [(ngModel)]="carga.quantidade" [name]="'quantidade_' + $index" min="1" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Peso Estimado</label>
+            <input type="text" class="form-control" placeholder="Ex: 500 kg" [(ngModel)]="carga.peso" [name]="'peso_' + $index" />
+          </div>
+        </div>
+      </div>
+    }
+    <button type="button" class="btn-secondary" style="margin-bottom: 1rem" (click)="adicionarCarga()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      Adicionar Carga
+    </button>
+
+    <div class="form-section-title">Observações</div>
+    <div class="form-group full-width">
+      <textarea class="form-control" placeholder="Observações gerais sobre a guia" [(ngModel)]="guia.observacoes" name="observacoes" rows="4"></textarea>
+    </div>
+
+    <div class="form-actions">
+      <a routerLink="/billing/guias" class="btn-secondary">Cancelar</a>
+      <button type="button" class="btn-secondary" (click)="baixarGuia()">Baixar PDF</button>
+      <button type="submit" class="btn-primary">Gerar Guia</button>
+    </div>
+  </form>
+</div>

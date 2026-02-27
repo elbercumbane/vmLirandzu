@@ -1,0 +1,373 @@
+<app-billing-sidebar [isOpen]="sidebarOpen" (toggleSidebar)="toggleSidebar()"></app-billing-sidebar>
+
+<div class="billing-dashboard" [class.sidebar-open]="sidebarOpen">
+  <app-dashboard-navbar></app-dashboard-navbar>
+
+  <button type="button" class="billing-sidebar-toggle" [class.sidebar-open]="sidebarOpen" (click)="toggleSidebar()" [attr.aria-label]="sidebarOpen ? 'Fechar menu' : 'Abrir menu'">
+    <span class="billing-sidebar-toggle-icon">{{ sidebarOpen ? '✕' : '☰' }}</span>
+  </button>
+
+  <main class="billing-dashboard-content">
+    <div class="billing-dashboard-header">
+      <h1 class="billing-title">Sistema de Gestão de Facturas</h1>
+      <p class="billing-subtitle">Visão geral das operações — Janeiro 2025</p>
+    </div>
+
+    <div class="billing-kpi-grid">
+      <div class="billing-kpi-card">
+        <div class="billing-kpi-top-line billing-kpi-top-line-orange"></div>
+        <div class="billing-kpi-header">
+          <div class="billing-kpi-icon billing-kpi-icon-orange">📦</div>
+          <div class="billing-kpi-title">Total Encomendas do Mês</div>
+        </div>
+        <div class="billing-kpi-value">47</div>
+        <div class="billing-kpi-subtext">encomendas registadas</div>
+      </div>
+
+      <div class="billing-kpi-card">
+        <div class="billing-kpi-top-line billing-kpi-top-line-blue"></div>
+        <div class="billing-kpi-header">
+          <div class="billing-kpi-icon billing-kpi-icon-blue">📄</div>
+          <div class="billing-kpi-title">Valor Total Facturado</div>
+        </div>
+        <div class="billing-kpi-value">285.400 MZN</div>
+        <div class="billing-kpi-subtext">valor total do mês</div>
+      </div>
+
+      <div class="billing-kpi-card">
+        <div class="billing-kpi-top-line billing-kpi-top-line-green"></div>
+        <div class="billing-kpi-header">
+          <div class="billing-kpi-icon billing-kpi-icon-green">✔</div>
+          <div class="billing-kpi-title">Total Recebido</div>
+        </div>
+        <div class="billing-kpi-value">198.750 MZN</div>
+        <div class="billing-kpi-subtext">pagamentos confirmados</div>
+      </div>
+
+      <div class="billing-kpi-card billing-kpi-card-alert">
+        <div class="billing-kpi-top-line billing-kpi-top-line-red"></div>
+        <div class="billing-kpi-header">
+          <div class="billing-kpi-icon billing-kpi-icon-red">⚠</div>
+          <div class="billing-kpi-title">Total em Dívida</div>
+        </div>
+        <div class="billing-kpi-value">86.650 MZN</div>
+        <div class="billing-kpi-subtext">valor por receber</div>
+      </div>
+
+      <div class="billing-kpi-card">
+        <div class="billing-kpi-top-line billing-kpi-top-line-green"></div>
+        <div class="billing-kpi-header">
+          <div class="billing-kpi-icon billing-kpi-icon-green">✓</div>
+          <div class="billing-kpi-title">Encomendas Pagas</div>
+        </div>
+        <div class="billing-kpi-value">31 de 47</div>
+        <div class="billing-kpi-progress">
+          <div class="billing-kpi-progress-bar">
+            <div class="billing-kpi-progress-fill" style="width: 66%;"></div>
+          </div>
+          <span class="billing-kpi-progress-text">66% concluídas</span>
+        </div>
+      </div>
+
+      <div class="billing-kpi-card">
+        <div class="billing-kpi-top-line billing-kpi-top-line-yellow"></div>
+        <div class="billing-kpi-header">
+          <div class="billing-kpi-icon billing-kpi-icon-yellow">⏰</div>
+          <div class="billing-kpi-title">Encomendas Pendentes</div>
+        </div>
+        <div class="billing-kpi-value">16 em aberto</div>
+        <div class="billing-kpi-subtext">requerem atenção</div>
+      </div>
+    </div>
+
+    <section class="debt-alerts-panel">
+      <div class="debt-alerts-header">
+        <div class="debt-alerts-header-left">
+          <span class="debt-alerts-icon">⚠</span>
+          <div>
+            <h3 class="debt-alerts-title">
+              Requer Atenção Imediata
+              <span class="debt-alerts-badge">{{ urgentAlertsCount }} urgentes</span>
+            </h3>
+            <p class="debt-alerts-subtitle">Encomendas com dívida em aberto há mais de 7 dias</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="debt-alerts-list">
+        <div *ngFor="let alert of debtAlerts; let last = last" class="debt-alert-item" [class.debt-alert-urgent]="alert.severity === 'URGENT'">
+          <div class="debt-alert-left">
+            <span class="debt-alert-order-code">{{ alert.orderNumber }}</span>
+            <div class="debt-alert-customer-name">{{ alert.customerName }}</div>
+            <div class="debt-alert-customer-phone">{{ alert.customerPhone }}</div>
+          </div>
+          <div class="debt-alert-center">
+            <div class="debt-alert-product">{{ alert.product }}</div>
+            <div class="debt-alert-days" [class.debt-alert-days-urgent]="alert.daysOverdue > 14" [class.debt-alert-days-warning]="alert.daysOverdue <= 14">
+              <span class="debt-alert-clock-icon">⏰</span>
+              {{ alert.daysOverdue }} dias em atraso
+            </div>
+          </div>
+          <div class="debt-alert-right">
+            <div class="debt-alert-amount">{{ alert.debtAmount | number:'1.0-0' }} MZN</div>
+            <div class="debt-alert-actions">
+              <button type="button" class="debt-alert-button debt-alert-button-payment">Registar Pagamento</button>
+              <button type="button" class="debt-alert-button debt-alert-button-contact">📞 Contactar</button>
+            </div>
+          </div>
+          <div *ngIf="!last" class="debt-alert-separator"></div>
+        </div>
+      </div>
+
+      <div class="debt-alerts-footer">
+        <div class="debt-alerts-footer-left">
+          Total em dívida crítica: <span class="debt-alerts-total">{{ totalCriticalDebt | number:'1.0-0' }} MZN</span>
+        </div>
+        <button type="button" class="debt-alerts-view-all-button">Ver Todas as Dívidas →</button>
+      </div>
+    </section>
+
+    <section class="dashboard-charts-section">
+      <div class="dashboard-chart-card dashboard-chart-bar">
+        <div class="dashboard-chart-header">
+          <h3 class="dashboard-chart-title">Encomendas por Semana</h3>
+          <p class="dashboard-chart-subtitle">Últimas 4 semanas — Janeiro 2025</p>
+        </div>
+        <div class="dashboard-chart-content">
+          <svg class="dashboard-bar-chart-svg" viewBox="0 0 600 220" preserveAspectRatio="xMidYMid meet">
+            <line x1="60" y1="20" x2="60" y2="180" stroke="rgba(30,58,95,0.5)" stroke-dasharray="3 3" />
+            <line x1="60" y1="180" x2="60" y2="180" stroke="rgba(30,58,95,0.5)" stroke-dasharray="3 3" />
+            <line x1="60" y1="140" x2="560" y2="140" stroke="rgba(30,58,95,0.5)" stroke-dasharray="3 3" />
+            <line x1="60" y1="100" x2="560" y2="100" stroke="rgba(30,58,95,0.5)" stroke-dasharray="3 3" />
+            <line x1="60" y1="60" x2="560" y2="60" stroke="rgba(30,58,95,0.5)" stroke-dasharray="3 3" />
+            <line x1="60" y1="20" x2="560" y2="20" stroke="rgba(30,58,95,0.5)" stroke-dasharray="3 3" />
+
+            <g *ngFor="let data of weeklyOrdersData; let i = index">
+              <rect
+                [attr.x]="80 + i * 120"
+                [attr.y]="getBarY(data.paid, maxBarValue)"
+                [attr.width]="30"
+                [attr.height]="getBarHeight(data.paid, maxBarValue)"
+                fill="#22C55E"
+              />
+              <rect
+                [attr.x]="80 + i * 120"
+                [attr.y]="getBarY(data.partial, maxBarValue) - getBarHeight(data.paid, maxBarValue)"
+                [attr.width]="30"
+                [attr.height]="getBarHeight(data.partial, maxBarValue)"
+                fill="#EAB308"
+              />
+              <rect
+                [attr.x]="80 + i * 120"
+                [attr.y]="getBarY(data.unpaid, maxBarValue) - getBarHeight(data.partial, maxBarValue) - getBarHeight(data.paid, maxBarValue)"
+                [attr.width]="30"
+                [attr.height]="getBarHeight(data.unpaid, maxBarValue)"
+                fill="#EF4444"
+              />
+
+              <text
+                [attr.x]="95 + i * 120"
+                y="195"
+                text-anchor="middle"
+                fill="#6B84A3"
+                font-size="10"
+              >{{ data.week }}</text>
+              <text
+                [attr.x]="95 + i * 120"
+                y="208"
+                text-anchor="middle"
+                fill="#6B84A3"
+                font-size="9"
+              >{{ data.weekRange }}</text>
+            </g>
+
+            <text x="55" y="185" text-anchor="end" fill="#6B84A3" font-size="10">0</text>
+            <text x="55" y="145" text-anchor="end" fill="#6B84A3" font-size="10">{{ Math.round(maxBarValue * 0.5) }}</text>
+            <text x="55" y="105" text-anchor="end" fill="#6B84A3" font-size="10">{{ maxBarValue }}</text>
+          </svg>
+          <div class="dashboard-bar-legend">
+            <span class="dashboard-legend-item"><span class="dashboard-legend-dot" style="background-color: #22C55E;"></span> Pago</span>
+            <span class="dashboard-legend-item"><span class="dashboard-legend-dot" style="background-color: #EAB308;"></span> Parcial</span>
+            <span class="dashboard-legend-item"><span class="dashboard-legend-dot" style="background-color: #EF4444;"></span> Não Pago</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-chart-card dashboard-chart-pie">
+        <div class="dashboard-chart-header">
+          <h3 class="dashboard-chart-title">Distribuição de Status</h3>
+          <p class="dashboard-chart-subtitle">Total do mês actual</p>
+        </div>
+        <div class="dashboard-chart-content">
+          <div class="dashboard-pie-chart-wrapper">
+            <svg class="dashboard-pie-chart-svg" viewBox="0 0 300 220" preserveAspectRatio="xMidYMid meet">
+              <path
+                *ngFor="let item of statusDistributionData; let i = index"
+                [attr.d]="getPiePath(i, totalOrders)"
+                [attr.fill]="item.color"
+                class="dashboard-pie-segment"
+              />
+            </svg>
+            <div class="dashboard-pie-center">
+              <div class="dashboard-pie-center-value">{{ totalOrders }}</div>
+              <div class="dashboard-pie-center-label">total</div>
+            </div>
+          </div>
+          <div class="dashboard-pie-legend">
+            <div *ngFor="let item of statusDistributionData" class="dashboard-pie-legend-item">
+              <span class="dashboard-pie-legend-dot" [style.background-color]="item.color"></span>
+              <span class="dashboard-pie-legend-label">{{ item.name === 'PAGO' ? 'Pagas' : item.name === 'PARCIAL' ? 'Parciais' : 'Não Pagas' }}</span>
+              <span class="dashboard-pie-legend-value">— {{ item.value }} encomendas — {{ getStatusPercentage(item.value) }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="recent-orders-section">
+      <div class="recent-orders-header">
+        <div>
+          <h2 class="recent-orders-title">Encomendas Recentes</h2>
+          <p class="recent-orders-subtitle">Últimas 10 encomendas registadas</p>
+        </div>
+        <button type="button" class="recent-orders-view-all-button">
+          Ver Todas →
+        </button>
+      </div>
+
+      <div class="recent-orders-filters">
+        <div class="recent-orders-filters-left">
+          <button
+            type="button"
+            class="recent-orders-filter-button"
+            [class.active]="activeFilter === 'ALL'"
+            (click)="setFilter('ALL')"
+          >
+            Todas ({{ totalCount }})
+          </button>
+          <button
+            type="button"
+            class="recent-orders-filter-button filter-paid"
+            [class.active]="activeFilter === 'PAID'"
+            (click)="setFilter('PAID')"
+          >
+            ✓ Pagas ({{ paidCount }})
+          </button>
+          <button
+            type="button"
+            class="recent-orders-filter-button filter-partial"
+            [class.active]="activeFilter === 'PARTIAL'"
+            (click)="setFilter('PARTIAL')"
+          >
+            ◑ Parciais ({{ partialCount }})
+          </button>
+          <button
+            type="button"
+            class="recent-orders-filter-button filter-unpaid"
+            [class.active]="activeFilter === 'UNPAID'"
+            (click)="setFilter('UNPAID')"
+          >
+            ✗ Não Pagas ({{ unpaidCount }})
+          </button>
+        </div>
+      </div>
+
+      <div class="recent-orders-table-wrapper">
+        <table class="recent-orders-table">
+          <thead>
+            <tr>
+              <th>Nº Encomenda</th>
+              <th>Cliente</th>
+              <th>Produto</th>
+              <th>Valor Total</th>
+              <th>Pago</th>
+              <th>Dívida</th>
+              <th>Status</th>
+              <th>Data</th>
+              <th>Acções</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of filteredOrders; let i = index">
+              <td>
+                <span class="order-code-tag">{{ order.number }}</span>
+              </td>
+              <td>
+                <div class="order-customer-name">{{ order.customerName }}</div>
+                <div class="order-customer-phone">{{ order.customerPhone }}</div>
+              </td>
+              <td>
+                <span class="order-product">{{ truncate(order.product, 30) }}</span>
+              </td>
+              <td class="order-amount">
+                <span class="order-amount-strong">{{ order.total | number:'1.0-0' }} MZN</span>
+              </td>
+              <td class="order-amount">
+                <span class="order-paid" [class.order-paid-full]="order.paid === order.total">
+                  {{ order.paid | number:'1.0-0' }} MZN
+                </span>
+              </td>
+              <td class="order-amount">
+                <ng-container *ngIf="order.debt > 0; else noDebt">
+                  <span class="order-debt">{{ order.debt | number:'1.0-0' }} MZN</span>
+                </ng-container>
+                <ng-template #noDebt>—</ng-template>
+              </td>
+              <td>
+                <span
+                  class="order-status-badge"
+                  [ngClass]="{
+                    'status-paid': order.status === 'PAID',
+                    'status-partial': order.status === 'PARTIAL',
+                    'status-unpaid': order.status === 'UNPAID',
+                    'status-cancelled': order.status === 'CANCELLED'
+                  }"
+                >
+                  {{
+                    order.status === 'PAID'
+                      ? 'PAGO'
+                      : order.status === 'PARTIAL'
+                      ? 'PARCIAL'
+                      : order.status === 'UNPAID'
+                      ? 'NÃO PAGO'
+                      : 'CANCELADO'
+                  }}
+                </span>
+              </td>
+              <td>
+                <span class="order-date">{{ order.date }}</span>
+              </td>
+              <td>
+                <div class="order-actions">
+                  <button type="button" class="order-action-button" title="Ver detalhes">👁</button>
+                  <button type="button" class="order-action-button" title="Editar encomenda">✏</button>
+                  <button type="button" class="order-action-button" title="Gerar PDF">📄</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="recent-orders-footer">
+        <div class="recent-orders-footer-left">
+          Mostrando {{ filteredOrders.length }} de {{ totalCount }} encomendas
+        </div>
+        <div class="recent-orders-footer-right">
+          <div class="recent-orders-pagination">
+            <button type="button" class="pagination-button" disabled>&lt;</button>
+            <button type="button" class="pagination-button active">1</button>
+            <button type="button" class="pagination-button">2</button>
+            <button type="button" class="pagination-button">3</button>
+            <span class="pagination-ellipsis">...</span>
+            <button type="button" class="pagination-button">&gt;</button>
+          </div>
+          <div class="recent-orders-page-size">
+            Linhas por página:
+            <span class="page-size-select">10 ▼</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
