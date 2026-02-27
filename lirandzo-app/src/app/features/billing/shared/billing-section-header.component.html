@@ -1,0 +1,42 @@
+<header class="billing-section-header">
+  <div class="billing-section-header-content">
+    <div class="billing-section-header-mark">VM</div>
+    <div class="billing-section-header-text">
+      <h1 class="billing-section-title">{{ title }}</h1>
+      <p class="billing-section-subtitle">{{ subtitle }}</p>
+    </div>
+    <div class="billing-section-header-actions">
+      <a *ngIf="showBack && backLink"
+         [routerLink]="backLink"
+         class="billing-section-header-btn billing-section-header-btn-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Voltar
+      </a>
+
+      <button *ngIf="showHelp"
+              type="button"
+              class="billing-section-header-btn billing-section-header-btn-help"
+              (click)="toggleHelp()"
+              [class.active]="helpOpen">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        Ajuda
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="showHelp && helpOpen" class="billing-section-help-popup">
+    <h4>{{ helpTitle || ('Como usar ' + title) }}</h4>
+    <ul *ngIf="helpItems?.length">
+      <li *ngFor="let item of helpItems">{{ item }}</li>
+    </ul>
+    <button type="button" class="billing-section-help-close" (click)="toggleHelp()">Fechar</button>
+  </div>
+</header>
+

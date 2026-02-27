@@ -1,15 +1,16 @@
-<div class="page-header">
-  <div class="page-header-left">
-    <h1>Viagens</h1>
-    <p>Gestão de viagens</p>
-  </div>
-  <a routerLink="/billing/viagens/nova" class="btn-primary">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-      <path d="M12 5v14M5 12h14"/>
-    </svg>
-    Nova Viagem
-  </a>
-</div>
+<app-billing-section-header
+  [showBack]="true"
+  [showHelp]="true"
+  [backLink]="'/billing'"
+  title="Viagens"
+  subtitle="Gestão de viagens e performance operacional"
+  helpTitle="Como usar Viagens"
+  [helpItems]="[
+    'Veja o total de viagens, quilometragem e custos totais.',
+    'Use filtros e pesquisa para encontrar viagens por código ou motorista.',
+    'Use o botão Nova Viagem para planear novas rotas.'
+  ]"
+></app-billing-section-header>
 
 <div class="kpi-grid">
   <div class="kpi-card">

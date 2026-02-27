@@ -1,8 +1,25 @@
-<div class="page-header">
-  <div class="page-header-left">
-    <h1>Clientes</h1>
-    <p>Lista de clientes registados através das encomendas e facturas</p>
-  </div>
+<app-billing-section-header
+  [showBack]="true"
+  [showHelp]="true"
+  [backLink]="'/billing'"
+  title="Clientes"
+  subtitle="Lista de clientes e resumo financeiro"
+  helpTitle="Como usar Clientes"
+  [helpItems]="[
+    'Veja o total facturado e em dívida por cliente.',
+    'Use a pesquisa para filtrar por nome, província ou contacto.',
+    'Use o botão Histórico do Cliente para ver o detalhe de um cliente específico.'
+  ]"
+></app-billing-section-header>
+
+<div class="toolbar" style="margin-bottom: 0.75rem;">
+  <button
+    type="button"
+    class="btn-secondary"
+    routerLink="/billing/clientes/historico"
+  >
+    Ver Histórico por Cliente
+  </button>
 </div>
 
 <div class="kpi-grid">

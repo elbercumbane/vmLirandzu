@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
 
 interface ItemEncomenda {
   quantidade: number;
@@ -12,7 +13,7 @@ interface ItemEncomenda {
 @Component({
   selector: 'app-encomendas-cadastro',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, BillingSectionHeaderComponent],
   templateUrl: './encomendas-cadastro.component.html',
   styleUrls: ['../shared/billing-page.css', './encomendas-cadastro.component.css']
 })

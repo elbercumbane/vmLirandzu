@@ -1,13 +1,16 @@
-<div class="page-top-row">
-  <div class="page-header-left">
-    <h1>Gerar Cotação</h1>
-    <p>Crie a cotação para enviar ao cliente</p>
-  </div>
-  <a routerLink="/billing/cotacoes" class="btn-back">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-    Voltar aos Pedidos
-  </a>
-</div>
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="'/billing/cotacoes'"
+  [showHelp]="true"
+  title="Gerar Cotação"
+  subtitle="Crie e envie cotações profissionais para os clientes"
+  helpTitle="Como gerar uma Cotação"
+  [helpItems]="[
+    'Preencha os dados do cliente e da rota (origem, destino e tipo de veículo).',
+    'Adicione produtos/serviços e valores para formar o total da cotação.',
+    'Defina a validade e o operador responsável para controlo interno.'
+  ]"
+></app-billing-section-header>
 
 <div class="card">
   <!-- Cabeçalho do documento -->

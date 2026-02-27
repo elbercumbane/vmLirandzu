@@ -1,13 +1,16 @@
-<div class="page-top-row">
-  <div class="page-header-left">
-    <h1>Nova Viagem / Guia de Remessa</h1>
-    <p>Registe a viagem e associe as cargas de vários clientes</p>
-  </div>
-  <a routerLink="/billing/viagens" class="btn-back">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-    Voltar
-  </a>
-</div>
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="'/billing/viagens'"
+  [showHelp]="true"
+  title="Nova Viagem / Guia de Remessa"
+  subtitle="Registe a viagem e associe as cargas de vários clientes"
+  helpTitle="Como registar uma Viagem / Guia"
+  [helpItems]="[
+    'Escolha o motorista e a viatura responsáveis pela viagem.',
+    'Defina origem, destino, datas e os dados principais da rota.',
+    'Adicione todas as cargas (clientes, produtos e referências de encomenda) que vão nesta viagem.'
+  ]"
+></app-billing-section-header>
 
 <div class="card">
   <!-- Atribuição -->

@@ -1,16 +1,16 @@
-<div class="page-header">
-  <div class="page-header-left">
-    <h1>Guias de Remessa</h1>
-    <p>Documentos de transporte gerados a partir das viagens</p>
-  </div>
-  <a routerLink="/billing/guias/nova" class="btn-primary">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <line x1="12" y1="5" x2="12" y2="19"></line>
-      <line x1="5" y1="12" x2="19" y2="12"></line>
-    </svg>
-    Gerar Nova Guia
-  </a>
-</div>
+<app-billing-section-header
+  [showBack]="true"
+  [showHelp]="true"
+  [backLink]="'/billing'"
+  title="Guias de Remessa"
+  subtitle="Documentos de transporte ligados às viagens"
+  helpTitle="Como usar Guias de Remessa"
+  [helpItems]="[
+    'Veja o total de guias, entregues, em trânsito e pendentes.',
+    'Use os filtros para encontrar guias por estado, referência ou destino.',
+    'Use o botão Gerar Nova Guia para criar documentos de transporte.'
+  ]"
+></app-billing-section-header>
 
 <div class="kpi-grid">
   <div class="kpi-card">

@@ -2,8 +2,8 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  height: 56px;
-  padding: 0 1.75rem 0 1.25rem;
+  height: 64px;
+  padding: 0 2rem 0 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -76,7 +76,7 @@
 
 .navbar-company-name {
   font-weight: 700;
-  font-size: 13px;
+  font-size: 14px;
   letter-spacing: 2px;
   color: var(--text-primary);
   text-transform: uppercase;
@@ -84,7 +84,7 @@
 }
 
 .navbar-company-subtitle {
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 1px;
   color: var(--text-link);
   text-transform: uppercase;
@@ -178,7 +178,7 @@
 
 .navbar-datetime .navbar-time {
   font-family: 'JetBrains Mono', 'Courier New', monospace;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text-primary);
   letter-spacing: 1px;
@@ -186,7 +186,7 @@
 }
 
 .navbar-datetime .navbar-date {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-muted);
   letter-spacing: 0.5px;
   line-height: 1;
@@ -204,12 +204,12 @@
 }
 
 .navbar-lang-btn {
-  padding: 4px 10px;
+  padding: 5px 11px;
   border: none;
   border-radius: 6px;
   background: transparent;
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;

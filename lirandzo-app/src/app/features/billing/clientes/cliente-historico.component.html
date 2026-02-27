@@ -1,0 +1,111 @@
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="'/billing/clientes'"
+  [showHelp]="true"
+  title="Histórico do Cliente"
+  subtitle="Resumo de encomendas e cotações por cliente"
+  helpTitle="Como usar o Histórico do Cliente"
+  [helpItems]="[
+    'Seleccione um cliente no topo para ver o resumo financeiro e operacional.',
+    'Revise as encomendas (facturado, pago, dívida) e cotações associadas.',
+    'Use estes dados para priorizar cobranças e oportunidades comerciais.'
+  ]"
+></app-billing-section-header>
+
+<div class="card cliente-historico-card">
+  <div class="cliente-historico-top">
+    <div class="cliente-historico-select">
+      <label for="clienteFiltro" class="form-label">Pesquisar por nome, província ou contacto...</label>
+      <input
+        id="clienteFiltro"
+        type="text"
+        class="form-control"
+        [(ngModel)]="filtro"
+        (input)="onFiltroChange()"
+        placeholder="Pesquisar por nome, província ou contacto..."
+      />
+    </div>
+
+    <div *ngIf="clienteSelecionado" class="cliente-historico-resumo">
+      <div class="cliente-historico-row">
+        <div>
+          <div class="cliente-nome">{{ clienteSelecionado.nome }}</div>
+          <div class="cliente-subinfo">
+            {{ clienteSelecionado.contacto }} · {{ clienteSelecionado.telefone }}
+          </div>
+        </div>
+        <div class="cliente-pill">
+          {{ clienteSelecionado.provincia }}
+        </div>
+      </div>
+
+      <div class="kpi-grid cliente-kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-top-line" style="background: var(--accent)"></div>
+          <div class="kpi-label">Encomendas</div>
+          <div class="kpi-value">{{ totalEncomendas }}</div>
+          <div class="kpi-sub">registadas</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top-line" style="background: var(--success)"></div>
+          <div class="kpi-label">Total Facturado</div>
+          <div class="kpi-value" style="color: var(--success)">
+            {{ totalFaturado | number:'1.0-0' }} <small>MZN</small>
+          </div>
+          <div class="kpi-sub">todas as encomendas</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top-line" style="background: var(--danger)"></div>
+          <div class="kpi-label">Total em Dívida</div>
+          <div class="kpi-value" style="color: var(--danger)">
+            {{ totalDivida | number:'1.0-0' }} <small>MZN</small>
+          </div>
+          <div class="kpi-sub">valor em aberto</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top-line" style="background: var(--info)"></div>
+          <div class="kpi-label">Cotações</div>
+          <div class="kpi-value">{{ totalCotacoes }}</div>
+          <div class="kpi-sub">pedidos registados</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2 class="subsection-title">Histórico consolidado do cliente</h2>
+  <div class="table-wrapper" *ngIf="historicoDoCliente.length; else noHistory">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Ref.</th>
+          <th>Data</th>
+          <th>Descrição</th>
+          <th>Rota</th>
+          <th>Valor</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let h of historicoDoCliente">
+          <td>{{ h.tipo }}</td>
+          <td>{{ h.ref }}</td>
+          <td>{{ h.data }}</td>
+          <td>{{ h.descricao }}</td>
+          <td>{{ h.rota }}</td>
+          <td [class.text-danger]="h.tipo === 'Dívida' && h.valor > 0"
+              [class.text-success]="h.tipo === 'Recebimento' && h.valor > 0">
+            {{ h.valor | number:'1.0-0' }} <ng-container *ngIf="h.valor">MZN</ng-container>
+          </td>
+          <td>{{ h.status }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <ng-template #noHistory>
+    <p class="empty-text">Ainda não existe histórico registado para este cliente.</p>
+  </ng-template>
+</div>
+

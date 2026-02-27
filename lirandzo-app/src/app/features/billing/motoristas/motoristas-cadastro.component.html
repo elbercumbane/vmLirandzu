@@ -1,13 +1,16 @@
-<div class="page-top-row">
-  <div class="page-header-left">
-    <h1>Novo Motorista</h1>
-    <p>Preencha os dados do motorista</p>
-  </div>
-  <a routerLink="/billing/motoristas" class="btn-back">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-    Voltar
-  </a>
-</div>
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="'/billing/motoristas'"
+  [showHelp]="true"
+  title="Novo Motorista"
+  subtitle="Registo de motoristas para associar a viaturas e viagens"
+  helpTitle="Como registar um Motorista"
+  [helpItems]="[
+    'Preencha os dados pessoais e de contacto do motorista.',
+    'Registe as informações da carta de condução e categorias permitidas.',
+    'Use a secção de histórico para futuras integrações com viagens e desempenho.'
+  ]"
+></app-billing-section-header>
 
 <div class="card">
   <form (ngSubmit)="salvar()">

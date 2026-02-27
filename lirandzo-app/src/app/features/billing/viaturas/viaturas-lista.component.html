@@ -1,15 +1,16 @@
-<div class="page-header">
-  <div class="page-header-left">
-    <h1>Viaturas</h1>
-    <p>Gestão da frota</p>
-  </div>
-  <a routerLink="/billing/viaturas/nova" class="btn-primary">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 5v14M5 12h14"/>
-    </svg>
-    Nova Viatura
-  </a>
-</div>
+<app-billing-section-header
+  [showBack]="true"
+  [showHelp]="true"
+  [backLink]="'/billing'"
+  title="Viaturas"
+  subtitle="Gestão da frota e estado das viaturas"
+  helpTitle="Como usar Viaturas"
+  [helpItems]="[
+    'Use a pesquisa e filtros para encontrar viaturas por matrícula ou estado.',
+    'Analise os KPIs para ver quantas viaturas estão operacionais ou em manutenção.',
+    'Use o botão Nova Viatura para registar viaturas na frota.'
+  ]"
+></app-billing-section-header>
 
 <div class="kpi-grid">
   <div class="kpi-card">

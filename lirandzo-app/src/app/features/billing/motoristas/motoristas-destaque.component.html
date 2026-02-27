@@ -1,0 +1,58 @@
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="'/billing/motoristas'"
+  [showHelp]="true"
+  title="Destaque & Desempenho dos Motoristas"
+  subtitle="Visão consolidada de performance da equipa de motoristas"
+  helpTitle="Como usar Destaque dos Motoristas"
+  [helpItems]="[
+    'Veja o score de desempenho de cada motorista e o ranking do mês.',
+    'Use estas informações para premiar, treinar ou redistribuir a frota.',
+    'Os dados são mock, servem para ilustrar o comportamento futuro com store real.'
+  ]"
+></app-billing-section-header>
+
+<div class="card drivers-performance-card">
+  <div class="drivers-performance-content">
+    <div class="drivers-score-list">
+      <div class="driver-score-item" *ngFor="let m of motoristasDesempenho">
+        <div class="driver-score-avatar">
+          {{ getIniciais(m.nome) }}
+        </div>
+        <div class="driver-score-main">
+          <div class="driver-score-top">
+            <div class="driver-score-name">{{ m.nome }}</div>
+            <div class="driver-score-value">{{ m.desempenhoScore }}/100</div>
+          </div>
+          <div class="driver-score-bar-track">
+            <div
+              class="driver-score-bar-fill"
+              [style.width.%]="m.desempenhoScore"
+              [ngClass]="getScoreClass(m.desempenhoScore)"
+            ></div>
+          </div>
+          <div class="driver-score-meta">
+            {{ m.totalViagens }} viagens · {{ m.totalKmPercorridos | number:'1.0-0' }} km
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="drivers-ranking">
+      <div class="drivers-ranking-item" *ngFor="let m of top3; let i = index">
+        <div class="drivers-ranking-medal" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
+          <span *ngIf="i === 0">🥇</span>
+          <span *ngIf="i === 1">🥈</span>
+          <span *ngIf="i === 2">🥉</span>
+        </div>
+        <div class="drivers-ranking-info">
+          <div class="drivers-ranking-name">
+            {{ m.nome }}
+            <span *ngIf="i === 0" class="drivers-ranking-tag">Melhor motorista do mês</span>
+          </div>
+          <div class="drivers-ranking-score">{{ m.desempenhoScore }}/100</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

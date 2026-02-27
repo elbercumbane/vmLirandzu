@@ -1,15 +1,16 @@
-<div class="page-header">
-  <div class="page-header-left">
-    <h1>Encomendas</h1>
-    <p>Gestão de encomendas</p>
-  </div>
-  <a routerLink="/billing/encomendas/nova" class="btn-primary">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-      <path d="M12 5v14M5 12h14"/>
-    </svg>
-    Nova Encomenda
-  </a>
-</div>
+<app-billing-section-header
+  [showBack]="true"
+  [showHelp]="true"
+  [backLink]="'/billing'"
+  title="Encomendas"
+  subtitle="Gestão de encomendas e estado de pagamento"
+  helpTitle="Como usar Encomendas"
+  [helpItems]="[
+    'Use os filtros e a pesquisa para encontrar encomendas por nº, cliente ou produto.',
+    'Analise os KPIs para ver valor facturado, dívidas e taxa de pagamento.',
+    'Use o botão Nova Encomenda para registar novos pedidos.'
+  ]"
+></app-billing-section-header>
 
 <div class="kpi-grid">
   <div class="kpi-card">

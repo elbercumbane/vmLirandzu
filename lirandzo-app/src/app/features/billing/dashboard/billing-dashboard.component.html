@@ -1,9 +1,15 @@
-<div class="page-header">
-  <div class="page-header-left">
-    <h1>Dashboard</h1>
-    <p>Visão geral das operações — Janeiro 2025</p>
-  </div>
-</div>
+<app-billing-section-header
+  [showBack]="false"
+  [showHelp]="true"
+  title="Dashboard"
+  subtitle="Visão geral das operações — Janeiro 2025"
+  helpTitle="Como usar o Dashboard"
+  [helpItems]="[
+    'Veja a visão geral de encomendas, receitas, viagens e combustível no topo.',
+    'Use os gráficos para comparar receitas vs despesas ao longo dos meses.',
+    'Analise o desempenho por viatura, clientes em dívida e motoristas destaque.'
+  ]"
+></app-billing-section-header>
 
 <!-- KPIs -->
 <div class="kpi-grid">

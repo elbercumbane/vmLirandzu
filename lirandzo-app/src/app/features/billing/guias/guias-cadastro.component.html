@@ -1,13 +1,16 @@
-<div class="page-top-row">
-  <div class="page-header-left">
-    <h1>Gerar Guia de Remessa</h1>
-    <p>Documento de transporte para a viagem</p>
-  </div>
-  <a routerLink="/billing/guias" class="btn-back">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-    Voltar
-  </a>
-</div>
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="'/billing/guias'"
+  [showHelp]="true"
+  title="Gerar Guia de Remessa"
+  subtitle="Documento de transporte com cargas, clientes e rota da viagem"
+  helpTitle="Como gerar uma Guia de Remessa"
+  [helpItems]="[
+    'Preencha os dados da guia, atribuindo motorista, viatura e rota.',
+    'Registe todas as cargas (clientes e produtos) associadas a esta viagem.',
+    'Use KM de saída para futura integração com controlo de combustível.'
+  ]"
+></app-billing-section-header>
 
 <div class="card">
   <div class="guia-doc-header">

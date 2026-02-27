@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
 
 @Component({
   selector: 'app-billing-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, BillingSectionHeaderComponent],
   templateUrl: './billing-dashboard.component.html',
   styleUrls: ['../shared/billing-page.css', './billing-dashboard.component.css']
 })
@@ -35,7 +36,7 @@ export class BillingDashboardComponent {
     { cliente: 'Domingos Cuamba', telefone: '845678321', valor: 33900, dias: 8 }
   ];
 
-  // Top drivers
+  // Top drivers (array estático original)
   topDrivers = [
     { nome: 'Mário Tembe', viagens: 51, avaliacao: 4.9 },
     { nome: 'João Macuácua', viagens: 45, avaliacao: 4.8 },

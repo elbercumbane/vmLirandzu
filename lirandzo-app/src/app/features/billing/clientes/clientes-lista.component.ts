@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
 
 @Component({
   selector: 'app-clientes-lista',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, BillingSectionHeaderComponent],
   templateUrl: './clientes-lista.component.html',
   styleUrls: ['../shared/billing-page.css', './clientes-lista.component.css']
 })

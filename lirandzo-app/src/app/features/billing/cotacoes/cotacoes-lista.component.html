@@ -1,13 +1,16 @@
-<div class="page-header">
-  <div class="page-header-left">
-    <h1>Pedidos de Cotação</h1>
-    <p>Pedidos recebidos de clientes — responda e gere cotações</p>
-  </div>
-  <a routerLink="/billing/cotacoes/gerar" class="btn-primary">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-    Gerar Cotação
-  </a>
-</div>
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="'/billing'"
+  [showHelp]="true"
+  title="Pedidos de Cotação"
+  subtitle="Pedidos recebidos de clientes — responda e gere cotações"
+  helpTitle="Como usar Pedidos de Cotação"
+  [helpItems]="[
+    'Use os filtros para ver pedidos pendentes, respondidos ou com cotação gerada.',
+    'Pesquise por cliente, referência ou destino para localizar pedidos específicos.',
+    'Use o botão Gerar Cotação para abrir o formulário de criação de cotação.'
+  ]"
+></app-billing-section-header>
 
 <div class="kpi-grid">
   <div class="kpi-card">

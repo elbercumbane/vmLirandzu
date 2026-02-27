@@ -1,15 +1,16 @@
-<div class="page-header">
-  <div class="page-header-left">
-    <h1>Motoristas</h1>
-    <p>Gestão de motoristas</p>
-  </div>
-  <a routerLink="/billing/motoristas/novo" class="btn-primary">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-      <path d="M12 5v14M5 12h14"/>
-    </svg>
-    Novo Motorista
-  </a>
-</div>
+<app-billing-section-header
+  [showBack]="true"
+  [showHelp]="true"
+  [backLink]="'/billing'"
+  title="Motoristas"
+  subtitle="Gestão de motoristas e desempenho operacional"
+  helpTitle="Como usar Motoristas"
+  [helpItems]="[
+    'Veja quantos motoristas estão disponíveis, em viagem ou inactivos.',
+    'Use a pesquisa para encontrar motoristas por nome ou telefone.',
+    'Use o botão Novo Motorista para registar novos profissionais.'
+  ]"
+></app-billing-section-header>
 
 <div class="kpi-grid">
   <div class="kpi-card">

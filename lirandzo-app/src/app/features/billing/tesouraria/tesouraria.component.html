@@ -1,9 +1,16 @@
-<div class="page-header">
-  <div class="page-header-left">
-    <h1>Tesouraria</h1>
-    <p>Controlo financeiro detalhado</p>
-  </div>
-</div>
+<app-billing-section-header
+  [showBack]="true"
+  [showHelp]="true"
+  [backLink]="'/billing'"
+  title="Tesouraria"
+  subtitle="Controlo financeiro detalhado — receitas, despesas e dívidas"
+  helpTitle="Como usar Tesouraria"
+  [helpItems]="[
+    'Use os KPIs para ver rapidamente recebimentos, despesas, saldo e dívidas.',
+    'Navegue entre as abas de Recebimentos, Despesas e Dívidas para gerir os lançamentos.',
+    'Use os formulários de registo para adicionar novos movimentos financeiros.'
+  ]"
+></app-billing-section-header>
 
 <div class="kpi-grid">
   <div class="kpi-card">

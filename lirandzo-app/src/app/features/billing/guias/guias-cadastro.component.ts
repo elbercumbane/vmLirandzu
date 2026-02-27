@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
 
 interface CargaGuia {
   cliente: string;
@@ -14,7 +15,7 @@ interface CargaGuia {
 @Component({
   selector: 'app-guias-cadastro',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, BillingSectionHeaderComponent],
   templateUrl: './guias-cadastro.component.html',
   styleUrls: ['../shared/billing-page.css', './guias-cadastro.component.css']
 })

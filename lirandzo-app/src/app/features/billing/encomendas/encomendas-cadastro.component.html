@@ -1,13 +1,16 @@
-<div class="page-top-row">
-  <div class="page-header-left">
-    <h1>Nova Encomenda / Factura</h1>
-    <p>Preencha os dados da encomenda conforme a factura</p>
-  </div>
-  <a routerLink="/billing/encomendas" class="btn-back">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-    Voltar
-  </a>
-</div>
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="'/billing/encomendas'"
+  [showHelp]="true"
+  title="Nova Encomenda / Factura"
+  subtitle="Preencha os dados da encomenda conforme a factura"
+  helpTitle="Como registar uma Encomenda"
+  [helpItems]="[
+    'Comece pelos dados do cliente (destinatário) e número de factura.',
+    'Adicione os itens da carga e custos adicionais (transporte, recolha, bill of entry).',
+    'Revise o total geral antes de gravar ou integrar com o módulo de tesouraria.'
+  ]"
+></app-billing-section-header>
 
 <div class="card">
   <!-- Invoice header -->

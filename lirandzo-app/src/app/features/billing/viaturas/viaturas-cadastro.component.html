@@ -1,13 +1,16 @@
-<div class="page-top-row">
-  <div class="page-header-left">
-    <h1>Nova Viatura</h1>
-    <p>Registar nova viatura na frota</p>
-  </div>
-  <a routerLink="/billing/viaturas" class="btn-back">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-    Voltar
-  </a>
-</div>
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="'/billing/viaturas'"
+  [showHelp]="true"
+  title="Nova Viatura"
+  subtitle="Registar nova viatura na frota"
+  helpTitle="Como registar uma Viatura"
+  [helpItems]="[
+    'Informe a matrícula, marca, modelo, tipo e ano da viatura.',
+    'Defina capacidade, consumo médio e estado actual para planeamento da frota.',
+    'Estes dados serão usados no futuro para manutenção e controlo de custos.'
+  ]"
+></app-billing-section-header>
 
 <div class="card">
   <form (ngSubmit)="salvar()">
