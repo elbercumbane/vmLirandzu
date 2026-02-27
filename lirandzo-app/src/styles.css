@@ -1,0 +1,143 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #fff;
+  color: #1a1a24;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* ====================================================
+   BILLING THEME SYSTEM
+   Todas as cores do billing ficam AQUI.
+   Componentes usam var(--nome) em vez de hex.
+   ==================================================== */
+
+[data-theme="dark"] {
+  --bg-page: #0C1524;
+  --bg-sidebar: #0E1B30;
+  --bg-navbar: #0E1B30;
+  --bg-card: #122035;
+  --bg-card-inner: #0E182C;
+  --bg-input: #0C1524;
+  --bg-table-head: #182A44;
+  --bg-table-odd: #0E182C;
+  --bg-table-even: #101C30;
+  --bg-dropdown: #111E34;
+  --bg-hover: rgba(249, 115, 22, 0.06);
+  --bg-icon: rgba(12, 21, 36, 0.8);
+  --bg-code: rgba(15, 23, 42, 0.9);
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+
+  --border-primary: rgba(45, 80, 130, 0.4);
+  --border-subtle: rgba(45, 80, 130, 0.25);
+  --border-input: rgba(45, 80, 130, 0.35);
+
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #5A7594;
+  --text-link: #7B93B0;
+  --text-inverse: #0C1524;
+
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.15);
+  --shadow-card-hover: 0 6px 24px rgba(0, 0, 0, 0.25);
+  --shadow-dropdown: 0 16px 48px rgba(0, 0, 0, 0.4);
+  --shadow-sidebar: 4px 0 30px rgba(0, 0, 0, 0.3);
+
+  --accent: #F97316;
+  --accent-hover: #EA580C;
+  --accent-soft: rgba(249, 115, 22, 0.08);
+  --accent-border: rgba(249, 115, 22, 0.3);
+  --accent-glow: rgba(249, 115, 22, 0.25);
+
+  --success: #22C55E;
+  --warning: #EAB308;
+  --danger: #EF4444;
+  --info: #3B82F6;
+
+  --danger-soft: rgba(239, 68, 68, 0.1);
+  --danger-border: rgba(239, 68, 68, 0.2);
+  --warning-soft: rgba(249, 115, 22, 0.1);
+  --info-soft: rgba(59, 130, 246, 0.1);
+
+  --scrollbar-track: #0E182C;
+  --scrollbar-thumb: #1E3A5F;
+
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --bg-page: #F1F5F9;
+  --bg-sidebar: #FFFFFF;
+  --bg-navbar: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-card-inner: #F8FAFC;
+  --bg-input: #F1F5F9;
+  --bg-table-head: #F1F5F9;
+  --bg-table-odd: #FFFFFF;
+  --bg-table-even: #F8FAFC;
+  --bg-dropdown: #FFFFFF;
+  --bg-hover: rgba(249, 115, 22, 0.04);
+  --bg-icon: #F1F5F9;
+  --bg-code: #F1F5F9;
+  --bg-overlay: rgba(0, 0, 0, 0.3);
+
+  --border-primary: #E2E8F0;
+  --border-subtle: #F1F5F9;
+  --border-input: #CBD5E1;
+
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --text-link: #64748B;
+  --text-inverse: #FFFFFF;
+
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-dropdown: 0 10px 40px rgba(0, 0, 0, 0.12);
+  --shadow-sidebar: 2px 0 12px rgba(0, 0, 0, 0.06);
+
+  --accent: #EA580C;
+  --accent-hover: #C2410C;
+  --accent-soft: rgba(234, 88, 12, 0.06);
+  --accent-border: rgba(234, 88, 12, 0.25);
+  --accent-glow: rgba(234, 88, 12, 0.15);
+
+  --success: #16A34A;
+  --warning: #CA8A04;
+  --danger: #DC2626;
+  --info: #2563EB;
+
+  --danger-soft: rgba(220, 38, 38, 0.06);
+  --danger-border: rgba(220, 38, 38, 0.15);
+  --warning-soft: rgba(234, 88, 12, 0.06);
+  --info-soft: rgba(37, 99, 235, 0.06);
+
+  --scrollbar-track: #F1F5F9;
+  --scrollbar-thumb: #CBD5E1;
+
+  color-scheme: light;
+}

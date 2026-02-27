@@ -1,0 +1,29 @@
+<section class="testimonials" id="depoimentos">
+  <div class="testimonials-container">
+    <h2 class="testimonials-title">O que nossos clientes dizem</h2>
+    <p class="testimonials-subtitle">Avaliações e depoimentos de quem confia na nossa logística</p>
+    <div class="testimonials-grid">
+      @for (t of testimonials; track t.author) {
+        <article class="testimonial-card">
+          @if (t.deliveryPhoto) {
+            <div class="testimonial-delivery-photo">
+              <img [src]="t.deliveryPhoto" alt="Serviço entregue ao cliente" />
+              <span class="testimonial-photo-label">Recebido / realizado pelo cliente</span>
+            </div>
+          }
+          <div class="testimonial-stars" aria-hidden="true">
+            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+          </div>
+          <blockquote class="testimonial-quote">"{{ t.quote }}"</blockquote>
+          <div class="testimonial-author">
+            <img [src]="t.avatar" [alt]="t.author" class="testimonial-avatar" />
+            <div class="testimonial-info">
+              <strong class="testimonial-name">{{ t.author }}</strong>
+              <span class="testimonial-role">{{ t.role }}</span>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>

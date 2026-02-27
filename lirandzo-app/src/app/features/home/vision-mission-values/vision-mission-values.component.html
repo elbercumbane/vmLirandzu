@@ -1,0 +1,41 @@
+<section class="vmv" id="visao-missao-valores">
+  <div class="vmv-container">
+    <h2 class="vmv-title">Identidade Corporativa</h2>
+    <div class="vmv-rings">
+      @for (card of cards; track card.type; let i = $index) {
+        <article class="vmv-card" [class.vmv-card--large]="i === 1" [attr.data-type]="card.type">
+          <div
+            class="vmv-circle"
+            [style.background]="card.circleColor"
+            [style.--title-color]="card.titleColor"
+            [style.--text-color]="card.textColor"
+          >
+            <h3 class="vmv-circle-title">{{ card.title }}</h3>
+            <div class="vmv-circle-icon" [attr.data-icon]="card.icon">
+              @switch (card.icon) {
+                @case ('target') {
+                  <span class="icon-target"></span>
+                }
+                @case ('eye') {
+                  <span class="icon-eye"></span>
+                }
+                @case ('heart') {
+                  <span class="icon-heart"></span>
+                }
+              }
+            </div>
+            @if (card.listItems && card.listItems.length) {
+              <ul class="vmv-circle-list">
+                @for (item of card.listItems; track item) {
+                  <li><span class="check"></span>{{ item }}</li>
+                }
+              </ul>
+            } @else {
+              <p class="vmv-circle-text">{{ card.text }}</p>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>

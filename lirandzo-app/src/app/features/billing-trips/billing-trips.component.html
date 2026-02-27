@@ -1,0 +1,306 @@
+<app-billing-sidebar [isOpen]="sidebarOpen" (toggleSidebar)="toggleSidebar()"></app-billing-sidebar>
+<button type="button" class="billing-sidebar-toggle" [class.sidebar-open]="sidebarOpen" (click)="toggleSidebar()" [attr.aria-label]="sidebarOpen ? 'Fechar menu' : 'Abrir menu'">
+  <span class="billing-sidebar-toggle-icon">{{ sidebarOpen ? '✕' : '☰' }}</span>
+</button>
+
+<section class="trips-page">
+  <div class="trips-page-inner">
+    <!-- Header -->
+    <header class="trips-header">
+      <div>
+        <h1 class="trips-title">GUIAS DE VIAGEM</h1>
+        <p class="trips-subtitle">Gestão de viagens à África do Sul — Maputo ↔ Joanesburgo</p>
+      </div>
+      <button type="button" class="trips-new-button">
+        <span class="trips-new-icon">＋</span>
+        <span>Nova Viagem</span>
+      </button>
+    </header>
+
+    <!-- KPI cards -->
+    <section class="trips-kpi-grid">
+      <div class="trips-kpi-card trips-kpi-orange">
+        <div class="trips-kpi-icon">🚛</div>
+        <div class="trips-kpi-content">
+          <div class="trips-kpi-value">{{ monthTrips }}</div>
+          <div class="trips-kpi-label">Viagens do mês</div>
+          <div class="trips-kpi-subtext">viagens realizadas</div>
+        </div>
+      </div>
+
+      <div class="trips-kpi-card trips-kpi-blue trips-kpi-pulse">
+        <div class="trips-kpi-icon">📍</div>
+        <div class="trips-kpi-content">
+          <div class="trips-kpi-value">{{ inProgressTrips }}</div>
+          <div class="trips-kpi-label">Em curso</div>
+          <div class="trips-kpi-subtext">viagem activa agora</div>
+        </div>
+      </div>
+
+      <div class="trips-kpi-card trips-kpi-green">
+        <div class="trips-kpi-icon">📦</div>
+        <div class="trips-kpi-content">
+          <div class="trips-kpi-value">{{ totalOrders }}</div>
+          <div class="trips-kpi-label">Encomendas transportadas</div>
+          <div class="trips-kpi-subtext">este mês</div>
+        </div>
+      </div>
+
+      <div class="trips-kpi-card trips-kpi-orange">
+        <div class="trips-kpi-icon">📈</div>
+        <div class="trips-kpi-content">
+          <div class="trips-kpi-value">{{ totalValue | number: '1.0-0' }} MZN</div>
+          <div class="trips-kpi-label">Valor transportado</div>
+          <div class="trips-kpi-subtext">valor total das viagens</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trips list -->
+    <section class="trips-list">
+      <article
+        *ngFor="let trip of trips"
+        class="trip-card"
+        [class.trip-card-active]="trip.status === 'IN_PROGRESS'"
+      >
+        <!-- Left: identity -->
+        <div class="trip-left">
+          <div class="trip-id-row">
+            <span class="trip-id-badge">{{ trip.id }}</span>
+            <span
+              class="trip-status-badge"
+              [ngClass]="{
+                'status-completed': trip.status === 'COMPLETED',
+                'status-in-progress': trip.status === 'IN_PROGRESS',
+                'status-planned': trip.status === 'PLANNED'
+              }"
+            >
+              {{
+                trip.status === 'COMPLETED'
+                  ? 'CONCLUÍDA'
+                  : trip.status === 'IN_PROGRESS'
+                  ? 'EM CURSO'
+                  : 'PLANEADA'
+              }}
+            </span>
+            <span *ngIf="trip.status === 'IN_PROGRESS'" class="trip-active-badge">ACTIVA AGORA</span>
+          </div>
+          <div class="trip-manager">
+            <span class="trip-manager-avatar">
+              {{ trip.manager.split(' ')[0][0] }}{{ trip.manager.split(' ')[1][0] }}
+            </span>
+            <span class="trip-manager-name">{{ trip.manager }}</span>
+          </div>
+          <div class="trip-dates">
+            <span class="trip-date-item">
+              📅 Partida: {{ trip.startDate }}
+            </span>
+            <span class="trip-date-item">
+              📅 Retorno: {{ trip.endDate }}
+            </span>
+          </div>
+          <div class="trip-route">
+            🚛 {{ trip.route }}
+          </div>
+        </div>
+
+        <!-- Center: summary -->
+        <div class="trip-center">
+          <div class="trip-orders-count">
+            <span class="trip-orders-value">{{ trip.totalOrders }}</span>
+            <span class="trip-orders-label">encomendas</span>
+          </div>
+          <div class="trip-progress">
+            <div class="trip-progress-bar">
+              <div
+                class="trip-progress-segment trip-progress-paid"
+                [style.width.%]="(trip.paidOrders / trip.totalOrders) * 100"
+              ></div>
+              <div
+                class="trip-progress-segment trip-progress-partial"
+                [style.width.%]="(trip.partialOrders / trip.totalOrders) * 100"
+              ></div>
+              <div
+                class="trip-progress-segment trip-progress-unpaid"
+                [style.width.%]="(trip.unpaidOrders / trip.totalOrders) * 100"
+              ></div>
+            </div>
+            <div class="trip-progress-legend">
+              <span class="trip-progress-legend-item">
+                <span class="dot paid"></span> {{ trip.paidOrders }} pagas
+              </span>
+              <span class="trip-progress-legend-item">
+                <span class="dot partial"></span> {{ trip.partialOrders }} parciais
+              </span>
+              <span class="trip-progress-legend-item">
+                <span class="dot unpaid"></span> {{ trip.unpaidOrders }} não pagas
+              </span>
+            </div>
+          </div>
+          <div class="trip-total-value">
+            <span class="trip-total-label">Valor total transportado</span>
+            <span class="trip-total-amount">{{ trip.totalValueMzn | number: '1.0-0' }} MZN</span>
+          </div>
+        </div>
+
+        <!-- Right: actions -->
+        <div class="trip-right">
+          <div class="trip-unpaid-badge" *ngIf="trip.unpaidOrders > 0">
+            {{ trip.unpaidOrders }} não pagas
+          </div>
+          <div class="trip-actions">
+            <button type="button" class="trip-action-button trip-action-guide" (click)="openGuideModal(trip)">
+              📄 Ver Guia
+            </button>
+            <button
+              type="button"
+              class="trip-action-button trip-action-field"
+              *ngIf="trip.status === 'IN_PROGRESS'"
+              (click)="openFieldModal(trip)"
+            >
+              ✅ Conferir em Campo
+            </button>
+            <button type="button" class="trip-action-button trip-action-export">
+              ⬇ Exportar PDF
+            </button>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Guide modal (simplified) -->
+    <div class="trips-modal-backdrop" *ngIf="guideModalOpen">
+      <div class="trips-modal trips-modal-large">
+        <header class="trips-modal-header">
+          <div>
+            <h3 class="trips-modal-title">
+              Guia de Viagem — {{ selectedTrip?.id }}
+            </h3>
+            <p class="trips-modal-subtitle">
+              {{ selectedTrip?.manager }} · {{ selectedTrip?.startDate }} → {{ selectedTrip?.endDate }}
+            </p>
+          </div>
+          <button type="button" class="trips-modal-close" (click)="closeGuideModal()">✕</button>
+        </header>
+        <div class="trips-modal-body">
+          <div class="trips-modal-summary">
+            <div><strong>Rota:</strong> {{ selectedTrip?.route }}</div>
+            <div><strong>Encomendas:</strong> {{ selectedTrip?.totalOrders }}</div>
+            <div><strong>Total ZAR:</strong> 12.345</div>
+            <div><strong>Total MZN:</strong> {{ selectedTrip?.totalValueMzn | number: '1.0-0' }} MZN</div>
+          </div>
+
+          <div class="trips-modal-table-wrapper">
+            <table class="trips-modal-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nº Encomenda</th>
+                  <th>Cliente</th>
+                  <th>Produto</th>
+                  <th>Loja JHB</th>
+                  <th>ZAR</th>
+                  <th>Status Pgto</th>
+                  <th>Conferido</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>VML-2025-0001</td>
+                  <td>Ana Rodrigues</td>
+                  <td>iPhone 15 Pro 256GB</td>
+                  <td>iStore Sandton</td>
+                  <td>2.400</td>
+                  <td><span class="status-paid">PAGO</span></td>
+                  <td><input type="checkbox" checked /></td>
+                </tr>
+                <tr class="row-partial">
+                  <td>2</td>
+                  <td>VML-2025-0002</td>
+                  <td>Carlos Mondlane</td>
+                  <td>Samsung TV 55&quot; 4K</td>
+                  <td>Makro JHB</td>
+                  <td>2.026</td>
+                  <td><span class="status-partial">PARCIAL</span></td>
+                  <td><input type="checkbox" /></td>
+                </tr>
+                <tr class="row-unpaid">
+                  <td>3</td>
+                  <td>VML-2025-0003</td>
+                  <td>Fátima Cossa</td>
+                  <td>Nike Air Max + Adidas</td>
+                  <td>Sports Scene</td>
+                  <td>680</td>
+                  <td><span class="status-unpaid">NÃO PAGO</span></td>
+                  <td><input type="checkbox" /></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <footer class="trips-modal-footer">
+          <div class="trips-modal-footer-left">
+            <div>Total encomendas: 3</div>
+            <div>Total ZAR: 5.106</div>
+            <div>Total MZN: {{ selectedTrip?.totalValueMzn | number: '1.0-0' }} MZN</div>
+          </div>
+          <div class="trips-modal-footer-right">
+            <button type="button" class="trips-modal-button">Fechar</button>
+            <button type="button" class="trips-modal-button trips-modal-button-primary">
+              ⬇ Exportar Guia PDF
+            </button>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <!-- Field modal (simplified) -->
+    <div class="trips-modal-backdrop" *ngIf="fieldModalOpen">
+      <div class="trips-modal trips-modal-field">
+        <header class="trips-modal-header">
+          <div>
+            <h3 class="trips-modal-title">🇿🇦 Modo Campo — {{ selectedTrip?.id }}</h3>
+            <p class="trips-modal-subtitle">Joanesburgo — viagem activa</p>
+          </div>
+          <button type="button" class="trips-modal-close" (click)="closeFieldModal()">✕</button>
+        </header>
+        <div class="trips-modal-body trips-modal-field-body">
+          <div class="trips-field-summary">
+            <span>12 itens</span>
+            <span>5 confirmados</span>
+            <span>7 pendentes</span>
+          </div>
+          <div class="trips-field-list">
+            <div class="trips-field-item">
+              <div class="trips-field-client">Ana Rodrigues</div>
+              <div class="trips-field-product">iPhone 15 Pro 256GB — iStore Sandton</div>
+              <div class="trips-field-amount">R 2.400</div>
+              <div class="trips-field-actions">
+                <button type="button" class="field-btn field-btn-success">✓ COMPRADO</button>
+                <button type="button" class="field-btn field-btn-danger">⚠ NÃO ENCONTRADO</button>
+                <button type="button" class="field-btn field-btn-warning">⏳ AGUARDA</button>
+              </div>
+            </div>
+            <!-- Outros itens mock poderiam ser adicionados aqui -->
+          </div>
+        </div>
+        <footer class="trips-modal-footer trips-modal-field-footer">
+          <div class="trips-field-progress">
+            <div class="trips-field-progress-bar">
+              <div class="trips-field-progress-fill" style="width: 40%;"></div>
+            </div>
+            <span>5 de 12 confirmados</span>
+          </div>
+          <div class="trips-modal-footer-right">
+            <button type="button" class="trips-modal-button">Guardar e Continuar Depois</button>
+            <button type="button" class="trips-modal-button trips-modal-button-primary" disabled>
+              Finalizar Conferência
+            </button>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+</section>
+

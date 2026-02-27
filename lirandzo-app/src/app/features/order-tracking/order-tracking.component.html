@@ -1,0 +1,65 @@
+<main class="tracking-page">
+  <section class="tracking-hero">
+    <div class="tracking-hero-content" #heroContent>
+      <h1 class="tracking-hero-title">Onde está a sua carga?</h1>
+      <p class="tracking-hero-description">
+        Consulte o status da sua entrega em tempo real. Insira o número da fatura e acompanhe cada etapa, do armazém até à sua porta.
+      </p>
+      <form class="tracking-hero-form" (ngSubmit)="search()">
+        <div class="tracking-input-group">
+          <input
+            type="text"
+            [(ngModel)]="trackingCode"
+            name="trackingCode"
+            class="tracking-input-large"
+            placeholder="Número da fatura (ex: 001)"
+            maxlength="30"
+          />
+          <button type="submit" class="tracking-btn-large">Rastrear</button>
+        </div>
+        <p class="tracking-hint">Ex.: 001, 002 ou 003</p>
+      </form>
+    </div>
+  </section>
+
+  @if (searched) {
+    <section class="tracking-result" role="region" aria-label="Resultado do rastreio">
+      <div class="tracking-result-inner">
+        <div class="result-header">
+          <span class="result-title">Status da entrega</span>
+          <div class="result-details">
+            <span class="result-detail"><strong>Nº da fatura:</strong> {{ currentFatura }}</span>
+            @if (currentPackageId) {
+              <span class="result-detail"><strong>Nº do pedido / embalagem:</strong> {{ currentPackageId }}</span>
+            }
+            @if (currentRoute) {
+              <span class="result-detail result-route"><strong>Rota:</strong> {{ currentRoute }}</span>
+            }
+          </div>
+          <p class="result-status">{{ mockStatus }}</p>
+        </div>
+        <p class="result-timeline-label">Etapas da entrega</p>
+        <div class="tracking-timeline">
+          @for (step of mockSteps; track step.label; let i = $index) {
+            <div
+              class="timeline-item"
+              [class.done]="step.done"
+              [class.long-step]="step.longDuration"
+              [style.animation-delay]="(i * 90) + 'ms'"
+            >
+              <div class="timeline-marker">
+                @if (step.done) {
+                  <span class="timeline-check" aria-hidden="true">✓</span>
+                }
+              </div>
+              <div class="timeline-content">
+                <strong>{{ step.label }}</strong>
+                <span class="timeline-meta">{{ step.date }}<ng-container *ngIf="step.location"> · {{ step.location }}</ng-container></span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+</main>

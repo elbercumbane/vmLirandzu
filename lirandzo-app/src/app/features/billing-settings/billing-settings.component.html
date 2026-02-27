@@ -1,0 +1,544 @@
+<section class="settings-page">
+  <div class="settings-page-inner">
+    <!-- Header -->
+    <header class="settings-header">
+      <div class="settings-header-content">
+        <div class="settings-header-mark">VM</div>
+        <div class="settings-header-text">
+          <h1 class="settings-title">Configurações do Sistema</h1>
+          <p class="settings-subtitle">VM Lirandzu Transportes — Painel de administração</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content: 2 Columns -->
+    <div class="settings-layout">
+      <!-- Left Column: Tab Menu -->
+      <aside class="settings-tabs-menu">
+        <button
+          type="button"
+          class="settings-tab-item"
+          [class.active]="activeTab === 'empresa'"
+          (click)="setActiveTab('empresa')"
+        >
+          <span class="settings-tab-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          </span>
+          <span class="settings-tab-label">Dados da Empresa</span>
+        </button>
+        <button
+          type="button"
+          class="settings-tab-item"
+          [class.active]="activeTab === 'cambio'"
+          (click)="setActiveTab('cambio')"
+        >
+          <span class="settings-tab-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          </span>
+          <span class="settings-tab-label">Taxas & Câmbio</span>
+        </button>
+        <button
+          type="button"
+          class="settings-tab-item"
+          [class.active]="activeTab === 'gestores'"
+          (click)="setActiveTab('gestores')"
+        >
+          <span class="settings-tab-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          </span>
+          <span class="settings-tab-label">Gestores & Utilizadores</span>
+        </button>
+        <button
+          type="button"
+          class="settings-tab-item"
+          [class.active]="activeTab === 'facturas'"
+          (click)="setActiveTab('facturas')"
+        >
+          <span class="settings-tab-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path></svg>
+          </span>
+          <span class="settings-tab-label">Configuração de Facturas</span>
+        </button>
+        <button
+          type="button"
+          class="settings-tab-item"
+          [class.active]="activeTab === 'backup'"
+          (click)="setActiveTab('backup')"
+        >
+          <span class="settings-tab-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          </span>
+          <span class="settings-tab-label">Backup & Dados</span>
+        </button>
+        <button
+          type="button"
+          class="settings-tab-item"
+          [class.active]="activeTab === 'notificacoes'"
+          (click)="setActiveTab('notificacoes')"
+        >
+          <span class="settings-tab-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          </span>
+          <span class="settings-tab-label">Notificações</span>
+        </button>
+      </aside>
+
+      <!-- Right Column: Tab Content -->
+      <div class="settings-content">
+        <!-- TAB 1: Dados da Empresa -->
+        <div *ngIf="activeTab === 'empresa'" class="settings-tab-content">
+          <h2 class="settings-section-title">Informações da Empresa</h2>
+          <p class="settings-section-subtitle">Estes dados aparecem em todas as facturas emitidas</p>
+
+          <form class="settings-form">
+            <div class="settings-form-grid">
+              <div class="settings-form-group">
+                <label class="settings-label">Nome da Empresa</label>
+                <input type="text" class="settings-input" [(ngModel)]="companyData.name" name="companyName" />
+              </div>
+
+              <div class="settings-form-group">
+                <label class="settings-label">NIF / NUIT</label>
+                <input type="text" class="settings-input" [(ngModel)]="companyData.nif" name="nif" />
+              </div>
+
+              <div class="settings-form-group">
+                <label class="settings-label">Email Principal</label>
+                <input type="email" class="settings-input" [(ngModel)]="companyData.emailMain" name="emailMain" />
+              </div>
+
+              <div class="settings-form-group">
+                <label class="settings-label">Email Administração</label>
+                <input type="email" class="settings-input" [(ngModel)]="companyData.emailAdmin" name="emailAdmin" />
+              </div>
+
+              <div class="settings-form-group">
+                <label class="settings-label">Telefone Moçambique</label>
+                <input type="tel" class="settings-input" [(ngModel)]="companyData.phoneMZ" name="phoneMZ" />
+              </div>
+
+              <div class="settings-form-group">
+                <label class="settings-label">Telefone África do Sul</label>
+                <input type="tel" class="settings-input" [(ngModel)]="companyData.phoneZA" name="phoneZA" />
+              </div>
+
+              <div class="settings-form-group settings-form-group-full">
+                <label class="settings-label">Morada Maputo</label>
+                <input type="text" class="settings-input" [(ngModel)]="companyData.addressMZ" name="addressMZ" />
+              </div>
+
+              <div class="settings-form-group settings-form-group-full">
+                <label class="settings-label">Morada Joanesburgo</label>
+                <input type="text" class="settings-input" [(ngModel)]="companyData.addressZA" name="addressZA" />
+              </div>
+
+              <div class="settings-form-group settings-form-group-full">
+                <label class="settings-label">Lema/Slogan</label>
+                <input type="text" class="settings-input" [(ngModel)]="companyData.slogan" name="slogan" />
+              </div>
+            </div>
+
+            <!-- Logo Section -->
+            <div class="settings-logo-section">
+              <label class="settings-label">Logo da Empresa</label>
+              <div class="settings-logo-preview">
+                <div class="settings-logo-placeholder">VM</div>
+                <div class="settings-logo-info">
+                  <p class="settings-logo-note">Recomendado: PNG 200x200px fundo transparente</p>
+                  <button type="button" class="settings-button-outline">Alterar Logo</button>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="settings-button-primary" (click)="saveCompanyData()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+              Guardar Alterações
+            </button>
+          </form>
+        </div>
+
+        <!-- TAB 2: Taxas & Câmbio -->
+        <div *ngIf="activeTab === 'cambio'" class="settings-tab-content">
+          <h2 class="settings-section-title">Taxas e Câmbios</h2>
+          <p class="settings-section-subtitle">Valores utilizados no cálculo das facturas</p>
+
+          <!-- Exchange Rate Section -->
+          <div class="settings-card settings-card-orange">
+            <label class="settings-label">Taxa de Câmbio Actual — ZAR → MZN</label>
+            <div class="settings-exchange-display">
+              <input type="number" class="settings-exchange-input" [(ngModel)]="exchangeRate" step="0.01" />
+              <p class="settings-exchange-date">Última actualização: {{ exchangeRateDate }}</p>
+              <button type="button" class="settings-button-primary" (click)="updateExchangeRate()">
+                Actualizar Câmbio
+              </button>
+            </div>
+            <p class="settings-warning">
+              <svg class="settings-warning-icon-inline" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              Este valor é aplicado a todas as novas encomendas. Encomendas já registadas mantêm o câmbio original.
+            </p>
+
+            <!-- Exchange History -->
+            <div class="settings-history-table">
+              <table class="settings-table">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Câmbio Anterior</th>
+                    <th>Câmbio Novo</th>
+                    <th>Alterado por</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let history of exchangeHistory">
+                    <td>{{ history.date }}</td>
+                    <td>{{ history.oldRate }}</td>
+                    <td>{{ history.newRate }}</td>
+                    <td>{{ history.changedBy }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Transport Rate Section -->
+          <div class="settings-card">
+            <label class="settings-label">Taxa de transporte base por encomenda (MZN)</label>
+            <input type="number" class="settings-input" [(ngModel)]="defaultTransportRate" />
+            <p class="settings-note">Valor sugerido ao criar nova encomenda (editável por encomenda)</p>
+            <button type="button" class="settings-button-primary" (click)="saveTransportRate()">
+              Guardar Taxa
+            </button>
+          </div>
+
+          <!-- Category Rates Section -->
+          <div class="settings-card">
+            <h3 class="settings-card-title">Taxas por Categoria de Produto</h3>
+            <table class="settings-table">
+              <thead>
+                <tr>
+                  <th>Categoria</th>
+                  <th>Taxa Base (MZN)</th>
+                  <th>Descrição</th>
+                  <th>Acção</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let category of categoryRates">
+                  <td>{{ category.category }}</td>
+                  <td>{{ category.rate | number: '1.0-0' }} MZN</td>
+                  <td>{{ category.description }}</td>
+                  <td>
+                    <button type="button" class="settings-button-outline-small">Editar</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <button type="button" class="settings-button-outline">+ Adicionar Categoria</button>
+          </div>
+        </div>
+
+        <!-- TAB 3: Gestores & Utilizadores -->
+        <div *ngIf="activeTab === 'gestores'" class="settings-tab-content">
+          <div class="settings-header-row">
+            <div>
+              <h2 class="settings-section-title">Equipa de Gestores</h2>
+              <p class="settings-section-subtitle">Utilizadores com acesso ao sistema</p>
+            </div>
+            <button type="button" class="settings-button-primary" (click)="openManagerModal()">
+              + Adicionar Gestor
+            </button>
+          </div>
+
+          <div class="settings-managers-grid">
+            <div *ngFor="let manager of managers" class="settings-manager-card">
+              <div class="settings-manager-avatar" [style.background]="manager.foto ? 'transparent' : getManagerColor(manager.name)">
+                <img *ngIf="manager.foto" [src]="manager.foto" alt="" />
+                <span *ngIf="!manager.foto">{{ manager.avatar }}</span>
+              </div>
+              <div class="settings-manager-info">
+                <h3 class="settings-manager-name">{{ manager.name }}</h3>
+                <p class="settings-manager-role">{{ manager.role }}</p>
+                <p class="settings-manager-detail"><svg class="settings-detail-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> {{ manager.email }}</p>
+                <p class="settings-manager-detail"><svg class="settings-detail-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> {{ manager.phone }}</p>
+                <p class="settings-manager-detail"><svg class="settings-detail-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Desde: {{ manager.joinDate }}</p>
+                <span class="settings-status-badge" [class.active]="manager.status === 'ACTIVE'">
+                  {{ manager.status === 'ACTIVE' ? 'ACTIVO' : 'INACTIVO' }}
+                </span>
+              </div>
+              <div class="settings-manager-actions">
+                <button type="button" class="settings-button-outline-small" (click)="openManagerModal(manager)">
+                  Editar
+                </button>
+                <button type="button" class="settings-button-outline-small settings-button-danger" (click)="deactivateManager(manager)">
+                  Desactivar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: Configuração de Facturas -->
+        <div *ngIf="activeTab === 'facturas'" class="settings-tab-content">
+          <h2 class="settings-section-title">Aparência das Facturas PDF</h2>
+          <p class="settings-section-subtitle">Personalizar o formato das facturas emitidas</p>
+
+          <!-- Header Info Section -->
+          <div class="settings-card">
+            <h3 class="settings-card-title">Informações do Cabeçalho</h3>
+            <div class="settings-toggle-group">
+              <label class="settings-toggle">
+                <input type="checkbox" [(ngModel)]="invoiceSettings.showLogo" />
+                <span class="settings-toggle-slider"></span>
+                <span class="settings-toggle-label">Mostrar logo na factura</span>
+              </label>
+              <label class="settings-toggle">
+                <input type="checkbox" [(ngModel)]="invoiceSettings.showAddress" />
+                <span class="settings-toggle-slider"></span>
+                <span class="settings-toggle-label">Mostrar morada completa</span>
+              </label>
+              <label class="settings-toggle">
+                <input type="checkbox" [(ngModel)]="invoiceSettings.showNIF" />
+                <span class="settings-toggle-slider"></span>
+                <span class="settings-toggle-label">Mostrar NIF/NUIT</span>
+              </label>
+              <label class="settings-toggle">
+                <input type="checkbox" [(ngModel)]="invoiceSettings.showSlogan" />
+                <span class="settings-toggle-slider"></span>
+                <span class="settings-toggle-label">Mostrar lema da empresa</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Numbering Section -->
+          <div class="settings-card">
+            <h3 class="settings-card-title">Numeração</h3>
+            <div class="settings-form-group">
+              <label class="settings-label">Formato do nº de encomenda</label>
+              <input type="text" class="settings-input" [(ngModel)]="invoiceSettings.orderFormat" />
+              <p class="settings-note">Exemplo: VML-2025-0047</p>
+            </div>
+            <div class="settings-form-group">
+              <label class="settings-label">Próximo número</label>
+              <input type="number" class="settings-input" [(ngModel)]="invoiceSettings.nextNumber" />
+            </div>
+          </div>
+
+          <!-- Terms Section -->
+          <div class="settings-card">
+            <h3 class="settings-card-title">Termos e Condições</h3>
+            <textarea class="settings-textarea" [(ngModel)]="invoiceSettings.terms" rows="6"></textarea>
+            <button type="button" class="settings-button-primary" (click)="saveTerms()">
+              Guardar Termos
+            </button>
+          </div>
+
+          <!-- Preview Section -->
+          <div class="settings-card settings-card-preview">
+            <h3 class="settings-card-title">Preview da Factura</h3>
+            <div class="settings-invoice-preview">
+              <div class="settings-preview-logo">VM</div>
+              <h4>VM Lirandzu Transportes</h4>
+              <p>Bairro Djuba, Célula D, Q.1, NR7 – Mozal</p>
+              <hr />
+              <h3>FACTURA Nº VML-2025-0047</h3>
+              <p>Cliente: Exemplo Cliente</p>
+              <p>Data: 18/01/2025</p>
+            </div>
+            <button type="button" class="settings-button-outline">Imprimir Preview</button>
+          </div>
+
+          <button type="button" class="settings-button-primary" (click)="saveInvoiceSettings()">
+            Guardar Configurações
+          </button>
+        </div>
+
+        <!-- TAB 5: Backup & Dados -->
+        <div *ngIf="activeTab === 'backup'" class="settings-tab-content">
+          <h2 class="settings-section-title">Gestão de Dados</h2>
+          <p class="settings-section-subtitle">Backup, exportação e restauro do sistema</p>
+
+          <!-- Backup Section -->
+          <div class="settings-card settings-card-green">
+            <div class="settings-backup-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            </div>
+            <h3 class="settings-card-title">Fazer Backup Agora</h3>
+            <p class="settings-card-text">Exporta todos os dados do sistema (encomendas, clientes, viagens, pagamentos) para um ficheiro JSON.</p>
+            <p class="settings-backup-date">Última cópia: {{ lastBackup }}</p>
+            <button type="button" class="settings-button-green" (click)="makeBackup()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              Fazer Backup Completo
+            </button>
+          </div>
+
+          <!-- Export Section -->
+          <div class="settings-card">
+            <h3 class="settings-card-title">Exportação de Dados</h3>
+            <div class="settings-export-buttons">
+              <button type="button" class="settings-button-outline" (click)="exportData('Encomendas CSV')">
+                Exportar Encomendas (CSV)
+              </button>
+              <button type="button" class="settings-button-outline settings-button-outline-blue" (click)="exportData('Clientes CSV')">
+                Exportar Clientes (CSV)
+              </button>
+              <button type="button" class="settings-button-outline settings-button-outline-green" (click)="exportData('Tudo JSON')">
+                Exportar Tudo (JSON)
+              </button>
+            </div>
+          </div>
+
+          <!-- Restore Section -->
+          <div class="settings-card settings-card-yellow">
+            <div class="settings-warning-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </div>
+            <h3 class="settings-card-title">Restaurar Backup</h3>
+            <p class="settings-card-text">Atenção: restaurar um backup substitui TODOS os dados actuais. Esta acção não pode ser desfeita.</p>
+            <input type="file" accept=".json" class="settings-file-input" />
+            <button type="button" class="settings-button-danger" (click)="restoreBackup()">
+              Restaurar
+            </button>
+          </div>
+
+          <!-- Clear Demo Section -->
+          <div class="settings-card settings-card-gray">
+            <h3 class="settings-card-title">Limpar Dados de Demonstração</h3>
+            <p class="settings-card-text">Remover todos os dados mock/demonstração e começar com o sistema limpo para uso real.</p>
+            <button type="button" class="settings-button-outline settings-button-outline-danger" (click)="clearDemoData()">
+              Limpar Dados Demo
+            </button>
+          </div>
+        </div>
+
+        <!-- TAB 6: Notificações -->
+        <div *ngIf="activeTab === 'notificacoes'" class="settings-tab-content">
+          <h2 class="settings-section-title">Preferências de Notificação</h2>
+          <p class="settings-section-subtitle">Configurar alertas e lembretes automáticos</p>
+
+          <div class="settings-card">
+            <h3 class="settings-card-title">Alertas de Dívida</h3>
+            <div class="settings-toggle-group">
+              <label class="settings-toggle">
+                <input type="checkbox" [(ngModel)]="notifications.showDebtPanel" />
+                <span class="settings-toggle-slider"></span>
+                <span class="settings-toggle-label">Mostrar painel de alertas no dashboard</span>
+              </label>
+              <label class="settings-toggle">
+                <input type="checkbox" [(ngModel)]="notifications.highlightDebtClients" />
+                <span class="settings-toggle-slider"></span>
+                <span class="settings-toggle-label">Destacar clientes com dívida nos cards</span>
+              </label>
+              <div class="settings-toggle-with-select">
+                <label class="settings-toggle-label">Alertar quando encomenda não paga há mais de:</label>
+                <select class="settings-select" [(ngModel)]="notifications.debtDays">
+                  <option [value]="3">3 dias</option>
+                  <option [value]="7">7 dias</option>
+                  <option [value]="14">14 dias</option>
+                  <option [value]="30">30 dias</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <h3 class="settings-card-title">Alertas de Viagem</h3>
+            <div class="settings-toggle-group">
+              <label class="settings-toggle">
+                <input type="checkbox" [(ngModel)]="notifications.tripReminder1Day" />
+                <span class="settings-toggle-slider"></span>
+                <span class="settings-toggle-label">Lembrete 1 dia antes da viagem partir</span>
+              </label>
+              <label class="settings-toggle">
+                <input type="checkbox" [(ngModel)]="notifications.tripUnpaidAlert" />
+                <span class="settings-toggle-slider"></span>
+                <span class="settings-toggle-label">Alerta de encomendas não pagas antes de partir</span>
+              </label>
+              <label class="settings-toggle">
+                <input type="checkbox" [(ngModel)]="notifications.tripCompletedNotification" />
+                <span class="settings-toggle-slider"></span>
+                <span class="settings-toggle-label">Notificação quando viagem marcada como concluída</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <h3 class="settings-card-title">Resumos</h3>
+            <div class="settings-toggle-group">
+              <label class="settings-toggle">
+                <input type="checkbox" [(ngModel)]="notifications.dailySummary" />
+                <span class="settings-toggle-slider"></span>
+                <span class="settings-toggle-label">Resumo diário no dashboard (encomendas do dia)</span>
+              </label>
+              <label class="settings-toggle">
+                <input type="checkbox" [(ngModel)]="notifications.showBadge" />
+                <span class="settings-toggle-slider"></span>
+                <span class="settings-toggle-label">Mostrar badge de contagem na navegação</span>
+              </label>
+            </div>
+          </div>
+
+          <button type="button" class="settings-button-primary" (click)="saveNotifications()">
+            Guardar Preferências
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Manager Modal -->
+<div *ngIf="isManagerModalOpen" class="settings-modal-overlay" (click)="closeManagerModal()">
+  <div class="settings-modal" (click)="$event.stopPropagation()">
+    <div class="settings-modal-header">
+      <h3 class="settings-modal-title">{{ selectedManager ? 'Editar Gestor' : 'Adicionar Gestor' }}</h3>
+      <button type="button" class="settings-modal-close" (click)="closeManagerModal()" aria-label="Fechar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    <div class="settings-modal-body">
+      <form class="settings-form">
+        <div class="settings-form-group settings-form-group-photo">
+          <label class="settings-label">Foto de perfil</label>
+          <div class="settings-photo-upload">
+            <div class="settings-photo-preview" [class.has-photo]="managerForm.foto">
+              <img *ngIf="managerForm.foto" [src]="managerForm.foto" alt="Foto" />
+              <span *ngIf="!managerForm.foto" class="settings-photo-placeholder">{{ getManagerFormInitials() }}</span>
+            </div>
+            <label class="settings-photo-btn">
+              <input type="file" accept="image/*" (change)="onManagerPhotoChange($event)" />
+              Seleccionar foto
+            </label>
+          </div>
+        </div>
+        <div class="settings-form-group">
+          <label class="settings-label">Nome</label>
+          <input type="text" class="settings-input" [(ngModel)]="managerForm.name" name="managerName" />
+        </div>
+        <div class="settings-form-group">
+          <label class="settings-label">Cargo</label>
+          <input type="text" class="settings-input" [(ngModel)]="managerForm.role" name="managerRole" />
+        </div>
+        <div class="settings-form-group">
+          <label class="settings-label">Email</label>
+          <input type="email" class="settings-input" [(ngModel)]="managerForm.email" name="managerEmail" />
+        </div>
+        <div class="settings-form-group">
+          <label class="settings-label">Telefone</label>
+          <input type="tel" class="settings-input" [(ngModel)]="managerForm.phone" name="managerPhone" />
+        </div>
+        <div class="settings-form-group">
+          <label class="settings-label">PIN de acesso (4 dígitos)</label>
+          <input type="password" class="settings-input" [(ngModel)]="managerForm.pin" name="managerPin" maxlength="4" />
+        </div>
+        <div class="settings-form-group">
+          <label class="settings-label">Confirmar PIN</label>
+          <input type="password" class="settings-input" [(ngModel)]="managerForm.confirmPin" name="managerConfirmPin" maxlength="4" />
+        </div>
+      </form>
+    </div>
+    <div class="settings-modal-footer">
+      <button type="button" class="settings-button-outline" (click)="closeManagerModal()">Cancelar</button>
+      <button type="button" class="settings-button-primary" (click)="saveManager()">Guardar</button>
+    </div>
+  </div>
+</div>

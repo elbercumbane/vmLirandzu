@@ -1,0 +1,19 @@
+<section class="partners" id="parceiros">
+  <div class="partners-container">
+    <h2 class="partners-title">Parceiros</h2>
+    <div class="partners-track-wrap">
+      <div class="partners-track">
+        @for (p of partners; track p.name) {
+          <div class="partner-item">
+            <img [src]="p.logo" [alt]="p.name" class="partner-logo" />
+          </div>
+        }
+        @for (p of partners; track 'dup-' + p.name) {
+          <div class="partner-item">
+            <img [src]="p.logo" [alt]="p.name" class="partner-logo" />
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>

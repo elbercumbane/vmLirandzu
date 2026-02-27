@@ -2,64 +2,76 @@
 
 Portal web moderno para VM Lirandzu Transportes & Logística, desenvolvido com Angular 19.
 
+Este repositório integra:
+- O **portal público** desenvolvido pelo Guilherme (Angular 19, layout com login e novo dashboard) dentro da pasta `lirandzo-app/`
+- O **sistema de facturação/billing** que vive na raiz `src/app/billing` e partilha o mesmo domínio/porta via `app.routes.ts`
+
 ## 🚀 Instalação
 
-1. Instale as dependências:
+1. Instale as dependências na raiz (billing + shell):
 ```bash
 npm install
 ```
 
-2. Execute o servidor de desenvolvimento:
+2. Instale as dependências do portal Angular principal (lirandzo-app):
+```bash
+cd lirandzo-app
+npm install
+cd ..
+```
+
+3. Execute o servidor de desenvolvimento (shell principal):
 ```bash
 npm start
 ```
 
-3. Acesse `http://localhost:4200` no navegador
+4. Acesse `http://localhost:4200` no navegador.
 
 ## 🛠️ Build para Produção
 
+Na raiz do projecto:
 ```bash
 npm run build
 ```
 
-Os arquivos serão gerados na pasta `dist/vm-lirandzu`
+Os artefactos do Angular standalone (billing) serão gerados em `dist/` conforme configuração local.
 
-## 📁 Estrutura do Projeto
+Para o portal Angular 19 (`lirandzo-app`), use:
+```bash
+cd lirandzo-app
+npm run build
+cd ..
+```
 
+## 📁 Estrutura do Projeto (resumo)
+
+### Shell / Facturação (este repo)
 ```
 src/
 ├── app/
-│   ├── components/
-│   │   ├── nav/           # Navegação
-│   │   ├── hero/          # Seção Hero com caminhão
-│   │   ├── marquee/       # Barra de rolagem de serviços
-│   │   ├── como-funciona/ # Processo em 4 passos
-│   │   ├── servicos/      # Lista de serviços
-│   │   ├── depoimentos/   # Testemunhos de clientes
-│   │   ├── cta/           # Call to Action
-│   │   └── footer/        # Rodapé
-│   └── app.component.ts   # Componente principal
-├── styles.css             # Estilos globais
-└── index.html             # HTML principal
+│   ├── billing/           # Módulos e páginas do sistema de facturação
+│   ├── services/          # Serviços partilhados (orders, payments, trips, etc.)
+│   ├── models/            # Modelos de domínio
+│   └── app.routes.ts      # Rotas principais (/, /billing, etc.)
+└── styles.css             # Estilos globais
+```
+
+### Portal Angular 19 do Guilherme (`lirandzo-app/`)
+```
+lirandzo-app/
+├── src/app/features/      # Home, login, client-area, etc.
+├── src/app/shared/        # Navbar, footer, sidebar, guards, services, etc.
+├── src/app/billing/       # Layout e páginas de billing no portal
+└── src/styles.css         # Estilos globais do portal
 ```
 
 ## ✨ Características
 
-- ✅ Design moderno com tema escuro
-- ✅ Cursor customizado
-- ✅ Animações suaves
-- ✅ Caminhão SVG animado no Hero
-- ✅ Contadores animados
-- ✅ Scroll reveal
-- ✅ Totalmente responsivo
-- ✅ Angular 19 Standalone Components
-
-## 🎨 Cores
-
-- Vermelho Principal: `#C8102E`
-- Fundo Escuro: `#060608`
-- Texto: `#f0f0f0`
+- ✅ Portal marketing + área de cliente da VM Lirandzu (branch do Guilherme)
+- ✅ Sistema de facturação integrado no mesmo domínio/porta via rotas
+- ✅ Design moderno com tema escuro e elementos animados
+- ✅ Angular 19 com Standalone Components e arquitectura modular
 
 ## 📱 Responsividade
 
-O site é totalmente responsivo e se adapta a diferentes tamanhos de tela.
+O portal e o módulo de facturação são responsivos e adaptam-se a diferentes tamanhos de ecrã.
