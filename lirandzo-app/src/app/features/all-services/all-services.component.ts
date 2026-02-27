@@ -2,17 +2,19 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
-interface Service {
-  image: string;
+interface ServiceDetail {
+  icon: string;
   title: string;
   description: string;
+  features: string[];
+  color: 'blue' | 'dark' | 'soft';
 }
 
 interface CompletedProject {
   title: string;
   description: string;
-  year?: number;
-  client?: string;
+  year: number;
+  client: string;
 }
 
 @Component({
@@ -23,32 +25,111 @@ interface CompletedProject {
   styleUrl: './all-services.component.css'
 })
 export class AllServicesComponent {
-  services: Service[] = [
+  services: ServiceDetail[] = [
     {
-      image: 'https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=600&q=80',
+      icon: 'truck',
       title: 'Transporte Rodoviário',
-      description: 'Transporte de mercadorias no corredor Joanesburgo–Maputo e rotas regionais. Frota moderna e rastreamento 24h.'
+      description: 'Transporte de mercadorias nos corredores Joanesburgo–Maputo, Beira–Tete e outras rotas nacionais e regionais. Frota moderna com rastreamento GPS 24 horas e motoristas experientes.',
+      features: [
+        'Cobertura nacional e internacional',
+        'Frota própria rastreada por GPS',
+        'Cargas completas e fraccionadas',
+        'Entregas porta a porta',
+        'Motoristas certificados e treinados'
+      ],
+      color: 'blue'
     },
     {
-      image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80',
+      icon: 'procurement',
       title: 'Procurement',
-      description: 'Compras e aquisição de mercadorias na África do Sul com entrega em Moçambique. Fonte única, logística integrada.'
+      description: 'Serviço de compras e aquisição de mercadorias na África do Sul com entrega directa em Moçambique. Fonte única de abastecimento com logística integrada do fornecedor ao destino final.',
+      features: [
+        'Negociação com fornecedores na ZA',
+        'Consolidação de cargas',
+        'Documentação aduaneira incluída',
+        'Transporte integrado origem–destino',
+        'Relatórios e visibilidade total'
+      ],
+      color: 'dark'
     },
     {
-      image: 'https://images.unsplash.com/photo-1553413077-190dd305871c?w=600&q=80',
+      icon: 'tracking',
       title: 'Rastreamento em Tempo Real',
-      description: 'Acompanhe sua carga a qualquer momento por aplicativo ou painel web, do depósito ao destino.'
+      description: 'Acompanhe a sua carga a qualquer momento através do nosso painel web ou aplicação móvel. Receba notificações automáticas em cada etapa do transporte, do depósito ao destino.',
+      features: [
+        'Painel de controlo online',
+        'Notificações por SMS e e-mail',
+        'Localização GPS em tempo real',
+        'Histórico completo de movimentações',
+        'Previsão de chegada actualizada'
+      ],
+      color: 'soft'
     },
     {
-      image: 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=600&q=80',
+      icon: 'logistics',
       title: 'Logística Integrada',
-      description: 'Armazenagem, picking, expedição e entrega porta a porta. África do Sul até Moçambique sob um único parceiro.'
+      description: 'Armazenagem, picking, expedição e entrega porta a porta. Da África do Sul até Moçambique, toda a cadeia logística gerida por um único parceiro com processos optimizados.',
+      features: [
+        'Armazéns estratégicos',
+        'Picking e embalagem',
+        'Cross-docking',
+        'Gestão de inventário',
+        'Distribuição last-mile'
+      ],
+      color: 'blue'
+    },
+    {
+      icon: 'warehouse',
+      title: 'Armazenagem',
+      description: 'Espaços de armazenamento seguros e monitorizados para consolidação, stockagem temporária ou distribuição. Ideais para quem precisa de um hub logístico antes da entrega final.',
+      features: [
+        'Armazéns cobertos e seguros',
+        'Controlo de stock digital',
+        'Áreas por tipo de mercadoria',
+        'Carga e descarga mecanizada',
+        'Acesso 24/7 sob pedido'
+      ],
+      color: 'dark'
+    },
+    {
+      icon: 'customs',
+      title: 'Despacho Aduaneiro',
+      description: 'Tratamos de toda a documentação e formalidades aduaneiras para importações e exportações. Desalfandegamento ágil nas fronteiras entre Moçambique, África do Sul, Eswatini e Zimbabué.',
+      features: [
+        'Documentação de importação/exportação',
+        'Desalfandegamento em fronteiras',
+        'Assessoria em regulamentação',
+        'Coordenação com autoridades',
+        'Redução de tempos de espera'
+      ],
+      color: 'soft'
     }
   ];
 
   completed: CompletedProject[] = [
-    { title: 'Entrega de equipamento industrial', description: 'Transporte e desalfandegamento de máquinas de Joanesburgo para Maputo.', year: 2024, client: 'Indústria ABC' },
-    { title: 'Procurement e entrega de materiais de construção', description: 'Aquisição na ZA e entrega em obra em Moçambique, com rastreamento em tempo real.', year: 2024, client: 'Construtora XYZ' },
-    { title: 'Cargas refrigeradas Maputo–Joanesburgo', description: 'Logística integrada de produtos perecíveis no corredor.', year: 2023, client: 'Distribuidora Norte' }
+    {
+      title: 'Entrega de equipamento industrial',
+      description: 'Transporte e desalfandegamento de máquinas pesadas de Joanesburgo para Maputo, com escolta especial.',
+      year: 2025,
+      client: 'Indústria ABC'
+    },
+    {
+      title: 'Procurement de materiais de construção',
+      description: 'Aquisição de materiais na África do Sul e entrega em obra em Moçambique, com rastreamento em tempo real.',
+      year: 2025,
+      client: 'Construtora XYZ'
+    },
+    {
+      title: 'Cargas refrigeradas Maputo–Joanesburgo',
+      description: 'Logística integrada de produtos perecíveis no corredor, com controlo de temperatura durante todo o percurso.',
+      year: 2024,
+      client: 'Distribuidora Norte'
+    },
+    {
+      title: 'Distribuição nacional de bens de consumo',
+      description: 'Armazenagem em Maputo e distribuição para Beira, Nampula e Tete com entregas semanais programadas.',
+      year: 2024,
+      client: 'Grupo Comercial Sul'
+    }
   ];
 }

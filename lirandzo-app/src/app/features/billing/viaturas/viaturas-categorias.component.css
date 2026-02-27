@@ -1,0 +1,64 @@
+.cat-add-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.cat-add-row .form-control {
+  flex: 1;
+}
+
+.cat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cat-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.6rem;
+  background: var(--bg-card-inner);
+  border: 1px solid var(--border-subtle);
+  transition: background 0.15s ease;
+}
+
+.cat-item:hover {
+  background: var(--bg-hover);
+}
+
+.cat-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.cat-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  flex: 1.5;
+}
+
+.cat-count {
+  font-size: 0.75rem;
+}
+
+.cat-actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.cat-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.cat-edit-row .form-control {
+  flex: 1;
+  max-width: 250px;
+}

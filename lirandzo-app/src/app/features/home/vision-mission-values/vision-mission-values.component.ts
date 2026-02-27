@@ -33,28 +33,28 @@ export class VisionMissionValuesComponent implements AfterViewInit {
       title: 'Missão',
       text: 'Promover e implementar estratégias de desenvolvimento logístico, estimulando a competitividade e a entrega de excelência em transporte e procurement.',
       icon: 'target',
-      circleColor: '#0066ff',
-      titleColor: '#fff',
-      textColor: '#fff'
+      circleColor: '#13243A',
+      titleColor: '#f8fafc',
+      textColor: '#cbd5e1'
     },
     {
       type: 'visao',
       title: 'Visão',
       text: 'Ser referência em transporte de cargas e procurement no corredor África do Sul–Moçambique, com operações robustas e sustentáveis.',
       icon: 'eye',
-      circleColor: '#00a3a3',
-      titleColor: '#fff',
-      textColor: '#fff'
+      circleColor: '#1a4a72',
+      titleColor: '#f8fafc',
+      textColor: '#cbd5e1'
     },
     {
       type: 'valores',
       title: 'Valores',
       text: '',
-      icon: 'diamond',
+      icon: 'heart',
       listItems: ['Integridade', 'Transparência', 'Inovação', 'Excelência'],
-      circleColor: '#0047b3',
-      titleColor: '#fff',
-      textColor: '#fff'
+      circleColor: '#0f5c6e',
+      titleColor: '#f8fafc',
+      textColor: '#cbd5e1'
     }
   ];
 

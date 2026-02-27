@@ -1,0 +1,397 @@
+<div class="dashboard">
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <span class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        </span>
+        @if (!sidebarCollapsed) { <span class="logo-text">Lirandzo</span> }
+      </div>
+      <button class="sidebar-toggle" (click)="toggleSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+          @if (sidebarCollapsed) { <path d="M9 18l6-6-6-6"/> } @else { <path d="M15 18l-6-6 6-6"/> }
+        </svg>
+      </button>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item" [class.active]="activeTab === 'dashboard'" (click)="setTab('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        @if (!sidebarCollapsed) { <span>Dashboard</span> }
+      </button>
+      <button class="nav-item" [class.active]="activeTab === 'produtos'" (click)="setTab('produtos')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        @if (!sidebarCollapsed) { <span>Pedidos</span> }
+      </button>
+      <button class="nav-item" [class.active]="activeTab === 'rastreio'" (click)="setTab('rastreio')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+        @if (!sidebarCollapsed) { <span>Rastreio</span> }
+      </button>
+      <button class="nav-item" [class.active]="activeTab === 'cotacoes'" (click)="setTab('cotacoes')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+        @if (!sidebarCollapsed) { <span>Cotações</span> }
+      </button>
+      <button class="nav-item" [class.active]="activeTab === 'perfil'" (click)="setTab('perfil')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        @if (!sidebarCollapsed) { <span>Perfil</span> }
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <a routerLink="/" class="nav-item nav-item--back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        @if (!sidebarCollapsed) { <span>Voltar ao site</span> }
+      </a>
+    </div>
+  </aside>
+
+  <!-- Mobile Top Bar -->
+  <header class="mobile-topbar">
+    <button class="mobile-menu-btn" (click)="toggleMobileSidebar()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="mobile-title">Lirandzo</span>
+    <a routerLink="/" class="mobile-logout">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </a>
+  </header>
+
+  <!-- Mobile Sidebar Overlay -->
+  @if (mobileOpen) {
+    <div class="mobile-overlay" (click)="toggleMobileSidebar()"></div>
+    <aside class="sidebar sidebar--mobile">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <span class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span>
+          <span class="logo-text">Lirandzo</span>
+        </div>
+        <button class="sidebar-toggle" (click)="toggleMobileSidebar()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item" [class.active]="activeTab === 'dashboard'" (click)="setTab('dashboard'); toggleMobileSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></button>
+        <button class="nav-item" [class.active]="activeTab === 'produtos'" (click)="setTab('produtos'); toggleMobileSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg><span>Pedidos</span></button>
+        <button class="nav-item" [class.active]="activeTab === 'rastreio'" (click)="setTab('rastreio'); toggleMobileSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg><span>Rastreio</span></button>
+        <button class="nav-item" [class.active]="activeTab === 'cotacoes'" (click)="setTab('cotacoes'); toggleMobileSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg><span>Cotações</span></button>
+        <button class="nav-item" [class.active]="activeTab === 'perfil'" (click)="setTab('perfil'); toggleMobileSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Perfil</span></button>
+      </nav>
+      <div class="sidebar-footer">
+        <a routerLink="/" class="nav-item nav-item--back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Voltar ao site</span></a>
+      </div>
+    </aside>
+  }
+
+  <!-- Main Content -->
+  <main class="dashboard-main" [class.sidebar-collapsed]="sidebarCollapsed">
+    <div class="topbar">
+      <div class="topbar-left">
+        <p class="topbar-greeting">{{ greeting }}, <strong>Cliente Exemplo</strong></p>
+        <h1 class="topbar-title">
+          @if (activeTab === 'dashboard') { Dashboard }
+          @if (activeTab === 'produtos') { Os meus pedidos }
+          @if (activeTab === 'cotacoes') { As minhas cotações }
+          @if (activeTab === 'rastreio') { Rastreio de pedidos }
+          @if (activeTab === 'perfil') { Dados do perfil }
+        </h1>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-datetime">
+          <div class="topbar-time">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>{{ currentTime }}</span>
+          </div>
+          <div class="topbar-date">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span>{{ currentDate }}</span>
+          </div>
+        </div>
+        <div class="topbar-divider"></div>
+        <div class="topbar-user">
+          <div class="topbar-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div class="topbar-user-info"><span class="topbar-username">Cliente Exemplo</span><span class="topbar-email">cliente&#64;exemplo.com</span></div>
+        </div>
+        <div class="topbar-divider"></div>
+        <a routerLink="/" class="topbar-logout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Sair</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Stats (always visible) -->
+    <div class="client-stats">
+      <div class="stat-card stat-card--blue">
+        <div class="stat-card-content">
+          <div class="stat-top">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+            <div class="stat-trend stat-trend--up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M7 17l5-5 5 5"/></svg><span>12%</span></div>
+          </div>
+          <div class="stat-number">{{ totalOrders }}</div>
+          <div class="stat-label">Pedidos totais</div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:100%"></div></div>
+          <div class="stat-sub">vs. mês anterior</div>
+        </div>
+      </div>
+      <div class="stat-card stat-card--green">
+        <div class="stat-card-content">
+          <div class="stat-top">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></div>
+            <div class="stat-trend stat-trend--up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M7 17l5-5 5 5"/></svg><span>8%</span></div>
+          </div>
+          <div class="stat-number">{{ deliveredCount }}</div>
+          <div class="stat-label">Entregas concluídas</div>
+          <div class="stat-bar"><div class="stat-bar-fill" [style.width.%]="(deliveredCount / totalOrders) * 100"></div></div>
+          <div class="stat-sub">{{ deliveredCount }} de {{ totalOrders }} pedidos</div>
+        </div>
+      </div>
+      <div class="stat-card stat-card--orange">
+        <div class="stat-card-content">
+          <div class="stat-top">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="stat-trend stat-trend--neutral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M5 12h14"/></svg><span>0%</span></div>
+          </div>
+          <div class="stat-number">{{ pendingOrders.length }}</div>
+          <div class="stat-label">Por entregar</div>
+          <div class="stat-bar"><div class="stat-bar-fill" [style.width.%]="(pendingOrders.length / totalOrders) * 100"></div></div>
+          <div class="stat-sub">{{ inTransitCount }} em trânsito agora</div>
+        </div>
+      </div>
+      <div class="stat-card stat-card--purple">
+        <div class="stat-card-content">
+          <div class="stat-top">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></div>
+            <div class="stat-trend stat-trend--up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M7 17l5-5 5 5"/></svg><span>25%</span></div>
+          </div>
+          <div class="stat-number">{{ quotes.length }}</div>
+          <div class="stat-label">Cotações</div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:75%"></div></div>
+          <div class="stat-sub">2 aprovadas este mês</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== DASHBOARD TAB ========== -->
+    @if (activeTab === 'dashboard') {
+      <div class="tab-content">
+      <div class="charts-row anim-item anim-delay-1">
+        <div class="client-panel chart-panel">
+          <div class="chart-header">
+            <h3 class="panel-title">Fluxo de pedidos</h3>
+            <span class="chart-subtitle">Últimos 6 meses</span>
+          </div>
+          <div class="bar-chart">
+            @for (m of monthlyOrders; track m.month) {
+              <div class="bar-col">
+                <div class="bar-value">{{ m.count }}</div>
+                <div class="bar-track">
+                  <div class="bar-fill" [style.height.%]="m.pct"></div>
+                </div>
+                <div class="bar-label">{{ m.month }}</div>
+              </div>
+            }
+          </div>
+          <div class="chart-total-row">
+            <span class="chart-total-label">Total do período</span>
+            <span class="chart-total-value">31 pedidos</span>
+          </div>
+        </div>
+        <div class="client-panel chart-panel">
+          <div class="chart-header">
+            <h3 class="panel-title">Estado dos pedidos</h3>
+            <span class="chart-subtitle">Distribuição actual</span>
+          </div>
+          <div class="donut-chart-wrap">
+            <div class="donut-chart" [style.background]="statusDonut">
+              <div class="donut-hole">
+                <span class="donut-total">{{ totalOrders }}</span>
+                <span class="donut-total-label">Total</span>
+              </div>
+            </div>
+            <div class="donut-legend">
+              <div class="legend-item"><span class="legend-dot" style="background:#16a34a"></span><span class="legend-label">Entregue</span><span class="legend-count">{{ deliveredCount }}</span><span class="legend-pct">{{ (deliveredCount / totalOrders * 100) | number:'1.0-0' }}%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#0284c7"></span><span class="legend-label">Em trânsito</span><span class="legend-count">{{ inTransitCount }}</span><span class="legend-pct">{{ (inTransitCount / totalOrders * 100) | number:'1.0-0' }}%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#ea580c"></span><span class="legend-label">Pendente</span><span class="legend-count">{{ pendingCount }}</span><span class="legend-pct">{{ (pendingCount / totalOrders * 100) | number:'1.0-0' }}%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#7c3aed"></span><span class="legend-label">Processamento</span><span class="legend-count">{{ processingCount }}</span><span class="legend-pct">{{ (processingCount / totalOrders * 100) | number:'1.0-0' }}%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      @if (pendingOrders.length > 0) {
+        <div class="client-panel anim-item anim-delay-2">
+          <div class="panel-header">
+            <h2 class="panel-title">Pedidos por entregar</h2>
+            <button class="panel-action-outline" (click)="setTab('produtos')">Ver todos</button>
+          </div>
+          <div class="pending-cards">
+            @for (order of pendingOrders; track order.id) {
+              <div class="pending-card" [attr.data-status]="order.status">
+                <div class="pending-card-top"><span class="pending-card-id">{{ order.id }}</span><span class="status-badge" [attr.data-status]="order.status">{{ order.statusLabel }}</span></div>
+                <div class="pending-card-route">{{ order.origin }} → {{ order.destination }}</div>
+                <div class="pending-card-bottom"><span class="pending-card-date">Entrega: {{ order.estimatedDelivery }}</span><button class="pending-card-track" (click)="trackOrder(order)">Rastrear</button></div>
+                @if (order.progress !== undefined && order.progress > 0) { <div class="pending-card-progress"><div class="pending-card-bar" [style.width.%]="order.progress"></div></div> }
+              </div>
+            }
+          </div>
+        </div>
+      }
+      </div>
+    }
+
+    <!-- ========== PEDIDOS / PRODUTOS TAB ========== -->
+    @if (activeTab === 'produtos') {
+      <div class="tab-content">
+      <div class="client-panel anim-item anim-delay-1" style="margin-top:2rem">
+        <div class="panel-header">
+          <h2 class="panel-title">Todos os pedidos solicitados</h2>
+          <a routerLink="/orcamento" class="panel-action">+ Novo pedido</a>
+        </div>
+
+        <div class="filters-bar">
+          <div class="filter-group">
+            <label class="filter-label">Ano</label>
+            <select class="filter-select" [(ngModel)]="filterYear">
+              <option value="">Todos</option>
+              @for (y of availableYears; track y) { <option [value]="y">{{ y }}</option> }
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Data início</label>
+            <input type="date" class="filter-input" [(ngModel)]="filterDateFrom">
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Data fim</label>
+            <input type="date" class="filter-input" [(ngModel)]="filterDateTo">
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Estado</label>
+            <select class="filter-select" [(ngModel)]="filterStatus">
+              <option value="">Todos</option>
+              <option value="pendente">Pendente</option>
+              <option value="em_processamento">Em processamento</option>
+              <option value="em_transito">Em trânsito</option>
+              <option value="entregue">Entregue</option>
+            </select>
+          </div>
+          <button class="filter-clear" (click)="clearFilters()">Limpar filtros</button>
+        </div>
+
+        <div class="filter-results">
+          <span>{{ filteredCount }} pedido{{ filteredCount !== 1 ? 's' : '' }} encontrado{{ filteredCount !== 1 ? 's' : '' }}</span>
+        </div>
+
+        <div class="orders-table-wrap">
+          <table class="orders-table">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Data</th>
+                <th>Origem</th>
+                <th>Destino</th>
+                <th>Entrega est.</th>
+                <th>Estado</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of filteredOrders; track order.id) {
+                <tr>
+                  <td class="order-id">{{ order.id }}</td>
+                  <td>{{ order.date }}</td>
+                  <td>{{ order.origin }}</td>
+                  <td>{{ order.destination }}</td>
+                  <td>{{ order.estimatedDelivery }}</td>
+                  <td><span class="status-badge" [attr.data-status]="order.status">{{ order.statusLabel }}</span></td>
+                  <td><button class="order-track-link" (click)="trackOrder(order)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>Rastrear</button></td>
+                </tr>
+              }
+              @if (filteredOrders.length === 0) {
+                <tr><td colspan="7" class="empty-row">Nenhum pedido encontrado com os filtros aplicados.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      </div>
+    }
+
+    <!-- ========== RASTREIO TAB ========== -->
+    @if (activeTab === 'rastreio') {
+      <div class="tab-content">
+      <div class="tracking-section anim-item anim-delay-1">
+        @if (!selectedOrder) {
+          <div class="client-panel">
+            <div class="panel-header"><h2 class="panel-title">Seleccione um pedido para rastrear</h2></div>
+            <div class="tracking-order-list">
+              @for (order of orders; track order.id) {
+                <button class="tracking-order-card" (click)="trackOrder(order)">
+                  <div class="tracking-order-top"><span class="tracking-order-id">{{ order.id }}</span><span class="status-badge" [attr.data-status]="order.status">{{ order.statusLabel }}</span></div>
+                  <div class="tracking-order-route"><span>{{ order.origin }}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg><span>{{ order.destination }}</span></div>
+                  <div class="tracking-order-bottom"><span class="tracking-order-date">{{ order.date }}</span>@if (order.progress !== undefined) {<div class="tracking-mini-progress"><div class="tracking-mini-bar" [style.width.%]="order.progress"></div></div><span class="tracking-mini-pct">{{ order.progress }}%</span>}</div>
+                </button>
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="tracking-detail">
+            <button class="tracking-back" (click)="selectedOrder = null"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M15 18l-6-6 6-6"/></svg>Voltar à lista</button>
+            <div class="tracking-detail-header">
+              <div class="tracking-detail-info"><h2 class="tracking-detail-id">{{ selectedOrder.id }}</h2><span class="status-badge status-badge--lg" [attr.data-status]="selectedOrder.status">{{ selectedOrder.statusLabel }}</span></div>
+              <div class="tracking-detail-route"><div class="route-point"><div class="route-dot route-dot--origin"></div><div><span class="route-label">Origem</span><span class="route-city">{{ selectedOrder.origin }}</span></div></div><div class="route-line"></div><div class="route-point"><div class="route-dot route-dot--dest"></div><div><span class="route-label">Destino</span><span class="route-city">{{ selectedOrder.destination }}</span></div></div></div>
+            </div>
+            <div class="tracking-cards">
+              <div class="tracking-info-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><div><span class="tracking-info-label">Data do pedido</span><span class="tracking-info-value">{{ selectedOrder.date }}</span></div></div>
+              <div class="tracking-info-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><div><span class="tracking-info-label">Entrega estimada</span><span class="tracking-info-value">{{ selectedOrder.estimatedDelivery }}</span></div></div>
+              <div class="tracking-info-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><div><span class="tracking-info-label">Última localização</span><span class="tracking-info-value">{{ selectedOrder.lastUpdate }}</span></div></div>
+            </div>
+            <div class="client-panel">
+              <h3 class="panel-title">Progresso da entrega</h3>
+              <div class="tracking-progress"><div class="tracking-progress-bar"><div class="tracking-progress-fill" [style.width.%]="selectedOrder.progress"></div></div><span class="tracking-progress-pct">{{ selectedOrder.progress }}%</span></div>
+              <div class="tracking-timeline">
+                <div class="timeline-item" [class.done]="(selectedOrder.progress ?? 0) >= 0"><div class="timeline-dot"></div><div class="timeline-content"><span class="timeline-title">Pedido recebido</span><span class="timeline-desc">O seu pedido foi registado no sistema</span></div></div>
+                <div class="timeline-item" [class.done]="(selectedOrder.progress ?? 0) >= 15"><div class="timeline-dot"></div><div class="timeline-content"><span class="timeline-title">Em processamento</span><span class="timeline-desc">Preparação e carregamento da mercadoria</span></div></div>
+                <div class="timeline-item" [class.done]="(selectedOrder.progress ?? 0) >= 30"><div class="timeline-dot"></div><div class="timeline-content"><span class="timeline-title">Em trânsito</span><span class="timeline-desc">A carga está a caminho do destino</span></div></div>
+                <div class="timeline-item" [class.done]="(selectedOrder.progress ?? 0) >= 100"><div class="timeline-dot"></div><div class="timeline-content"><span class="timeline-title">Entregue</span><span class="timeline-desc">Mercadoria entregue no destino</span></div></div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+      </div>
+    }
+
+    @if (activeTab === 'cotacoes') {
+      <div class="tab-content">
+      <div class="client-panel anim-item anim-delay-1" style="margin-top:2rem">
+        <div class="panel-header"><h2 class="panel-title">Cotações solicitadas</h2><a routerLink="/orcamento" class="panel-action">+ Nova cotação</a></div>
+        <div class="orders-table-wrap">
+          <table class="orders-table"><thead><tr><th>Código</th><th>Data</th><th>Descrição</th><th>Valor</th><th>Estado</th></tr></thead>
+            <tbody>@for (quote of quotes; track quote.id) {<tr><td class="order-id">{{ quote.id }}</td><td>{{ quote.date }}</td><td>{{ quote.description }}</td><td class="quote-value">{{ quote.value }}</td><td><span class="status-badge" [attr.data-status]="quote.status">{{ quote.statusLabel }}</span></td></tr>}</tbody>
+          </table>
+        </div>
+      </div>
+      </div>
+    }
+
+    @if (activeTab === 'perfil') {
+      <div class="tab-content">
+      <div class="client-panel anim-item anim-delay-1" style="margin-top:2rem">
+        <div class="panel-header"><h2 class="panel-title">Informações da conta</h2></div>
+        <div class="profile-grid">
+          <div class="profile-card">
+            <div class="profile-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+            <h3 class="profile-name">Cliente Exemplo</h3><p class="profile-email">cliente&#64;exemplo.com</p>
+          </div>
+          <div class="profile-details">
+            <div class="profile-field"><span class="profile-label">Nome completo</span><span class="profile-value">Cliente Exemplo Lda.</span></div>
+            <div class="profile-field"><span class="profile-label">NUIT</span><span class="profile-value">400123456</span></div>
+            <div class="profile-field"><span class="profile-label">Telefone</span><span class="profile-value">+258 84 000 0000</span></div>
+            <div class="profile-field"><span class="profile-label">Endereço</span><span class="profile-value">Av. 25 de Setembro, Maputo</span></div>
+            <div class="profile-field"><span class="profile-label">Cliente desde</span><span class="profile-value">Janeiro 2024</span></div>
+          </div>
+        </div>
+      </div>
+      </div>
+    }
+  </main>
+</div>

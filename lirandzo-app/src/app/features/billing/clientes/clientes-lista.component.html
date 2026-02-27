@@ -1,0 +1,77 @@
+<div class="page-header">
+  <div class="page-header-left">
+    <h1>Clientes</h1>
+    <p>Lista de clientes registados através das encomendas e facturas</p>
+  </div>
+</div>
+
+<div class="kpi-grid">
+  <div class="card kpi-card">
+    <div class="kpi-value">{{ totalClientes }}</div>
+    <div class="kpi-label">Total Clientes</div>
+  </div>
+  <div class="card kpi-card">
+    <div class="kpi-value" style="color: var(--success)">{{ totalFaturado | number:'1.0-0' }} MZN</div>
+    <div class="kpi-label">Total Facturado</div>
+  </div>
+  <div class="card kpi-card">
+    <div class="kpi-value" style="color: var(--danger)">{{ totalEmDivida | number:'1.0-0' }} MZN</div>
+    <div class="kpi-label">Total em Dívida</div>
+  </div>
+  <div class="card kpi-card">
+    <div class="kpi-value" style="color: var(--warning)">{{ clientesComDivida }}</div>
+    <div class="kpi-label">Clientes com Dívida</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <input type="text" class="search-input" [(ngModel)]="filtro" placeholder="Pesquisar por nome, província ou contacto...">
+  </div>
+
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Província</th>
+          <th>Contacto</th>
+          <th>Telefone</th>
+          <th>Encomendas</th>
+          <th>Total Facturado</th>
+          <th>Saldo Devedor</th>
+          <th>Última Encomenda</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of clientesFiltrados" (click)="toggleDetalhe(c.id)" style="cursor: pointer">
+          <td style="font-weight: 600; color: var(--text-primary)">{{ c.nome }}</td>
+          <td>{{ c.provincia }}</td>
+          <td>{{ c.contacto }}</td>
+          <td>{{ c.telefone }}</td>
+          <td><span class="badge badge-info">{{ c.totalEncomendas }}</span></td>
+          <td style="font-weight: 600">{{ c.valorTotal | number:'1.0-0' }} MZN</td>
+          <td>
+            <span [style.color]="c.saldoDevedor > 0 ? 'var(--danger)' : 'var(--success)'" style="font-weight: 600">
+              {{ c.saldoDevedor | number:'1.0-0' }} MZN
+            </span>
+          </td>
+          <td>{{ c.ultimaEncomenda }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="empty-state" *ngIf="clientesFiltrados.length === 0">
+    <p>Nenhum cliente encontrado</p>
+  </div>
+</div>
+
+<div class="info-note">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"></circle>
+    <line x1="12" y1="16" x2="12" y2="12"></line>
+    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+  </svg>
+  <span>Os clientes são registados automaticamente quando uma encomenda ou factura é criada. Aceda a <strong>Encomendas → Nova Factura</strong> para adicionar novos clientes.</span>
+</div>

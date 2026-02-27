@@ -6,7 +6,7 @@
         Transportamos e gerimos a sua carga no corredor <strong>Joanesburgo–Maputo</strong>, com procurement na África do Sul e entrega em Moçambique. Frota moderna, rastreamento em tempo real e logística integrada porta a porta — tudo com um único parceiro.
       </p>
       <div class="services-ctas">
-        <a routerLink="/" fragment="contato" class="services-cta">Contacto</a>
+        <a routerLink="/contato" class="services-cta">Contacto</a>
         <a routerLink="/servicos" class="services-cta services-cta--secondary">Ver mais</a>
       </div>
     </div>
@@ -17,6 +17,7 @@
           <div class="service-body">
             <h3 class="service-title">{{ svc.title }}</h3>
             <p class="service-desc">{{ svc.description }}</p>
+            <a routerLink="/servicos" class="service-more">Saber mais →</a>
           </div>
         </article>
       }

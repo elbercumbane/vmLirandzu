@@ -35,8 +35,8 @@
   padding: 0;
   background: #fff;
   border-radius: 20px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 102, 255, 0.08);
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(203, 213, 225, 0.6);
   transition: transform 0.3s, box-shadow 0.3s;
   display: flex;
   flex-direction: column;
@@ -91,7 +91,7 @@
 
 .testimonial-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 16px 48px rgba(0, 102, 255, 0.12);
+  box-shadow: 0 16px 48px rgba(99, 102, 241, 0.1);
 }
 
 .testimonial-stars {
