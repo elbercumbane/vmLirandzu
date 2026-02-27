@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BillingSidebarComponent } from '../../shared/billing-sidebar/billing-sidebar.component';
 
 interface Manager {
   id: number;
@@ -12,6 +11,7 @@ interface Manager {
   joinDate: string;
   status: 'ACTIVE' | 'INACTIVE';
   avatar: string;
+  foto?: string;
 }
 
 interface ExchangeRateHistory {
@@ -30,13 +30,11 @@ interface CategoryRate {
 @Component({
   selector: 'app-billing-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, BillingSidebarComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './billing-settings.component.html',
   styleUrl: './billing-settings.component.css'
 })
 export class BillingSettingsComponent {
-  sidebarOpen = false;
-
   // Active tab
   activeTab: 'empresa' | 'cambio' | 'gestores' | 'facturas' | 'backup' | 'notificacoes' = 'empresa';
 
@@ -82,7 +80,8 @@ export class BillingSettingsComponent {
     email: '',
     phone: '',
     pin: '',
-    confirmPin: ''
+    confirmPin: '',
+    foto: '' as string
   };
 
   // Tab 4: Configuração de Facturas
@@ -110,10 +109,6 @@ export class BillingSettingsComponent {
     dailySummary: true,
     showBadge: true
   };
-
-  toggleSidebar(): void {
-    this.sidebarOpen = !this.sidebarOpen;
-  }
 
   setActiveTab(tab: 'empresa' | 'cambio' | 'gestores' | 'facturas' | 'backup' | 'notificacoes'): void {
     this.activeTab = tab;
@@ -144,7 +139,8 @@ export class BillingSettingsComponent {
         email: manager.email,
         phone: manager.phone,
         pin: '',
-        confirmPin: ''
+        confirmPin: '',
+        foto: manager.foto ?? ''
       };
     } else {
       this.selectedManager = null;
@@ -154,10 +150,23 @@ export class BillingSettingsComponent {
         email: '',
         phone: '',
         pin: '',
-        confirmPin: ''
+        confirmPin: '',
+        foto: ''
       };
     }
     this.isManagerModalOpen = true;
+  }
+
+  onManagerPhotoChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.managerForm.foto = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   closeManagerModal(): void {
@@ -179,7 +188,8 @@ export class BillingSettingsComponent {
           name: this.managerForm.name,
           role: this.managerForm.role,
           email: this.managerForm.email,
-          phone: this.managerForm.phone
+          phone: this.managerForm.phone,
+          foto: this.managerForm.foto || undefined
         };
       }
     } else {
@@ -192,7 +202,8 @@ export class BillingSettingsComponent {
         phone: this.managerForm.phone,
         joinDate: new Date().toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' }),
         status: 'ACTIVE',
-        avatar: this.managerForm.name.split(' ').map(n => n[0]).join('')
+        avatar: this.managerForm.name.split(' ').map(n => n[0]).join(''),
+        foto: this.managerForm.foto || undefined
       };
       this.managers.push(newManager);
     }
@@ -205,6 +216,11 @@ export class BillingSettingsComponent {
       manager.status = 'INACTIVE';
       alert('✓ Gestor desactivado!');
     }
+  }
+
+  getManagerFormInitials(): string {
+    const n = this.managerForm.name.trim();
+    return n ? n.split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2) : '?';
   }
 
   getManagerColor(name: string): string {

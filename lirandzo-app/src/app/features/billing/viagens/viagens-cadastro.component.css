@@ -1,0 +1,39 @@
+.cargo-card {
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  background: var(--bg-card-inner);
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 0.75rem;
+  position: relative;
+}
+
+.cargo-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.cargo-card-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.cargo-remove-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--danger-border);
+  background: transparent;
+  color: var(--danger);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.cargo-remove-btn:hover {
+  background: var(--danger-soft);
+}

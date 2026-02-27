@@ -7,22 +7,22 @@
   height: 48px;
   border-radius: 0.75rem;
   border: none;
-  background: rgba(11, 22, 44, 0.95);
+  background: var(--bg-card);
   backdrop-filter: blur(20px);
-  color: #fff;
+  color: var(--text-primary);
   font-size: 1.5rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-card);
   transition: all 0.3s ease;
-  border: 1px solid rgba(30, 58, 95, 0.7);
+  border: 1px solid var(--border-primary);
 }
 
 .billing-sidebar-toggle:hover {
-  background: rgba(249, 115, 22, 0.2);
-  border-color: rgba(249, 115, 22, 0.5);
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
   transform: scale(1.05);
 }
 
@@ -43,45 +43,73 @@
 
 .settings-page {
   min-height: 100vh;
-  background-image:
-    linear-gradient(120deg, rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.75)),
-    url('https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=1920&q=80');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  padding: 4rem 0;
+  background: var(--bg-page);
+  padding: 2rem 0 4rem;
+  width: 100%;
 }
 
 .settings-page-inner {
-  max-width: 1800px;
-  margin: 0 auto;
-  padding: 0 3rem;
-  transition: padding-left 0.3s ease;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 @media (min-width: 1024px) {
   .settings-page-inner {
-    padding-left: calc(280px + 3rem);
+    padding: 0 2.5rem;
   }
 }
 
 .settings-header {
-  margin-bottom: 2rem;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-inner) 100%);
+  border-radius: 0.9rem;
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-card);
+}
+
+.settings-header-content {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.settings-header-mark {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: #111827;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  border-radius: 0.65rem;
+}
+
+.settings-header-text {
+  flex: 1;
 }
 
 .settings-title {
-  font-size: 2.4rem;
+  font-size: 1.6rem;
   font-weight: 800;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: #f9fafb;
-  margin: 0 0 0.3rem;
+  letter-spacing: 0.02em;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem;
+  line-height: 1.2;
 }
 
 .settings-subtitle {
   margin: 0;
-  font-size: 1.05rem;
-  color: rgba(148, 163, 184, 0.95);
+  font-size: 0.95rem;
+  color: var(--text-secondary);
 }
 
 /* Layout: 2 Columns */
@@ -95,12 +123,12 @@
 .settings-tabs-menu {
   width: 260px;
   flex-shrink: 0;
-  background: rgba(11, 22, 44, 0.95);
+  background: var(--bg-card);
   border-radius: 0.9rem;
-  border: 1px solid rgba(30, 64, 175, 0.8);
+  border: 1px solid var(--border-primary);
   padding: 1rem 0;
   backdrop-filter: blur(18px);
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.75);
+  box-shadow: var(--shadow-card);
 }
 
 .settings-tab-item {
@@ -108,7 +136,7 @@
   padding: 14px 20px;
   border: none;
   background: transparent;
-  color: #6B84A3;
+  color: var(--text-muted);
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
@@ -125,13 +153,28 @@
 }
 
 .settings-tab-item.active {
-  color: #fff;
-  background: rgba(249, 115, 22, 0.12);
-  border-left-color: #F97316;
+  color: var(--text-primary);
+  background: var(--accent-soft);
+  border-left-color: var(--accent);
 }
 
 .settings-tab-icon {
-  font-size: 1.2rem;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.settings-tab-item.active .settings-tab-icon {
+  color: var(--accent);
+}
+
+.settings-tab-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
 .settings-tab-label {
@@ -145,24 +188,24 @@
 }
 
 .settings-tab-content {
-  background: rgba(11, 22, 44, 0.95);
+  background: var(--bg-card);
   border-radius: 0.9rem;
-  border: 1px solid rgba(30, 64, 175, 0.8);
+  border: 1px solid var(--border-primary);
   padding: 2rem;
   backdrop-filter: blur(18px);
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.75);
+  box-shadow: var(--shadow-card);
 }
 
 .settings-section-title {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #E5E7EB;
+  color: var(--text-primary);
   margin: 0 0 0.5rem;
 }
 
 .settings-section-subtitle {
   font-size: 1rem;
-  color: rgba(148, 163, 184, 0.95);
+  color: var(--text-secondary);
   margin: 0 0 2rem;
 }
 
@@ -201,7 +244,7 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #6B84A3;
+  color: var(--text-muted);
   font-weight: 600;
 }
 
@@ -210,9 +253,9 @@
 .settings-textarea {
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
-  border: 1px solid rgba(30, 58, 95, 0.7);
-  background: rgba(30, 58, 95, 0.4);
-  color: #E5E7EB;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-card-inner);
+  color: var(--text-primary);
   font-size: 0.95rem;
   transition: all 0.2s ease;
 }
@@ -221,8 +264,8 @@
 .settings-select:focus,
 .settings-textarea:focus {
   outline: none;
-  border-color: #F97316;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .settings-textarea {
@@ -232,13 +275,16 @@
 
 .settings-note {
   font-size: 0.85rem;
-  color: rgba(148, 163, 184, 0.8);
+  color: var(--text-muted);
   margin-top: 0.25rem;
 }
 
 .settings-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
   font-size: 0.9rem;
-  color: #FBBF24;
+  color: var(--warning);
   margin-top: 0.5rem;
   padding: 0.75rem;
   background: rgba(251, 191, 36, 0.1);
@@ -246,12 +292,21 @@
   border-left: 3px solid #FBBF24;
 }
 
+.settings-warning-icon-inline {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  color: #FBBF24;
+}
+
 /* Buttons */
 .settings-button-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
   border: none;
-  background: #F97316;
+  background: var(--accent);
   color: #111827;
   font-size: 0.95rem;
   font-weight: 600;
@@ -259,8 +314,12 @@
   transition: all 0.2s ease;
 }
 
+.settings-button-primary svg {
+  flex-shrink: 0;
+}
+
 .settings-button-primary:hover {
-  background: #EA580C;
+  background: var(--accent-hover);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
 }
@@ -268,9 +327,9 @@
 .settings-button-outline {
   padding: 0.65rem 1.25rem;
   border-radius: 0.5rem;
-  border: 1px solid #F97316;
+  border: 1px solid var(--accent);
   background: transparent;
-  color: #F97316;
+  color: var(--accent);
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
@@ -278,15 +337,15 @@
 }
 
 .settings-button-outline:hover {
-  background: rgba(249, 115, 22, 0.1);
+  background: var(--accent-soft);
 }
 
 .settings-button-outline-small {
   padding: 0.4rem 0.9rem;
   border-radius: 0.5rem;
-  border: 1px solid #F97316;
+  border: 1px solid var(--accent);
   background: transparent;
-  color: #F97316;
+  color: var(--accent);
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
@@ -294,12 +353,12 @@
 }
 
 .settings-button-outline-small:hover {
-  background: rgba(249, 115, 22, 0.1);
+  background: var(--accent-soft);
 }
 
 .settings-button-outline-blue {
-  border-color: #1E6FBF;
-  color: #1E6FBF;
+  border-color: var(--info);
+  color: var(--info);
 }
 
 .settings-button-outline-blue:hover {
@@ -307,8 +366,8 @@
 }
 
 .settings-button-outline-green {
-  border-color: #22C55E;
-  color: #22C55E;
+  border-color: var(--success);
+  color: var(--success);
 }
 
 .settings-button-outline-green:hover {
@@ -316,24 +375,31 @@
 }
 
 .settings-button-outline-danger {
-  border-color: #EF4444;
-  color: #EF4444;
+  border-color: var(--danger);
+  color: var(--danger);
 }
 
 .settings-button-outline-danger:hover {
-  background: rgba(239, 68, 68, 0.1);
+  background: var(--danger-soft);
 }
 
 .settings-button-green {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
   border: none;
-  background: #22C55E;
+  background: var(--success);
   color: #111827;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+.settings-button-green svg {
+  flex-shrink: 0;
 }
 
 .settings-button-green:hover {
@@ -345,7 +411,7 @@
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
   border: none;
-  background: #EF4444;
+  background: var(--danger);
   color: #fff;
   font-size: 0.95rem;
   font-weight: 600;
@@ -374,7 +440,7 @@
   width: 120px;
   height: 120px;
   border-radius: 0.5rem;
-  background: #F97316;
+  background: var(--accent);
   color: #111827;
   display: flex;
   align-items: center;
@@ -390,21 +456,21 @@
 
 .settings-logo-note {
   font-size: 0.85rem;
-  color: rgba(148, 163, 184, 0.8);
+  color: var(--text-muted);
   margin: 0 0 0.75rem;
 }
 
 /* Cards */
 .settings-card {
-  background: rgba(15, 23, 42, 0.95);
+  background: var(--bg-card);
   border-radius: 0.75rem;
-  border: 1px solid rgba(30, 64, 175, 0.7);
+  border: 1px solid var(--border-primary);
   padding: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
 .settings-card-orange {
-  border-color: rgba(249, 115, 22, 0.5);
+  border-color: var(--accent-border);
 }
 
 .settings-card-green {
@@ -422,13 +488,13 @@
 .settings-card-title {
   font-size: 1.15rem;
   font-weight: 600;
-  color: #E5E7EB;
+  color: var(--text-primary);
   margin: 0 0 1rem;
 }
 
 .settings-card-text {
   font-size: 0.95rem;
-  color: rgba(209, 213, 219, 0.9);
+  color: var(--text-secondary);
   margin: 0 0 1rem;
   line-height: 1.6;
 }
@@ -449,7 +515,7 @@
 
 .settings-exchange-date {
   font-size: 0.85rem;
-  color: rgba(148, 163, 184, 0.8);
+  color: var(--text-muted);
   margin: 0.5rem 0 1rem;
 }
 
@@ -466,19 +532,19 @@
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #6B84A3;
-  border-bottom: 1px solid rgba(30, 64, 175, 0.7);
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-primary);
 }
 
 .settings-table td {
   padding: 0.75rem;
   font-size: 0.95rem;
-  color: #E5E7EB;
-  border-bottom: 1px solid rgba(30, 64, 175, 0.4);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .settings-table tbody tr:hover {
-  background: rgba(249, 115, 22, 0.05);
+  background: var(--accent-soft);
 }
 
 .settings-history-table {
@@ -493,9 +559,9 @@
 }
 
 .settings-manager-card {
-  background: rgba(15, 23, 42, 0.95);
+  background: var(--bg-card);
   border-radius: 0.75rem;
-  border: 1px solid rgba(30, 64, 175, 0.7);
+  border: 1px solid var(--border-primary);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -514,6 +580,13 @@
   font-size: 1.8rem;
   font-weight: 700;
   color: #111827;
+  overflow: hidden;
+}
+
+.settings-manager-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .settings-manager-info {
@@ -524,20 +597,29 @@
 .settings-manager-name {
   font-size: 1.15rem;
   font-weight: 600;
-  color: #E5E7EB;
+  color: var(--text-primary);
   margin: 0 0 0.25rem;
 }
 
 .settings-manager-role {
   font-size: 0.9rem;
-  color: #F97316;
+  color: var(--accent);
   margin: 0 0 0.5rem;
 }
 
 .settings-manager-detail {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 0.85rem;
-  color: rgba(209, 213, 219, 0.8);
+  color: var(--text-muted);
   margin: 0.25rem 0;
+}
+
+.settings-detail-icon {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  opacity: 0.8;
 }
 
 .settings-status-badge {
@@ -554,7 +636,7 @@
 
 .settings-status-badge.active {
   background: rgba(34, 197, 94, 0.2);
-  color: #22C55E;
+  color: var(--success);
 }
 
 .settings-manager-actions {
@@ -605,7 +687,7 @@
 }
 
 .settings-toggle input[type="checkbox"]:checked + .settings-toggle-slider {
-  background: #F97316;
+  background: var(--accent);
 }
 
 .settings-toggle input[type="checkbox"]:checked + .settings-toggle-slider::before {
@@ -614,7 +696,7 @@
 
 .settings-toggle-label {
   font-size: 0.95rem;
-  color: #E5E7EB;
+  color: var(--text-primary);
   flex: 1;
 }
 
@@ -646,7 +728,7 @@
 .settings-preview-logo {
   width: 60px;
   height: 60px;
-  background: #F97316;
+  background: var(--accent);
   color: #111827;
   border-radius: 0.5rem;
   display: flex;
@@ -684,14 +766,24 @@
 /* Backup Section */
 .settings-backup-icon,
 .settings-warning-icon {
-  font-size: 3rem;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 1rem;
+  color: var(--text-muted);
+}
+
+.settings-card-green .settings-backup-icon {
+  color: var(--success);
+}
+
+.settings-card-yellow .settings-warning-icon {
+  color: var(--warning);
 }
 
 .settings-backup-date {
   font-size: 0.9rem;
-  color: rgba(148, 163, 184, 0.8);
+  color: var(--text-muted);
   margin: 0.5rem 0 1rem;
 }
 
@@ -705,9 +797,9 @@
   margin: 1rem 0;
   padding: 0.5rem;
   border-radius: 0.5rem;
-  border: 1px solid rgba(30, 64, 175, 0.7);
-  background: rgba(30, 58, 95, 0.4);
-  color: #E5E7EB;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-card-inner);
+  color: var(--text-primary);
   width: 100%;
 }
 
@@ -718,7 +810,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--bg-overlay);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -728,9 +820,9 @@
 }
 
 .settings-modal {
-  background: rgba(11, 22, 44, 0.98);
+  background: var(--bg-card);
   border-radius: 1rem;
-  border: 1px solid rgba(30, 64, 175, 0.8);
+  border: 1px solid var(--border-primary);
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
@@ -755,24 +847,23 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid rgba(30, 64, 175, 0.7);
+  border-bottom: 1px solid var(--border-primary);
 }
 
 .settings-modal-title {
   font-size: 1.3rem;
   font-weight: 700;
-  color: #E5E7EB;
+  color: var(--text-primary);
   margin: 0;
 }
 
 .settings-modal-close {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: none;
   background: rgba(148, 163, 184, 0.2);
-  color: #E5E7EB;
-  font-size: 1.2rem;
+  color: var(--text-primary);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -780,13 +871,80 @@
   transition: all 0.2s ease;
 }
 
+.settings-modal-close svg {
+  flex-shrink: 0;
+}
+
 .settings-modal-close:hover {
-  background: rgba(239, 68, 68, 0.2);
-  color: #EF4444;
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 .settings-modal-body {
   padding: 1.5rem;
+}
+
+.settings-form-group-photo {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.settings-photo-upload {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.35rem;
+}
+
+.settings-photo-preview {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--bg-card-inner);
+  border: 2px dashed var(--border-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.settings-photo-preview.has-photo {
+  border-style: solid;
+  border-color: var(--accent-border);
+}
+
+.settings-photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.settings-photo-placeholder {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.settings-photo-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: var(--accent-soft);
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.settings-photo-btn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.settings-photo-btn input {
+  display: none;
 }
 
 .settings-modal-footer {
@@ -821,8 +979,22 @@
 }
 
 @media (max-width: 768px) {
-  .settings-page-inner {
-    padding: 0 1.25rem;
+  .settings-header {
+    padding: 1rem 1.25rem;
+  }
+
+  .settings-header-mark {
+    width: 48px;
+    height: 48px;
+    font-size: 1rem;
+  }
+
+  .settings-title {
+    font-size: 1.35rem;
+  }
+
+  .settings-subtitle {
+    font-size: 0.88rem;
   }
 
   .settings-managers-grid {

@@ -11,6 +11,7 @@
   position: relative;
   width: 100%;
   min-height: 420px;
+  margin-top: -5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -156,14 +157,14 @@
 }
 
 .about-hero-card--accent {
-  background: #0f172a;
-  border-color: rgba(51, 65, 85, 0.6);
+  background: #f0fdf4;
+  border-color: rgba(34, 197, 94, 0.4);
 }
 
-.about-hero-card--accent .card-icon { color: #93c5fd; }
-.about-hero-card--accent .card-number-sm { color: #e2e8f0; }
-.about-hero-card--accent .card-label { color: #94a3b8; }
-.about-hero-card--accent .card-caption { color: #94a3b8; }
+.about-hero-card--accent .card-icon { color: #16a34a; }
+.about-hero-card--accent .card-number-sm { color: #15803d; }
+.about-hero-card--accent .card-label { color: #166534; }
+.about-hero-card--accent .card-caption { color: #4b5563; }
 
 .card-icon {
   width: 40px;
@@ -466,7 +467,8 @@
 }
 
 .about-grid--infra {
-  grid-template-columns: 1.1fr 1fr;
+  grid-template-columns: 1fr;
+  max-width: 720px;
 }
 
 .about-grid--team {

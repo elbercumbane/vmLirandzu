@@ -1,11 +1,12 @@
 import { Component, AfterViewInit, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { VisionMissionValuesComponent } from '../home/vision-mission-values/vision-mission-values.component';
+import { CeoMessageComponent } from '../../shared/ceo-message/ceo-message.component';
 
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [CommonModule, VisionMissionValuesComponent],
+  imports: [CommonModule, VisionMissionValuesComponent, CeoMessageComponent],
   templateUrl: './about.component.html',
   styleUrl: './about.component.css'
 })

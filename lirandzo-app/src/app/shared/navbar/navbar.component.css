@@ -4,16 +4,17 @@
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 2rem);
-  max-width: 1200px;
+  max-width: 1400px;
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.85rem 1.5rem;
-  background: #fff;
+  padding: 0.85rem 2.5rem;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
   border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 999px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(0, 0, 0, 0.04);
 }
 
 .logo {
@@ -55,12 +56,62 @@
   letter-spacing: 0.04em;
 }
 
-.nav-login {
-  font-weight: 500;
+.nav-btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.nav-btn--outline {
+  color: #0066ff;
+  border: 1px solid #0066ff;
+  background: transparent;
+}
+
+.nav-btn--outline:hover,
+.nav-btn--outline.active {
+  background: rgba(0, 102, 255, 0.08);
+  color: #0052cc;
+}
+
+.nav-btn--primary {
+  color: #fff;
+  background: linear-gradient(135deg, #0066ff 0%, #0047b3 100%);
+  border: none;
+}
+
+.nav-btn--primary:hover,
+.nav-btn--primary.active {
+  background: linear-gradient(135deg, #0052cc 0%, #003d99 100%);
+  color: #fff;
+}
+
+.nav-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 10px;
+  color: #0066ff;
+  border: 1px solid rgba(0, 102, 255, 0.3);
+  background: transparent;
+}
+
+.nav-btn-icon:hover,
+.nav-btn-icon.active {
+  background: rgba(0, 102, 255, 0.1);
+  color: #0052cc;
 }
 
 .nav-links {
   display: flex;
+  align-items: center;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -82,6 +133,14 @@
 
 .nav-lang-wrap {
   position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.nav-login-wrap {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
 }
 
 .nav-lang-btn {
@@ -186,6 +245,12 @@
 }
 
 @media (max-width: 768px) {
+  .nav-bar {
+    width: calc(100% - 1.5rem);
+    top: 0.75rem;
+    padding: 0.75rem 1.25rem;
+  }
+
   .menu-toggle {
     display: flex;
   }

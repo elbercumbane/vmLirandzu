@@ -8,6 +8,7 @@ import { PartnersComponent } from './partners/partners.component';
 import { TestimonialsComponent } from './testimonials/testimonials.component';
 import { CoverageComponent } from './coverage/coverage.component';
 import { FaqPreviewComponent } from './faq-preview/faq-preview.component';
+import { CeoMessageComponent } from '../../shared/ceo-message/ceo-message.component';
 
 @Component({
   selector: 'app-home',
@@ -18,6 +19,7 @@ import { FaqPreviewComponent } from './faq-preview/faq-preview.component';
     VisionMissionValuesComponent,
     ServicesComponent,
     GalleryComponent,
+    CeoMessageComponent,
     PartnersComponent,
     TestimonialsComponent,
     CoverageComponent,

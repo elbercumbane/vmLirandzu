@@ -3,6 +3,7 @@
   position: relative;
   height: 100vh;
   min-height: 680px;
+  margin-top: -5rem;
   overflow: hidden;
 }
 
@@ -57,7 +58,7 @@
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.2) 100%);
+  background: linear-gradient(90deg, rgba(18, 35, 57, 0.88) 0%, rgba(18, 35, 57, 0.65) 50%, rgba(18, 35, 57, 0.4) 100%);
 }
 
 .hero-inner {
@@ -131,8 +132,8 @@
 .btn-hero-cta {
   display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  justify-content: center;
+  gap: 0.75rem;
   padding: 1rem 1.5rem;
   font-weight: 600;
   font-size: 1rem;
@@ -144,8 +145,7 @@
 }
 
 .btn-label {
-  flex: 1;
-  text-align: left;
+  text-align: center;
 }
 
 .btn-arrow {
@@ -220,10 +220,14 @@
   z-index: 3;
   width: 48px;
   height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
   font-size: 2rem;
+  line-height: 1;
   cursor: pointer;
   border-radius: 50%;
   transition: background 0.2s;

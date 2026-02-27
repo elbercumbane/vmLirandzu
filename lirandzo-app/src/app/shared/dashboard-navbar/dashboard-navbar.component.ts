@@ -1,13 +1,21 @@
-import { Component, OnInit, OnDestroy, HostListener, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ElementRef, ViewChild, inject, Input, Output, EventEmitter } from '@angular/core';
+import { AuthService } from '../services/auth.service';
+
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-
+import { ThemeService } from '../services/theme.service';
 interface Notification {
   id: number;
   type: 'debt' | 'trip';
   message: string;
   amount?: number;
 }
+
+const ROLE_LABELS: Record<string, string> = {
+  admin: 'Administrador',
+  gestor: 'Gestor',
+  tecnico: 'Técnico'
+};
 
 @Component({
   selector: 'app-dashboard-navbar',
@@ -17,45 +25,71 @@ interface Notification {
   styleUrl: './dashboard-navbar.component.css'
 })
 export class DashboardNavbarComponent implements OnInit, OnDestroy {
+  @Input() sidebarOpen = false;
+  @Output() toggleSidebar = new EventEmitter<void>();
+  @ViewChild('profileDropdown', { static: false }) profileDropdown?: ElementRef;
+
+  private auth = inject(AuthService);
+
   @ViewChild('calendarDropdown', { static: false }) calendarDropdown?: ElementRef;
   @ViewChild('notificationsDropdown', { static: false }) notificationsDropdown?: ElementRef;
-  @ViewChild('profileDropdown', { static: false }) profileDropdown?: ElementRef;
 
   currentTime = '';
   currentDate = '';
+  currentLang: 'pt' | 'en' = 'pt';
   openDropdown: 'calendario' | 'notificacoes' | 'perfil' | null = null;
-  
+
   currentMonth = new Date().getMonth();
   currentYear = new Date().getFullYear();
   calendarDays: (number | null)[] = [];
   daysWithOrders = [2, 5, 7, 9, 11, 12, 14, 15, 17, 18, 19, 20, 21, 22, 23];
-  
+
   notifications: Notification[] = [
     { id: 1, type: 'debt', message: 'Fátima Cossa — 18 dias sem pagar', amount: 12800 },
     { id: 2, type: 'debt', message: 'Lurdes Sitoe — 11 dias sem pagar', amount: 29400 },
     { id: 3, type: 'trip', message: 'Viagem VGM-003 em curso — retorno hoje' }
   ];
-  
-  managerName = 'Nino Vieira';
-  managerRole = 'Gestor Principal';
-  managerInitials = 'NV';
-  
+
+  get managerName(): string {
+    return this.auth.currentUser()?.nome ?? 'Utilizador';
+  }
+
+  get managerRole(): string {
+    return this.auth.currentUser() ? ROLE_LABELS[this.auth.currentUser()!.role ?? ''] ?? this.auth.currentUser()!.role ?? '' : 'Sessão';
+  }
+
+  get managerInitials(): string {
+    return this.auth.currentUser()?.avatar ?? '—';
+  }
+
+  get canAccessConfiguracoes(): boolean {
+    return this.auth.canAccessConfiguracoes();
+  }
+
+  private timeInterval?: any;
+  private colonBlink = true;
+
+  constructor(private router: Router, public themeService: ThemeService) {}
+
+  get isDark(): boolean {
+    return this.themeService.isDark;
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggle();
+  }
+
   getShortDate(): string {
     const now = new Date();
     const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
     return `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
   }
 
-  private timeInterval?: any;
-  private colonBlink = true;
-
-  constructor(private router: Router) {}
-
   ngOnInit(): void {
     this.updateTime();
     this.updateDate();
     this.generateCalendar();
-    
+
     this.timeInterval = setInterval(() => {
       this.updateTime();
       this.colonBlink = !this.colonBlink;
@@ -87,16 +121,11 @@ export class DashboardNavbarComponent implements OnInit, OnDestroy {
   generateCalendar(): void {
     const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
     const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
-    const daysInPrevMonth = new Date(this.currentYear, this.currentMonth, 0).getDate();
-    
+
     this.calendarDays = [];
-    
-    // Days from previous month
     for (let i = firstDay - 1; i >= 0; i--) {
       this.calendarDays.push(null);
     }
-    
-    // Days of current month
     for (let i = 1; i <= daysInMonth; i++) {
       this.calendarDays.push(i);
     }
@@ -109,19 +138,9 @@ export class DashboardNavbarComponent implements OnInit, OnDestroy {
 
   navigateMonth(direction: 'prev' | 'next'): void {
     if (direction === 'prev') {
-      if (this.currentMonth === 0) {
-        this.currentMonth = 11;
-        this.currentYear--;
-      } else {
-        this.currentMonth--;
-      }
+      this.currentMonth === 0 ? (this.currentMonth = 11, this.currentYear--) : this.currentMonth--;
     } else {
-      if (this.currentMonth === 11) {
-        this.currentMonth = 0;
-        this.currentYear++;
-      } else {
-        this.currentMonth++;
-      }
+      this.currentMonth === 11 ? (this.currentMonth = 0, this.currentYear++) : this.currentMonth++;
     }
     this.generateCalendar();
   }
@@ -129,9 +148,7 @@ export class DashboardNavbarComponent implements OnInit, OnDestroy {
   isToday(day: number | null): boolean {
     if (day === null) return false;
     const today = new Date();
-    return day === today.getDate() && 
-           this.currentMonth === today.getMonth() && 
-           this.currentYear === today.getFullYear();
+    return day === today.getDate() && this.currentMonth === today.getMonth() && this.currentYear === today.getFullYear();
   }
 
   hasOrders(day: number | null): boolean {
@@ -140,39 +157,31 @@ export class DashboardNavbarComponent implements OnInit, OnDestroy {
   }
 
   toggleDropdown(dropdown: 'calendario' | 'notificacoes' | 'perfil'): void {
-    if (this.openDropdown === dropdown) {
-      this.openDropdown = null;
-    } else {
-      this.openDropdown = dropdown;
-    }
+    this.openDropdown = this.openDropdown === dropdown ? null : dropdown;
   }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    if (this.openDropdown) {
-      const target = event.target as HTMLElement;
-      
-      if (this.calendarDropdown && !this.calendarDropdown.nativeElement.contains(target) &&
-          !target.closest('.navbar-calendar-button')) {
-        if (this.openDropdown === 'calendario') {
-          this.openDropdown = null;
-        }
-      }
-      
-      if (this.notificationsDropdown && !this.notificationsDropdown.nativeElement.contains(target) &&
-          !target.closest('.navbar-notifications-button')) {
-        if (this.openDropdown === 'notificacoes') {
-          this.openDropdown = null;
-        }
-      }
-      
-      if (this.profileDropdown && !this.profileDropdown.nativeElement.contains(target) &&
-          !target.closest('.navbar-profile-button')) {
-        if (this.openDropdown === 'perfil') {
-          this.openDropdown = null;
-        }
-      }
+    if (!this.openDropdown) return;
+    const target = event.target as HTMLElement;
+
+    if (this.openDropdown === 'calendario' && this.calendarDropdown &&
+        !this.calendarDropdown.nativeElement.contains(target) && !target.closest('.navbar-calendar-button')) {
+      this.openDropdown = null;
     }
+    if (this.openDropdown === 'notificacoes' && this.notificationsDropdown &&
+        !this.notificationsDropdown.nativeElement.contains(target) && !target.closest('.navbar-notifications-button')) {
+      this.openDropdown = null;
+    }
+    if (this.openDropdown === 'perfil' && this.profileDropdown &&
+        !this.profileDropdown.nativeElement.contains(target) && !target.closest('.navbar-profile-button')) {
+      this.openDropdown = null;
+    }
+  }
+
+  setLang(lang: 'pt' | 'en'): void {
+    this.currentLang = lang;
+    // Em app real: usar serviço de i18n
   }
 
   goToSettings(): void {
@@ -181,8 +190,8 @@ export class DashboardNavbarComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    // Implementar lógica de logout
-    this.router.navigate(['/']);
+    this.auth.logout();
+    this.router.navigate(['/login']);
     this.openDropdown = null;
   }
 }

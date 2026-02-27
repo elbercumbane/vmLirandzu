@@ -15,9 +15,8 @@
     <li><a routerLink="/rastreio" routerLinkActive="active" (click)="closeMenu()">Rastrear Pedido</a></li>
     <li><a routerLink="/orcamento" (click)="closeMenu()">Solicitar Cotação</a></li>
     <li><a routerLink="/faq" routerLinkActive="active" (click)="closeMenu()">FAQ</a></li>
-    <li><a routerLink="/" fragment="contato" (click)="closeMenu()">Contato</a></li>
-    <li><a routerLink="/billing" (click)="closeMenu()">Sistema de Gestão de Facturas</a></li>
-    <li><a routerLink="/billing/encomendas" (click)="closeMenu()">Encomendas</a></li>
+    <li><a routerLink="/noticias" routerLinkActive="active" (click)="closeMenu()">Notícias</a></li>
+    <li><a routerLink="/contato" routerLinkActive="active" (click)="closeMenu()">Contato</a></li>
     <li class="nav-lang-wrap">
       <button type="button" class="nav-lang-btn" (click)="toggleLangDropdown()" [attr.aria-expanded]="langOpen" aria-haspopup="true" aria-label="Idioma">
         <span class="nav-lang-current">{{ currentLang }}</span>
@@ -28,6 +27,14 @@
         <button type="button" (click)="setLang('en'); closeLangDropdown()">English</button>
       </div>
     </li>
-    <li><a routerLink="/area-cliente" routerLinkActive="active" (click)="closeMenu()" class="nav-login">Área do Cliente</a></li>
+    <li><a routerLink="/area-cliente" routerLinkActive="active" (click)="closeMenu()">Área do Cliente</a></li>
+    <li class="nav-login-wrap">
+      <a routerLink="/login" routerLinkActive="active" (click)="closeMenu()" class="nav-btn nav-btn-icon" title="Login" aria-label="Login">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </a>
+    </li>
   </ul>
 </nav>

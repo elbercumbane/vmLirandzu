@@ -3,6 +3,7 @@ import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from './shared/navbar/navbar.component';
 import { FooterComponent } from './shared/footer/footer.component';
+import { ThemeService } from './shared/services/theme.service';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -16,13 +17,16 @@ export class AppComponent {
   showChrome = true;
 
   private router = inject(Router);
+  private themeService = inject(ThemeService);
 
   constructor() {
+    const hideChrome = (u: string) =>
+      u.startsWith('/area-cliente') || u.startsWith('/billing') || u.startsWith('/login') || u.startsWith('/recuperar-senha');
+    this.showChrome = !hideChrome(this.router.url);
     this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe(e => {
-        const url = e.urlAfterRedirects;
-        this.showChrome = !url.startsWith('/area-cliente') && !url.startsWith('/billing');
+        this.showChrome = !hideChrome(e.urlAfterRedirects);
       });
   }
 }

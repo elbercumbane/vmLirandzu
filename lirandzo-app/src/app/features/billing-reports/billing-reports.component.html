@@ -1,122 +1,234 @@
-<app-billing-sidebar [isOpen]="sidebarOpen" (toggleSidebar)="toggleSidebar()"></app-billing-sidebar>
-<button type="button" class="billing-sidebar-toggle" [class.sidebar-open]="sidebarOpen" (click)="toggleSidebar()" [attr.aria-label]="sidebarOpen ? 'Fechar menu' : 'Abrir menu'">
-  <span class="billing-sidebar-toggle-icon">{{ sidebarOpen ? '✕' : '☰' }}</span>
-</button>
-
 <section class="reports-page">
   <div class="reports-page-inner">
     <!-- Header -->
     <header class="reports-header">
-      <div>
-        <h1 class="reports-title">RELATÓRIOS & EXPORTAÇÃO</h1>
-        <p class="reports-subtitle">Análise financeira e operacional — VM Lirandzu Transportes</p>
+      <div class="reports-header-content">
+        <div class="reports-header-mark">VM</div>
+        <div class="reports-header-text">
+          <h1 class="reports-title">Relatórios & Exportação</h1>
+          <p class="reports-subtitle">Análise financeira e operacional — VM Lirandzu Transportes</p>
+        </div>
+        <div class="reports-header-actions">
+          <a routerLink="/billing" class="reports-header-btn reports-header-btn-back">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Voltar
+          </a>
+          <button type="button" class="reports-header-btn reports-header-btn-help" (click)="showHelpPopup = !showHelpPopup" [class.active]="showHelpPopup">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            Ajuda
+          </button>
+        </div>
+      </div>
+      <div *ngIf="showHelpPopup" class="reports-help-popup">
+        <h4>Como usar os Relatórios</h4>
+        <ul>
+          <li><strong>Filtros:</strong> Escolha o período de análise (Este Mês, Mês Anterior, etc.) ou defina datas personalizadas.</li>
+          <li><strong>Exportar:</strong> Gere relatórios em PDF ou CSV conforme a sua necessidade.</li>
+          <li><strong>KPIs:</strong> Visão geral do facturado, recebido, dívidas e taxa de recebimento.</li>
+          <li><strong>Gráficos:</strong> Evolução mensal e produtos mais vendidos.</li>
+        </ul>
+        <button type="button" class="reports-help-close" (click)="showHelpPopup = false">Fechar</button>
       </div>
     </header>
 
-    <!-- Period Selector -->
-    <section class="reports-period-card">
-      <div class="reports-period-row">
-        <label class="reports-period-label">Período de análise:</label>
-        <div class="reports-period-buttons">
-          <button
-            type="button"
-            class="reports-period-button"
-            [class.active]="selectedPeriod === 'THIS_MONTH'"
-            (click)="selectedPeriod = 'THIS_MONTH'; applyPeriod()"
-          >
-            Este Mês
-          </button>
-          <button
-            type="button"
-            class="reports-period-button"
-            [class.active]="selectedPeriod === 'LAST_MONTH'"
-            (click)="selectedPeriod = 'LAST_MONTH'; applyPeriod()"
-          >
-            Mês Anterior
-          </button>
-          <button
-            type="button"
-            class="reports-period-button"
-            [class.active]="selectedPeriod === 'LAST_3_MONTHS'"
-            (click)="selectedPeriod = 'LAST_3_MONTHS'; applyPeriod()"
-          >
-            Últimos 3 Meses
-          </button>
-          <button
-            type="button"
-            class="reports-period-button"
-            [class.active]="selectedPeriod === 'THIS_YEAR'"
-            (click)="selectedPeriod = 'THIS_YEAR'; applyPeriod()"
-          >
-            Este Ano
-          </button>
+    <!-- Filtros & Exportar -->
+    <section class="reports-filters-card">
+      <button
+        type="button"
+        class="reports-filters-toggle"
+        (click)="filtersOpen = !filtersOpen"
+        [attr.aria-expanded]="filtersOpen"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+        </svg>
+        <span>{{ filtersOpen ? 'Ocultar filtros' : 'Mostrar filtros' }}</span>
+        <svg class="reports-filters-chevron" [class.open]="filtersOpen" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+
+      <div class="reports-filters-body" [class.open]="filtersOpen">
+        <div class="reports-filters-section">
+          <h3 class="reports-filters-section-title">Período de análise</h3>
+          <div class="reports-filters-period-row">
+            <div class="reports-period-buttons">
+              <button
+                type="button"
+                class="reports-period-button"
+                [class.active]="selectedPeriod === 'THIS_MONTH'"
+                (click)="selectedPeriod = 'THIS_MONTH'; applyPeriod()"
+              >
+                Este Mês
+              </button>
+              <button
+                type="button"
+                class="reports-period-button"
+                [class.active]="selectedPeriod === 'LAST_MONTH'"
+                (click)="selectedPeriod = 'LAST_MONTH'; applyPeriod()"
+              >
+                Mês Anterior
+              </button>
+              <button
+                type="button"
+                class="reports-period-button"
+                [class.active]="selectedPeriod === 'LAST_3_MONTHS'"
+                (click)="selectedPeriod = 'LAST_3_MONTHS'; applyPeriod()"
+              >
+                Últimos 3 Meses
+              </button>
+              <button
+                type="button"
+                class="reports-period-button"
+                [class.active]="selectedPeriod === 'THIS_YEAR'"
+                (click)="selectedPeriod = 'THIS_YEAR'; applyPeriod()"
+              >
+                Este Ano
+              </button>
+            </div>
+            <div class="reports-period-custom">
+              <input type="date" class="reports-date-input" [(ngModel)]="customDateFrom" placeholder="De:" />
+              <span class="reports-date-separator">até</span>
+              <input type="date" class="reports-date-input" [(ngModel)]="customDateTo" placeholder="Até:" />
+              <button
+                type="button"
+                class="reports-period-button reports-period-button-apply"
+                [class.active]="selectedPeriod === 'CUSTOM'"
+                (click)="selectedPeriod = 'CUSTOM'; applyPeriod()"
+              >
+                Aplicar
+              </button>
+            </div>
+          </div>
+          <div class="reports-period-badge">
+            <span class="reports-period-badge-label">A mostrar:</span>
+            <strong>{{ currentPeriodText }}</strong>
+          </div>
         </div>
-        <div class="reports-period-custom">
-          <input type="date" class="reports-date-input" [(ngModel)]="customDateFrom" placeholder="De:" />
-          <span class="reports-date-separator">até</span>
-          <input type="date" class="reports-date-input" [(ngModel)]="customDateTo" placeholder="Até:" />
-          <button
-            type="button"
-            class="reports-period-button reports-period-button-custom"
-            [class.active]="selectedPeriod === 'CUSTOM'"
-            (click)="selectedPeriod = 'CUSTOM'; applyPeriod()"
-          >
-            Aplicar
-          </button>
-        </div>
-        <div class="reports-period-text">
-          A mostrar dados de: <strong>{{ currentPeriodText }}</strong>
+
+        <div class="reports-filters-divider"></div>
+
+        <div class="reports-filters-section">
+          <h3 class="reports-filters-section-title">Exportar relatórios</h3>
+          <div class="reports-export-row">
+            <button type="button" class="reports-export-btn" (click)="exportReport('Relatório Mensal PDF')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              Relatório Mensal PDF
+            </button>
+            <button type="button" class="reports-export-btn" (click)="exportReport('Lista de Encomendas CSV')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              Lista Encomendas CSV
+            </button>
+            <button type="button" class="reports-export-btn" (click)="exportReport('Relatório de Dívidas PDF')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              Dívidas PDF
+            </button>
+            <button type="button" class="reports-export-btn" (click)="exportReport('Relatório de Clientes PDF')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              Clientes PDF
+            </button>
+            <button type="button" class="reports-export-btn" (click)="exportReport('Relatório de Viagens PDF')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="2.5"></circle><circle cx="18.5" cy="17.5" r="2.5"></circle><path d="M15 6H3v9h2.05"></path><path d="M15 15V6l6 4v5h-1.05"></path><path d="M8 15h7"></path></svg>
+              Viagens PDF
+            </button>
+            <button type="button" class="reports-export-btn" (click)="exportReport('Dashboard Executivo PDF')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+              Dashboard PDF
+            </button>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- Financial Summary KPIs -->
     <section class="reports-kpi-grid">
-      <div class="reports-kpi-card reports-kpi-orange">
-        <div class="reports-kpi-icon">💰</div>
+      <div class="reports-kpi-card reports-kpi-accent">
+        <div class="reports-kpi-top-line"></div>
+        <div class="reports-kpi-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
         <div class="reports-kpi-content">
-          <div class="reports-kpi-value">{{ totalInvoiced | number: '1.0-0' }} MZN</div>
+          <div class="reports-kpi-value">{{ totalInvoiced | number: '1.0-0' }} <small>MZN</small></div>
           <div class="reports-kpi-label">Facturado Total</div>
+          <div class="reports-kpi-sub">valor total emitido</div>
         </div>
       </div>
 
-      <div class="reports-kpi-card reports-kpi-green">
-        <div class="reports-kpi-icon">✓</div>
+      <div class="reports-kpi-card reports-kpi-success">
+        <div class="reports-kpi-top-line"></div>
+        <div class="reports-kpi-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
         <div class="reports-kpi-content">
-          <div class="reports-kpi-value">{{ totalReceived | number: '1.0-0' }} MZN</div>
+          <div class="reports-kpi-value">{{ totalReceived | number: '1.0-0' }} <small>MZN</small></div>
           <div class="reports-kpi-label">Total Recebido</div>
+          <div class="reports-kpi-sub">pagamentos recebidos</div>
         </div>
       </div>
 
-      <div class="reports-kpi-card reports-kpi-red">
-        <div class="reports-kpi-icon">⚠</div>
+      <div class="reports-kpi-card reports-kpi-danger">
+        <div class="reports-kpi-top-line"></div>
+        <div class="reports-kpi-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
         <div class="reports-kpi-content">
-          <div class="reports-kpi-value">{{ totalDebt | number: '1.0-0' }} MZN</div>
+          <div class="reports-kpi-value">{{ totalDebt | number: '1.0-0' }} <small>MZN</small></div>
           <div class="reports-kpi-label">Total em Dívida</div>
+          <div class="reports-kpi-sub">a cobrar</div>
         </div>
       </div>
 
-      <div class="reports-kpi-card reports-kpi-blue">
-        <div class="reports-kpi-icon">📦</div>
+      <div class="reports-kpi-card reports-kpi-info">
+        <div class="reports-kpi-top-line"></div>
+        <div class="reports-kpi-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+          </svg>
+        </div>
         <div class="reports-kpi-content">
           <div class="reports-kpi-value">{{ totalOrders }}</div>
           <div class="reports-kpi-label">Nº Encomendas</div>
+          <div class="reports-kpi-sub">no período</div>
         </div>
       </div>
 
-      <div class="reports-kpi-card reports-kpi-orange">
-        <div class="reports-kpi-icon">📊</div>
+      <div class="reports-kpi-card reports-kpi-accent">
+        <div class="reports-kpi-top-line"></div>
+        <div class="reports-kpi-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+        </div>
         <div class="reports-kpi-content">
-          <div class="reports-kpi-value">{{ averageTicket | number: '1.0-0' }} MZN</div>
+          <div class="reports-kpi-value">{{ averageTicket | number: '1.0-0' }} <small>MZN</small></div>
           <div class="reports-kpi-label">Ticket Médio</div>
+          <div class="reports-kpi-sub">por encomenda</div>
         </div>
       </div>
 
-      <div class="reports-kpi-card reports-kpi-green">
-        <div class="reports-kpi-icon">📈</div>
+      <div class="reports-kpi-card reports-kpi-success">
+        <div class="reports-kpi-top-line"></div>
+        <div class="reports-kpi-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+            <polyline points="16 7 22 7 22 13"></polyline>
+          </svg>
+        </div>
         <div class="reports-kpi-content">
           <div class="reports-kpi-value">{{ receiptRate }}%</div>
           <div class="reports-kpi-label">Taxa de Recebimento</div>
+          <div class="reports-kpi-sub">receita cobrada</div>
           <div class="reports-kpi-progress">
             <div class="reports-kpi-progress-bar" [style.width.%]="receiptRate"></div>
           </div>
@@ -230,7 +342,7 @@
 
     <!-- Debts Report -->
     <section class="reports-section-card">
-      <div class="reports-section-header">
+      <div class="reports-section-header reports-debt-header">
         <div>
           <h3 class="reports-section-title">Dívidas em Aberto — Janeiro 2025</h3>
           <div class="reports-debt-summary">
@@ -238,9 +350,6 @@
             <span class="reports-debt-subtitle">5 clientes com pagamento pendente</span>
           </div>
         </div>
-        <button type="button" class="reports-export-button reports-export-red" (click)="exportReport('Lista de Dívidas PDF')">
-          📄 Exportar Lista PDF
-        </button>
       </div>
       <div class="reports-table-wrapper">
         <table class="reports-table">
@@ -366,66 +475,6 @@
             </tr>
           </tbody>
         </table>
-      </div>
-    </section>
-
-    <!-- Export Panel -->
-    <section class="reports-section-card">
-      <h3 class="reports-section-title">Exportar Relatórios</h3>
-      <div class="reports-export-grid">
-        <div class="reports-export-card">
-          <div class="reports-export-icon">📄</div>
-          <h4 class="reports-export-card-title">Relatório Mensal Completo</h4>
-          <p class="reports-export-card-subtitle">Todas as encomendas, pagamentos e resumo</p>
-          <button type="button" class="reports-export-card-button reports-export-orange" (click)="exportReport('Relatório Mensal PDF')">
-            Exportar PDF
-          </button>
-        </div>
-
-        <div class="reports-export-card">
-          <div class="reports-export-icon">📊</div>
-          <h4 class="reports-export-card-title">Lista de Encomendas</h4>
-          <p class="reports-export-card-subtitle">Tabela completa em formato Excel</p>
-          <button type="button" class="reports-export-card-button reports-export-green" (click)="exportReport('Lista de Encomendas CSV')">
-            Exportar CSV
-          </button>
-        </div>
-
-        <div class="reports-export-card">
-          <div class="reports-export-icon">⚠</div>
-          <h4 class="reports-export-card-title">Relatório de Dívidas</h4>
-          <p class="reports-export-card-subtitle">Clientes com pagamentos em aberto</p>
-          <button type="button" class="reports-export-card-button reports-export-red" (click)="exportReport('Relatório de Dívidas PDF')">
-            Exportar PDF
-          </button>
-        </div>
-
-        <div class="reports-export-card">
-          <div class="reports-export-icon">👥</div>
-          <h4 class="reports-export-card-title">Relatório de Clientes</h4>
-          <p class="reports-export-card-subtitle">Histórico e métricas por cliente</p>
-          <button type="button" class="reports-export-card-button reports-export-blue" (click)="exportReport('Relatório de Clientes PDF')">
-            Exportar PDF
-          </button>
-        </div>
-
-        <div class="reports-export-card">
-          <div class="reports-export-icon">🚛</div>
-          <h4 class="reports-export-card-title">Relatório de Viagens</h4>
-          <p class="reports-export-card-subtitle">Todas as guias e conferências</p>
-          <button type="button" class="reports-export-card-button reports-export-outline" (click)="exportReport('Relatório de Viagens PDF')">
-            Exportar PDF
-          </button>
-        </div>
-
-        <div class="reports-export-card">
-          <div class="reports-export-icon">📈</div>
-          <h4 class="reports-export-card-title">Dashboard Executivo</h4>
-          <p class="reports-export-card-subtitle">Resumo para gestão e direcção</p>
-          <button type="button" class="reports-export-card-button reports-export-outline" (click)="exportReport('Dashboard Executivo PDF')">
-            Exportar PDF
-          </button>
-        </div>
       </div>
     </section>
   </div>

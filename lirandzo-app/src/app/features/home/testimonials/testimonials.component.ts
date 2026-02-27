@@ -28,22 +28,19 @@ export class TestimonialsComponent implements AfterViewInit {
       quote: 'Entregas sempre no prazo. O rastreamento em tempo real nos dá tranquilidade total.',
       author: 'Maria Silva',
       role: 'Gerente de Logística, Indústria ABC',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&q=80',
-      deliveryPhoto: 'camiao-carga-sacos.jpeg'
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&q=80'
     },
     {
       quote: 'Parceria de anos. Profissionalismo e tecnologia que fazem a diferença no dia a dia.',
       author: 'Carlos Mendes',
       role: 'Diretor Comercial, Comércio XYZ',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&q=80',
-      deliveryPhoto: 'frota-camioes.jpg'
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&q=80'
     },
     {
       quote: 'Melhor custo-benefício do mercado. Recomendo a Lirandzo para quem precisa de confiança.',
       author: 'Ana Costa',
       role: 'CEO, Distribuidora Norte',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&q=80',
-      deliveryPhoto: 'camiao-terminal-carga.jpeg'
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&q=80'
     }
   ];
 

@@ -1,15 +1,19 @@
 <app-billing-sidebar [isOpen]="sidebarOpen" (toggleSidebar)="toggleSidebar()"></app-billing-sidebar>
-<app-dashboard-navbar></app-dashboard-navbar>
-<button type="button" class="billing-sidebar-toggle" [class.sidebar-open]="sidebarOpen" (click)="toggleSidebar()" [attr.aria-label]="sidebarOpen ? 'Fechar menu' : 'Abrir menu'">
-  <span class="billing-sidebar-toggle-icon">{{ sidebarOpen ? '✕' : '☰' }}</span>
-</button>
-<section class="hero billing-hero">
-  <div class="hero-slide billing-hero-bg"></div>
-  <div class="hero-overlay"></div>
-  <div class="billing-hero-inner" [class.sidebar-open]="sidebarOpen">
-    <h1 class="billing-title">Sistema de Gestão de Facturas</h1>
+
+<div class="billing-dashboard" [class.sidebar-open]="sidebarOpen">
+  <app-dashboard-navbar></app-dashboard-navbar>
+
+  <button type="button" class="billing-sidebar-toggle" [class.sidebar-open]="sidebarOpen" (click)="toggleSidebar()" [attr.aria-label]="sidebarOpen ? 'Fechar menu' : 'Abrir menu'">
+    <span class="billing-sidebar-toggle-icon">{{ sidebarOpen ? '✕' : '☰' }}</span>
+  </button>
+
+  <main class="billing-dashboard-content">
+    <div class="billing-dashboard-header">
+      <h1 class="billing-title">Sistema de Gestão de Facturas</h1>
+      <p class="billing-subtitle">Visão geral das operações — Janeiro 2025</p>
+    </div>
+
     <div class="billing-kpi-grid">
-      <!-- CARD 1 -->
       <div class="billing-kpi-card">
         <div class="billing-kpi-top-line billing-kpi-top-line-orange"></div>
         <div class="billing-kpi-header">
@@ -20,7 +24,6 @@
         <div class="billing-kpi-subtext">encomendas registadas</div>
       </div>
 
-      <!-- CARD 2 -->
       <div class="billing-kpi-card">
         <div class="billing-kpi-top-line billing-kpi-top-line-blue"></div>
         <div class="billing-kpi-header">
@@ -31,7 +34,6 @@
         <div class="billing-kpi-subtext">valor total do mês</div>
       </div>
 
-      <!-- CARD 3 -->
       <div class="billing-kpi-card">
         <div class="billing-kpi-top-line billing-kpi-top-line-green"></div>
         <div class="billing-kpi-header">
@@ -42,7 +44,6 @@
         <div class="billing-kpi-subtext">pagamentos confirmados</div>
       </div>
 
-      <!-- CARD 4 -->
       <div class="billing-kpi-card billing-kpi-card-alert">
         <div class="billing-kpi-top-line billing-kpi-top-line-red"></div>
         <div class="billing-kpi-header">
@@ -53,7 +54,6 @@
         <div class="billing-kpi-subtext">valor por receber</div>
       </div>
 
-      <!-- CARD 5 -->
       <div class="billing-kpi-card">
         <div class="billing-kpi-top-line billing-kpi-top-line-green"></div>
         <div class="billing-kpi-header">
@@ -69,7 +69,6 @@
         </div>
       </div>
 
-      <!-- CARD 6 -->
       <div class="billing-kpi-card">
         <div class="billing-kpi-top-line billing-kpi-top-line-yellow"></div>
         <div class="billing-kpi-header">
@@ -81,7 +80,6 @@
       </div>
     </div>
 
-    <!-- Debt Alerts Panel -->
     <section class="debt-alerts-panel">
       <div class="debt-alerts-header">
         <div class="debt-alerts-header-left">
@@ -129,7 +127,6 @@
       </div>
     </section>
 
-    <!-- Charts Section -->
     <section class="dashboard-charts-section">
       <div class="dashboard-chart-card dashboard-chart-bar">
         <div class="dashboard-chart-header">
@@ -138,17 +135,14 @@
         </div>
         <div class="dashboard-chart-content">
           <svg class="dashboard-bar-chart-svg" viewBox="0 0 600 220" preserveAspectRatio="xMidYMid meet">
-            <!-- Grid lines -->
             <line x1="60" y1="20" x2="60" y2="180" stroke="rgba(30,58,95,0.5)" stroke-dasharray="3 3" />
             <line x1="60" y1="180" x2="60" y2="180" stroke="rgba(30,58,95,0.5)" stroke-dasharray="3 3" />
             <line x1="60" y1="140" x2="560" y2="140" stroke="rgba(30,58,95,0.5)" stroke-dasharray="3 3" />
             <line x1="60" y1="100" x2="560" y2="100" stroke="rgba(30,58,95,0.5)" stroke-dasharray="3 3" />
             <line x1="60" y1="60" x2="560" y2="60" stroke="rgba(30,58,95,0.5)" stroke-dasharray="3 3" />
             <line x1="60" y1="20" x2="560" y2="20" stroke="rgba(30,58,95,0.5)" stroke-dasharray="3 3" />
-            
-            <!-- Bars -->
+
             <g *ngFor="let data of weeklyOrdersData; let i = index">
-              <!-- Paid (green) -->
               <rect
                 [attr.x]="80 + i * 120"
                 [attr.y]="getBarY(data.paid, maxBarValue)"
@@ -156,7 +150,6 @@
                 [attr.height]="getBarHeight(data.paid, maxBarValue)"
                 fill="#22C55E"
               />
-              <!-- Partial (yellow) -->
               <rect
                 [attr.x]="80 + i * 120"
                 [attr.y]="getBarY(data.partial, maxBarValue) - getBarHeight(data.paid, maxBarValue)"
@@ -164,7 +157,6 @@
                 [attr.height]="getBarHeight(data.partial, maxBarValue)"
                 fill="#EAB308"
               />
-              <!-- Unpaid (red) -->
               <rect
                 [attr.x]="80 + i * 120"
                 [attr.y]="getBarY(data.unpaid, maxBarValue) - getBarHeight(data.partial, maxBarValue) - getBarHeight(data.paid, maxBarValue)"
@@ -172,8 +164,7 @@
                 [attr.height]="getBarHeight(data.unpaid, maxBarValue)"
                 fill="#EF4444"
               />
-              
-              <!-- Week label -->
+
               <text
                 [attr.x]="95 + i * 120"
                 y="195"
@@ -189,8 +180,7 @@
                 font-size="9"
               >{{ data.weekRange }}</text>
             </g>
-            
-            <!-- Y-axis labels -->
+
             <text x="55" y="185" text-anchor="end" fill="#6B84A3" font-size="10">0</text>
             <text x="55" y="145" text-anchor="end" fill="#6B84A3" font-size="10">{{ Math.round(maxBarValue * 0.5) }}</text>
             <text x="55" y="105" text-anchor="end" fill="#6B84A3" font-size="10">{{ maxBarValue }}</text>
@@ -379,5 +369,5 @@
         </div>
       </div>
     </section>
-  </div>
-</section>
+  </main>
+</div>

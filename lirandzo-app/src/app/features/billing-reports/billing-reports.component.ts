@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BillingSidebarComponent } from '../../shared/billing-sidebar/billing-sidebar.component';
+import { RouterLink } from '@angular/router';
 
 type PeriodOption = 'THIS_MONTH' | 'LAST_MONTH' | 'LAST_3_MONTHS' | 'THIS_YEAR' | 'CUSTOM';
 
@@ -37,12 +37,13 @@ interface TripRow {
 @Component({
   selector: 'app-billing-reports',
   standalone: true,
-  imports: [CommonModule, FormsModule, BillingSidebarComponent],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './billing-reports.component.html',
   styleUrl: './billing-reports.component.css'
 })
 export class BillingReportsComponent {
-  sidebarOpen = false;
+  filtersOpen = true;
+  showHelpPopup = false;
 
   // Period selection
   selectedPeriod: PeriodOption = 'THIS_MONTH';
@@ -206,14 +207,18 @@ export class BillingReportsComponent {
     }
   }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (this.showHelpPopup && !target.closest('.reports-header')) {
+      this.showHelpPopup = false;
+    }
+  }
+
   exportReport(type: string): void {
     // Simulate export
     console.log(`Exporting ${type}...`);
     // In a real app, this would generate and download the file
     alert(`✓ Relatório ${type} gerado com sucesso!`);
-  }
-
-  toggleSidebar(): void {
-    this.sidebarOpen = !this.sidebarOpen;
   }
 }
