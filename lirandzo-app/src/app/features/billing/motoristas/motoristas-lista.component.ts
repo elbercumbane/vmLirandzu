@@ -1,8 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
+import { MotoristaService, Motorista } from '../../../services/motorista.service';
+
+interface MotoristaDisplay {
+  id: number;
+  nome: string;
+  telefone: string;
+  carta: string;
+  avaliacao: number;
+  status: string;
+}
 
 @Component({
   selector: 'app-motoristas-lista',
@@ -11,25 +21,66 @@ import { BillingSectionHeaderComponent } from '../shared/billing-section-header.
   templateUrl: './motoristas-lista.component.html',
   styleUrls: ['../shared/billing-page.css', './motoristas-lista.component.css']
 })
-export class MotoristasListaComponent {
+export class MotoristasListaComponent implements OnInit {
   searchTerm = '';
   activeFilter = 'TODOS';
+  motoristas: MotoristaDisplay[] = [];
+  loading = true;
+  error: string | null = null;
 
-  motoristas = [
-    { id: 1, nome: 'João Macuácua', telefone: '841234567', carta: 'C+E', viaturaAtribuida: 'MDD-45-78 (Volvo FH16)', totalViagens: 45, avaliacao: 4.8, status: 'DISPONÍVEL' },
-    { id: 2, nome: 'Alberto Chissano', telefone: '852345678', carta: 'C+E', viaturaAtribuida: 'MPT-12-34 (Scania R450)', totalViagens: 38, avaliacao: 4.5, status: 'EM VIAGEM' },
-    { id: 3, nome: 'Samuel Dinis', telefone: '863456789', carta: 'C', viaturaAtribuida: 'MTT-67-89 (Isuzu NPR)', totalViagens: 22, avaliacao: 4.2, status: 'DISPONÍVEL' },
-    { id: 4, nome: 'Mário Tembe', telefone: '874567890', carta: 'C+E', viaturaAtribuida: 'MNP-56-90 (Iveco Stralis)', totalViagens: 51, avaliacao: 4.9, status: 'EM VIAGEM' },
-    { id: 5, nome: 'Fernando Langa', telefone: '885678901', carta: 'C', viaturaAtribuida: '—', totalViagens: 15, avaliacao: 3.8, status: 'FÉRIAS' },
-    { id: 6, nome: 'Hélder Cuna', telefone: '896789012', carta: 'C+E', viaturaAtribuida: '—', totalViagens: 33, avaliacao: 4.0, status: 'INACTIVO' }
-  ];
+  constructor(private motoristaService: MotoristaService) {}
+
+  ngOnInit() {
+    this.carregarMotoristas();
+  }
+
+  carregarMotoristas() {
+    this.loading = true;
+    this.error = null;
+
+    this.motoristaService.listarMotoristas().subscribe({
+      next: (motoristasApi: Motorista[]) => {
+        this.motoristas = motoristasApi.map(m => this.mapearMotorista(m));
+        this.loading = false;
+      },
+      error: (error: unknown) => {
+        console.error('Erro ao carregar motoristas:', error);
+        this.error = 'Erro ao carregar motoristas da base de dados';
+        this.loading = false;
+        this.motoristas = [];
+      }
+    });
+  }
+
+  private mapearMotorista(motorista: Motorista): MotoristaDisplay {
+    const statusMap: { [key: string]: string } = {
+      'ATIVO': 'DISPONÍVEL',
+      'INATIVO': 'INACTIVO'
+    };
+
+    const statusDisplay = statusMap[motorista.status?.toUpperCase() || ''] || motorista.status || 'DISPONÍVEL';
+
+    return {
+      id: motorista.id || 0,
+      nome: motorista.nome || '',
+      telefone: motorista.telefone || 'N/A',
+      carta: motorista.numeroCarta || 'N/A',
+      avaliacao: motorista.avaliacaoMedia || 0,
+      status: statusDisplay
+    };
+  }
 
   get filteredMotoristas() {
     let list = this.motoristas;
-    if (this.activeFilter !== 'TODOS') list = list.filter(m => m.status === this.activeFilter);
+    if (this.activeFilter !== 'TODOS') {
+      list = list.filter(m => m.status === this.activeFilter);
+    }
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
-      list = list.filter(m => m.nome.toLowerCase().includes(term) || m.telefone.includes(term));
+      list = list.filter(m => 
+        m.nome.toLowerCase().includes(term) || 
+        m.telefone.toLowerCase().includes(term)
+      );
     }
     return list;
   }
@@ -38,6 +89,7 @@ export class MotoristasListaComponent {
   get disponiveis() { return this.motoristas.filter(m => m.status === 'DISPONÍVEL').length; }
   get emViagem() { return this.motoristas.filter(m => m.status === 'EM VIAGEM').length; }
   get avaliacaoMedia() {
+    if (this.motoristas.length === 0) return '0.0';
     const sum = this.motoristas.reduce((a, m) => a + m.avaliacao, 0);
     return (sum / this.motoristas.length).toFixed(1);
   }

@@ -17,67 +17,46 @@
     <div class="form-section-title">Dados Pessoais</div>
     <div class="form-grid">
       <div class="form-group">
-        <label class="form-label" for="nome">Nome</label>
-        <input type="text" id="nome" class="form-control" placeholder="Nome completo" [(ngModel)]="motorista.nome" name="nome" />
+        <label class="form-label" for="nome">Nome *</label>
+        <input type="text" id="nome" class="form-control" placeholder="Nome completo" [(ngModel)]="motorista.nome" name="nome" required />
       </div>
       <div class="form-group">
         <label class="form-label" for="telefone">Telefone</label>
         <input type="text" id="telefone" class="form-control" placeholder="Ex: 84 123 4567" [(ngModel)]="motorista.telefone" name="telefone" />
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="bi">BI</label>
-        <input type="text" id="bi" class="form-control" placeholder="Bilhete de Identidade" [(ngModel)]="motorista.bi" name="bi" />
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="dataNascimento">Data de Nascimento</label>
-        <input type="date" id="dataNascimento" class="form-control" [(ngModel)]="motorista.dataNascimento" name="dataNascimento" />
       </div>
     </div>
 
     <div class="form-section-title">Carta de Condução</div>
     <div class="form-grid">
       <div class="form-group">
-        <label class="form-label" for="cartaConducao">Nº Carta</label>
-        <input type="text" id="cartaConducao" class="form-control" placeholder="Número da carta" [(ngModel)]="motorista.cartaConducao" name="cartaConducao" />
+        <label class="form-label" for="numeroCarta">Nº Carta</label>
+        <input type="text" id="numeroCarta" class="form-control" placeholder="Número da carta" [(ngModel)]="motorista.numeroCarta" name="numeroCarta" />
       </div>
       <div class="form-group">
-        <label class="form-label" for="categoriaCarta">Categoria</label>
-        <select id="categoriaCarta" class="form-control" [(ngModel)]="motorista.categoriaCarta" name="categoriaCarta">
-          <option value="">Selecione</option>
-          @for (c of categorias; track c) {
-            <option [value]="c">{{ c }}</option>
-          }
+        <label class="form-label" for="status">Status</label>
+        <select id="status" class="form-control" [(ngModel)]="motorista.status" name="status">
+          <option value="ATIVO">Ativo</option>
+          <option value="INATIVO">Inactivo</option>
         </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="validadeCarta">Validade</label>
-        <input type="date" id="validadeCarta" class="form-control" [(ngModel)]="motorista.validadeCarta" name="validadeCarta" />
-      </div>
-    </div>
-
-    <div class="form-section-title">Contacto</div>
-    <div class="form-grid">
-      <div class="form-group full-width">
-        <label class="form-label" for="endereco">Endereço</label>
-        <input type="text" id="endereco" class="form-control" placeholder="Endereço completo" [(ngModel)]="motorista.endereco" name="endereco" />
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="contactoEmergencia">Contacto de Emergência</label>
-        <input type="text" id="contactoEmergencia" class="form-control" placeholder="Ex: 84 999 9999" [(ngModel)]="motorista.contactoEmergencia" name="contactoEmergencia" />
-      </div>
-    </div>
-
-    <div class="form-section-title">Observações</div>
-    <div class="form-grid">
-      <div class="form-group full-width">
-        <label class="form-label" for="observacoes">Observações</label>
-        <textarea id="observacoes" class="form-control" placeholder="Notas ou observações sobre o motorista" [(ngModel)]="motorista.observacoes" name="observacoes" rows="4"></textarea>
       </div>
     </div>
 
     <div class="form-actions">
       <a routerLink="/billing/motoristas" class="btn-secondary">Cancelar</a>
-      <button type="submit" class="btn-primary">Salvar Motorista</button>
+      <button type="submit" class="btn-primary" [disabled]="loading">
+        @if (loading) {
+          Guardando...
+        } @else {
+          Guardar Motorista
+        }
+      </button>
     </div>
   </form>
 </div>
+
+<app-notification-popup
+  *ngIf="showNotification"
+  [message]="notificationMessage"
+  [type]="notificationType"
+  [duration]="7000">
+</app-notification-popup>

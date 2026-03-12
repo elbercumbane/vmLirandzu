@@ -1,0 +1,85 @@
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="getBackLink()"
+  [showHelp]="true"
+  title="Editar Viatura"
+  subtitle="Actualize os dados da viatura conforme necessário"
+  helpTitle="Como editar uma Viatura"
+  [helpItems]="[
+    'Pode actualizar matrícula, marca, modelo, tipo, capacidade e status.',
+    'Após guardar, a viatura será actualizada na base de dados.',
+    'As alterações serão reflectidas imediatamente.'
+  ]"
+></app-billing-section-header>
+
+@if (loading) {
+  <div class="loading-state">
+    <p>A carregar dados da viatura...</p>
+  </div>
+} @else if (error) {
+  <div class="error-state">
+    <p>{{ error }}</p>
+    <button type="button" class="btn-secondary" (click)="carregarViatura()">Tentar Novamente</button>
+    <a routerLink="/billing/viaturas" class="btn-secondary" style="margin-left: 0.5rem;">Voltar</a>
+  </div>
+} @else {
+  <div class="card">
+    <form (ngSubmit)="salvar()">
+      <div class="form-section-title">Identificação</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Matrícula *</label>
+          <input type="text" class="form-control" placeholder="Ex: MDD-45-78" [(ngModel)]="viatura.matricula" name="matricula" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Marca *</label>
+          <input type="text" class="form-control" placeholder="Ex: Volvo, Scania" [(ngModel)]="viatura.marca" name="marca" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Modelo *</label>
+          <input type="text" class="form-control" placeholder="Ex: FH16, R450" [(ngModel)]="viatura.modelo" name="modelo" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipo</label>
+          <select class="form-control" [(ngModel)]="viatura.tipo" name="tipo">
+            <option value="">Seleccionar tipo</option>
+            @for (t of tiposViatura; track t) {
+              <option [value]="t">{{ t }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Capacidade (ton)</label>
+          <input type="number" class="form-control" placeholder="Ex: 25" [(ngModel)]="viatura.capacidade" name="capacidade" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-control" [(ngModel)]="viatura.status" name="status">
+            <option value="ATIVA">Ativa</option>
+            <option value="EM_MANUTENCAO">Em Manutenção</option>
+            <option value="RESERVADA">Reservada</option>
+            <option value="INATIVA">Inativa</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a [routerLink]="getBackLink()" class="btn-secondary">Cancelar</a>
+        <button type="button" class="btn-primary" (click)="salvar()" [disabled]="loading">
+          @if (loading) {
+            Guardando...
+          } @else {
+            Guardar Alterações
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+}
+
+<app-notification-popup
+  *ngIf="showNotification"
+  [message]="notificationMessage"
+  [type]="notificationType"
+  [duration]="7000">
+</app-notification-popup>

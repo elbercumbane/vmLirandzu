@@ -1,8 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
+import { GuiaRemessaService, GuiaRemessaResponse } from '../../../services/guia-remessa.service';
+
+interface GuiaDisplay {
+  id: number;
+  ref: string;
+  data: string;
+  motorista: string;
+  viatura: string;
+  origem: string;
+  destino: string;
+  totalCargas: number;
+  totalClientes: number;
+  estado: string;
+  valorTotal: number;
+}
 
 @Component({
   selector: 'app-guias-lista',
@@ -11,25 +26,92 @@ import { BillingSectionHeaderComponent } from '../shared/billing-section-header.
   templateUrl: './guias-lista.component.html',
   styleUrls: ['../shared/billing-page.css', './guias-lista.component.css']
 })
-export class GuiasListaComponent {
+export class GuiasListaComponent implements OnInit {
   filtro = '';
   filtroEstado = 'TODOS';
+  guias: GuiaDisplay[] = [];
+  loading = true;
+  error: string | null = null;
 
-  guias = [
-    { id: 1, ref: 'GR-2025-001', data: '22/01/2025', motorista: 'João Macuácua', viatura: 'MDD-45-78 (Volvo FH16)', origem: 'Maputo', destino: 'Cabo Delgado', totalCargas: 3, totalClientes: 2, estado: 'ENTREGUE', valorTotal: 112500 },
-    { id: 2, ref: 'GR-2025-002', data: '20/01/2025', motorista: 'Alberto Chissano', viatura: 'MPT-12-34 (Scania R450)', origem: 'Maputo', destino: 'Beira', totalCargas: 2, totalClientes: 2, estado: 'EM TRÂNSITO', valorTotal: 85000 },
-    { id: 3, ref: 'GR-2025-003', data: '18/01/2025', motorista: 'Samuel Dinis', viatura: 'MNP-56-90 (Iveco Stralis)', origem: 'Beira', destino: 'Tete', totalCargas: 4, totalClientes: 3, estado: 'ENTREGUE', valorTotal: 145000 },
-    { id: 4, ref: 'GR-2025-004', data: '15/01/2025', motorista: 'Mário Tembe', viatura: 'MTT-67-89 (Isuzu NPR)', origem: 'Maputo', destino: 'Xai-Xai', totalCargas: 1, totalClientes: 1, estado: 'ENTREGUE', valorTotal: 35000 },
-    { id: 5, ref: 'GR-2025-005', data: '25/01/2025', motorista: 'Carlos Sitoe', viatura: 'MBR-89-12 (Mercedes Actros)', origem: 'Maputo', destino: 'Nampula', totalCargas: 5, totalClientes: 4, estado: 'PENDENTE', valorTotal: 198000 },
-    { id: 6, ref: 'GR-2025-006', data: '23/01/2025', motorista: 'João Macuácua', viatura: 'MDD-45-78 (Volvo FH16)', origem: 'Nampula', destino: 'Maputo', totalCargas: 2, totalClientes: 1, estado: 'EM TRÂNSITO', valorTotal: 67000 }
-  ];
+  constructor(private guiaRemessaService: GuiaRemessaService) {}
+
+  ngOnInit() {
+    this.carregarGuias();
+  }
+
+  carregarGuias() {
+    this.loading = true;
+    this.error = null;
+
+    this.guiaRemessaService.listarGuiasRemessa().subscribe({
+      next: (guiasApi: GuiaRemessaResponse[]) => {
+        this.guias = guiasApi.map(g => this.mapearGuia(g));
+        this.loading = false;
+      },
+      error: (error: unknown) => {
+        console.error('Erro ao carregar guias:', error);
+        this.error = 'Erro ao carregar guias da base de dados';
+        this.loading = false;
+        this.guias = [];
+      }
+    });
+  }
+
+  private mapearGuia(guia: GuiaRemessaResponse): GuiaDisplay {
+    const statusMap: { [key: string]: string } = {
+      'EM_TRANSITO': 'EM TRÂNSITO',
+      'ENTREGUE': 'ENTREGUE',
+      'CANCELADA': 'CANCELADA'
+    };
+
+    const estado = statusMap[guia.status?.toUpperCase() || ''] || 'EM TRÂNSITO';
+    
+    const formatarData = (data?: string) => {
+      if (!data) return '';
+      return new Date(data).toLocaleDateString('pt-MZ', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+      });
+    };
+
+    // Contar clientes únicos
+    const clientesUnicos = new Set();
+    if (guia.itens) {
+      guia.itens.forEach(item => {
+        if (item.cliente?.id) {
+          clientesUnicos.add(item.cliente.id);
+        }
+      });
+    }
+
+    return {
+      id: guia.id,
+      ref: guia.referencia || `GR-${new Date().getFullYear()}-${String(guia.id).padStart(3, '0')}`,
+      data: formatarData(guia.dataGuia),
+      motorista: guia.motorista?.nome || 'Não atribuído',
+      viatura: guia.viatura ? `${guia.viatura.matricula} (${guia.viatura.marca} ${guia.viatura.modelo})` : 'Não atribuída',
+      origem: guia.origem || '',
+      destino: guia.destino || '',
+      totalCargas: guia.itens?.length || 0,
+      totalClientes: clientesUnicos.size,
+      estado,
+      valorTotal: guia.valorTotal || 0
+    };
+  }
 
   get guiasFiltradas() {
     let lista = this.guias;
-    if (this.filtroEstado !== 'TODOS') lista = lista.filter(g => g.estado === this.filtroEstado);
+    if (this.filtroEstado !== 'TODOS') {
+      lista = lista.filter(g => g.estado === this.filtroEstado);
+    }
     if (this.filtro.trim()) {
       const f = this.filtro.toLowerCase();
-      lista = lista.filter(g => g.ref.toLowerCase().includes(f) || g.motorista.toLowerCase().includes(f) || g.destino.toLowerCase().includes(f));
+      lista = lista.filter(g => 
+        g.ref.toLowerCase().includes(f) || 
+        g.motorista.toLowerCase().includes(f) || 
+        g.destino.toLowerCase().includes(f)
+      );
     }
     return lista;
   }

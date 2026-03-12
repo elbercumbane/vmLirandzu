@@ -1,0 +1,74 @@
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="getBackLink()"
+  [showHelp]="true"
+  title="Editar Motorista"
+  subtitle="Actualize os dados do motorista conforme necessário"
+  helpTitle="Como editar um Motorista"
+  [helpItems]="[
+    'Pode actualizar nome, telefone, número da carta e status.',
+    'Após guardar, o motorista será actualizado na base de dados.',
+    'As alterações serão reflectidas imediatamente.'
+  ]"
+></app-billing-section-header>
+
+@if (loading) {
+  <div class="loading-state">
+    <p>A carregar dados do motorista...</p>
+  </div>
+} @else if (error) {
+  <div class="error-state">
+    <p>{{ error }}</p>
+    <button type="button" class="btn-secondary" (click)="carregarMotorista()">Tentar Novamente</button>
+    <a routerLink="/billing/motoristas" class="btn-secondary" style="margin-left: 0.5rem;">Voltar</a>
+  </div>
+} @else {
+  <div class="card">
+    <form (ngSubmit)="salvar()">
+      <div class="form-section-title">Dados Pessoais</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="nome">Nome *</label>
+          <input type="text" id="nome" class="form-control" placeholder="Nome completo" [(ngModel)]="motorista.nome" name="nome" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="telefone">Telefone</label>
+          <input type="text" id="telefone" class="form-control" placeholder="Ex: 84 123 4567" [(ngModel)]="motorista.telefone" name="telefone" />
+        </div>
+      </div>
+
+      <div class="form-section-title">Carta de Condução</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="numeroCarta">Nº Carta</label>
+          <input type="text" id="numeroCarta" class="form-control" placeholder="Número da carta" [(ngModel)]="motorista.numeroCarta" name="numeroCarta" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="status">Status</label>
+          <select id="status" class="form-control" [(ngModel)]="motorista.status" name="status">
+            <option value="ATIVO">Ativo</option>
+            <option value="INATIVO">Inactivo</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a [routerLink]="getBackLink()" class="btn-secondary">Cancelar</a>
+        <button type="submit" class="btn-primary" [disabled]="loading">
+          @if (loading) {
+            Guardando...
+          } @else {
+            Guardar Alterações
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+}
+
+<app-notification-popup
+  *ngIf="showNotification"
+  [message]="notificationMessage"
+  [type]="notificationType"
+  [duration]="7000">
+</app-notification-popup>

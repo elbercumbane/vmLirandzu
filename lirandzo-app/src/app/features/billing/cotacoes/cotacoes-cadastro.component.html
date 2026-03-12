@@ -12,7 +12,7 @@
   ]"
 ></app-billing-section-header>
 
-<div class="card">
+<div class="card" id="cotacao-pdf-content">
   <!-- Cabeçalho do documento -->
   <div class="quote-doc-header">
     <div>
@@ -154,10 +154,183 @@
 
   <div class="form-actions">
     <a routerLink="/billing/cotacoes" class="btn-secondary">Cancelar</a>
-    <button type="button" class="btn-secondary" (click)="baixarCotacao()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-      Baixar PDF
+    <button type="button" class="btn-secondary" (click)="gerarCotacaoPDF()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+      Gerar Cotação
     </button>
-    <button type="button" class="btn-primary" (click)="gerarCotacao()">Gerar Cotação</button>
+    <button type="button" class="btn-primary" (click)="guardarCotacao()">Guardar Cotação</button>
   </div>
 </div>
+
+<app-notification-popup
+  *ngIf="showNotification"
+  [message]="notificationMessage"
+  [type]="notificationType"
+  [duration]="7000">
+</app-notification-popup>
+
+<!-- Preview Modal -->
+@if (showPreview) {
+<div class="preview-modal-overlay" (click)="fecharPreview()">
+  <div class="preview-modal" (click)="$event.stopPropagation()">
+    <div class="preview-modal-header">
+      <h3>Preview da Cotação</h3>
+      <button type="button" class="preview-modal-close" (click)="fecharPreview()" aria-label="Fechar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="preview-modal-body">
+      <div id="cotacao-preview-content" class="cotacao-preview">
+        <!-- Cabeçalho do documento -->
+        <div class="quote-doc-header">
+          <div>
+            <div class="quote-company">VM TRANSPORTES</div>
+            <div class="quote-company-sub">Lirandzo — Transporte de Cargas</div>
+          </div>
+          <div class="quote-doc-title">COTAÇÃO</div>
+        </div>
+
+        <!-- Informações Gerais -->
+        <div class="preview-info-grid">
+          <div class="preview-info-item">
+            <span class="preview-label">Referência:</span>
+            <span class="preview-value">{{ cotacao.referencia || 'N/A' }}</span>
+          </div>
+          <div class="preview-info-item">
+            <span class="preview-label">Data:</span>
+            <span class="preview-value">{{ formatarData(cotacao.data) }}</span>
+          </div>
+          <div class="preview-info-item">
+            <span class="preview-label">Validade:</span>
+            <span class="preview-value">{{ formatarData(cotacao.validade) }}</span>
+          </div>
+          <div class="preview-info-item">
+            <span class="preview-label">Operador:</span>
+            <span class="preview-value">{{ cotacao.operador || 'N/A' }}</span>
+          </div>
+        </div>
+
+        <!-- Dados do Cliente -->
+        <h3 class="preview-section-title">Dados do Cliente</h3>
+        <div class="preview-info-grid">
+          <div class="preview-info-item">
+            <span class="preview-label">Nome / Empresa:</span>
+            <span class="preview-value">{{ cotacao.clienteNome || 'N/A' }}</span>
+          </div>
+          <div class="preview-info-item">
+            <span class="preview-label">Pessoa de Contacto:</span>
+            <span class="preview-value">{{ cotacao.clienteContacto || 'N/A' }}</span>
+          </div>
+          <div class="preview-info-item">
+            <span class="preview-label">Telefone:</span>
+            <span class="preview-value">{{ cotacao.clienteTelefone || 'N/A' }}</span>
+          </div>
+          <div class="preview-info-item">
+            <span class="preview-label">Email:</span>
+            <span class="preview-value">{{ cotacao.clienteEmail || 'N/A' }}</span>
+          </div>
+        </div>
+
+        <!-- Rota e Veículo -->
+        <h3 class="preview-section-title">Rota e Veículo</h3>
+        <div class="preview-info-grid">
+          <div class="preview-info-item">
+            <span class="preview-label">Origem:</span>
+            <span class="preview-value">{{ cotacao.origem || 'N/A' }}</span>
+          </div>
+          <div class="preview-info-item">
+            <span class="preview-label">Destino:</span>
+            <span class="preview-value">{{ cotacao.destino || 'N/A' }}</span>
+          </div>
+          <div class="preview-info-item">
+            <span class="preview-label">Tipo de Veículo:</span>
+            <span class="preview-value">{{ cotacao.tipoVeiculo || 'N/A' }}</span>
+          </div>
+        </div>
+
+        <!-- Itens / Serviços -->
+        <h3 class="preview-section-title">Itens / Serviços</h3>
+        <div class="preview-table-wrapper">
+          <table class="preview-table">
+            <thead>
+              <tr>
+                <th style="width: 80px">Qtd</th>
+                <th>Descrição</th>
+                <th style="width: 150px">Preço Unit.</th>
+                <th style="width: 150px">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of itens; track $index) {
+                @if (item.descricao || item.precoUnitario) {
+                <tr>
+                  <td>{{ item.quantidade }}</td>
+                  <td>{{ item.descricao || 'N/A' }}</td>
+                  <td>{{ (item.precoUnitario || 0) | number:'1.2-2' }} MZN</td>
+                  <td style="font-weight: 600">{{ getSubtotalItem(item) | number:'1.2-2' }} MZN</td>
+                </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Custos Adicionais -->
+        <h3 class="preview-section-title">Custos Adicionais</h3>
+        <div class="preview-info-grid">
+          <div class="preview-info-item">
+            <span class="preview-label">Transporte:</span>
+            <span class="preview-value">{{ (cotacao.custoTransporte || 0) | number:'1.2-2' }} MZN</span>
+          </div>
+          <div class="preview-info-item">
+            <span class="preview-label">Recolha:</span>
+            <span class="preview-value">{{ (cotacao.custoRecolha || 0) | number:'1.2-2' }} MZN</span>
+          </div>
+          <div class="preview-info-item">
+            <span class="preview-label">Bill of Entry:</span>
+            <span class="preview-value">{{ (cotacao.custoBillOfEntry || 0) | number:'1.2-2' }} MZN</span>
+          </div>
+        </div>
+
+        <!-- Totais -->
+        <div class="quote-totals">
+          <div class="quote-total-row"><span>Subtotal Itens</span><span>{{ subtotalItens | number:'1.2-2' }} MZN</span></div>
+          <div class="quote-total-row"><span>Transporte</span><span>{{ (cotacao.custoTransporte || 0) | number:'1.2-2' }} MZN</span></div>
+          <div class="quote-total-row"><span>Recolha</span><span>{{ (cotacao.custoRecolha || 0) | number:'1.2-2' }} MZN</span></div>
+          <div class="quote-total-row"><span>Bill of Entry</span><span>{{ (cotacao.custoBillOfEntry || 0) | number:'1.2-2' }} MZN</span></div>
+          <div class="quote-total-row quote-total-final"><span>TOTAL</span><span>{{ totalGeral | number:'1.2-2' }} MZN</span></div>
+        </div>
+
+        <!-- Condições e Observações -->
+        <h3 class="preview-section-title">Condições e Observações</h3>
+        <div class="preview-text-content">
+          <div class="preview-text-item">
+            <strong>Condições:</strong>
+            <p>{{ cotacao.condicoes || 'N/A' }}</p>
+          </div>
+          @if (cotacao.observacoes) {
+          <div class="preview-text-item">
+            <strong>Observações:</strong>
+            <p>{{ cotacao.observacoes }}</p>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="preview-modal-footer">
+      <button type="button" class="btn-secondary" (click)="fecharPreview()">Cancelar</button>
+      <button type="button" class="btn-primary" (click)="guardarPDF()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        Guardar PDF
+      </button>
+    </div>
+  </div>
+</div>
+}

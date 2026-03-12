@@ -1,8 +1,24 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
+import { EncomendaService, EncomendaResponse } from '../../../services/encomenda.service';
+
+interface EncomendaDisplay {
+  id: number;
+  numero: string;
+  cliente: string;
+  telefone: string;
+  produto: string;
+  origem: string;
+  destino: string;
+  total: number;
+  pago: number;
+  divida: number;
+  status: string;
+  data: string;
+}
 
 @Component({
   selector: 'app-encomendas-lista',
@@ -11,27 +27,94 @@ import { BillingSectionHeaderComponent } from '../shared/billing-section-header.
   templateUrl: './encomendas-lista.component.html',
   styleUrls: ['../shared/billing-page.css', './encomendas-lista.component.css']
 })
-export class EncomendasListaComponent {
+export class EncomendasListaComponent implements OnInit {
   searchTerm = '';
   activeFilter = 'TODOS';
+  encomendas: EncomendaDisplay[] = [];
+  loading = true;
+  error: string | null = null;
 
-  encomendas = [
-    { id: 1, numero: 'VML-2025-0001', cliente: 'Ana Rodrigues', telefone: '054212348', produto: 'iPhone 15 Pro 256GB', origem: 'Maputo', destino: 'Beira', total: 45200, pago: 45200, divida: 0, status: 'PAGO', data: '02/01/2025' },
-    { id: 2, numero: 'VML-2025-0002', cliente: 'Carlos Mondlane', telefone: '084567123', produto: 'Samsung TV 55" 4K', origem: 'Johannesburg', destino: 'Maputo', total: 38500, pago: 20000, divida: 18500, status: 'PARCIAL', data: '05/01/2025' },
-    { id: 3, numero: 'VML-2025-0003', cliente: 'Fátima Cossa', telefone: '872341567', produto: 'Nike Air Max + Adidas', origem: 'Durban', destino: 'Maputo', total: 12800, pago: 0, divida: 12800, status: 'NÃO PAGO', data: '07/01/2025' },
-    { id: 4, numero: 'VML-2025-0004', cliente: 'José Tembe', telefone: '843219876', produto: 'Laptop Lenovo IdeaPad', origem: 'Maputo', destino: 'Nampula', total: 52000, pago: 52000, divida: 0, status: 'PAGO', data: '09/01/2025' },
-    { id: 5, numero: 'VML-2025-0005', cliente: 'Maria Machava', telefone: '821456789', produto: 'Máquina de costura Singer', origem: 'Maputo', destino: 'Inhambane', total: 18300, pago: 10000, divida: 8300, status: 'PARCIAL', data: '11/01/2025' },
-    { id: 6, numero: 'VML-2025-0006', cliente: 'Pedro Nhantumbo', telefone: '864523178', produto: 'PlayStation 5 + 2 jogos', origem: 'Johannesburg', destino: 'Maputo', total: 41600, pago: 41600, divida: 0, status: 'PAGO', data: '12/01/2025' },
-    { id: 7, numero: 'VML-2025-0007', cliente: 'Lurdes Sitoe', telefone: '853671234', produto: 'Frigorífico Samsung', origem: 'Maputo', destino: 'Gaza', total: 29400, pago: 0, divida: 29400, status: 'NÃO PAGO', data: '14/01/2025' },
-    { id: 8, numero: 'VML-2025-0008', cliente: 'António Bila', telefone: '874123456', produto: 'Roupas várias (5 peças)', origem: 'Durban', destino: 'Tete', total: 8750, pago: 8750, divida: 0, status: 'PAGO', data: '15/01/2025' }
-  ];
+  constructor(private encomendaService: EncomendaService) {}
+
+  ngOnInit() {
+    this.carregarEncomendas();
+  }
+
+  carregarEncomendas() {
+    this.loading = true;
+    this.error = null;
+    
+    this.encomendaService.listarEncomendas().subscribe({
+      next: (encomendasApi: EncomendaResponse[]) => {
+        this.encomendas = encomendasApi.map(e => this.mapearEncomenda(e));
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Erro ao carregar encomendas:', error);
+        this.error = 'Erro ao carregar encomendas da base de dados';
+        this.loading = false;
+        // Manter array vazio em caso de erro
+        this.encomendas = [];
+      }
+    });
+  }
+
+  private mapearEncomenda(encomenda: EncomendaResponse): EncomendaDisplay {
+    // Mapear status da API para formato de exibição
+    let statusDisplay = 'NÃO PAGO';
+    const statusUpper = (encomenda.status || '').toUpperCase();
+    if (statusUpper === 'PAGO') {
+      statusDisplay = 'PAGO';
+    } else if (statusUpper === 'PARCIAL') {
+      statusDisplay = 'PARCIAL';
+    } else if (statusUpper === 'NAO_PAGO' || statusUpper === 'NÃO_PAGO') {
+      statusDisplay = 'NÃO PAGO';
+    } else {
+      statusDisplay = 'NÃO PAGO';
+    }
+
+    // Formatar data
+    const dataFormatada = encomenda.dataEncomenda 
+      ? new Date(encomenda.dataEncomenda).toLocaleDateString('pt-MZ', { 
+          day: '2-digit', 
+          month: '2-digit', 
+          year: 'numeric' 
+        })
+      : '';
+
+    // Formatar número de encomenda (com padding de zeros)
+    const numeroFormatado = `VML-${String(encomenda.numeroEncomenda).padStart(4, '0')}`;
+
+    return {
+      id: encomenda.numeroEncomenda,
+      numero: numeroFormatado,
+      cliente: encomenda.cliente?.nome || 'Cliente não especificado',
+      telefone: encomenda.cliente?.telefone || '',
+      produto: encomenda.produto || '',
+      origem: encomenda.origem || '',
+      destino: encomenda.destino || '',
+      total: encomenda.valorTotal || 0,
+      pago: encomenda.valorPago || 0,
+      divida: encomenda.valorDivida || 0,
+      status: statusDisplay,
+      data: dataFormatada
+    };
+  }
 
   get filteredEncomendas() {
     let list = this.encomendas;
-    if (this.activeFilter !== 'TODOS') list = list.filter(e => e.status === this.activeFilter);
+    if (this.activeFilter !== 'TODOS') {
+      list = list.filter(e => e.status === this.activeFilter);
+    }
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
-      list = list.filter(e => e.numero.toLowerCase().includes(term) || e.cliente.toLowerCase().includes(term) || e.produto.toLowerCase().includes(term));
+      list = list.filter(e => 
+        e.numero.toLowerCase().includes(term) || 
+        e.cliente.toLowerCase().includes(term) || 
+        e.produto.toLowerCase().includes(term) ||
+        e.origem.toLowerCase().includes(term) ||
+        e.destino.toLowerCase().includes(term)
+      );
     }
     return list;
   }

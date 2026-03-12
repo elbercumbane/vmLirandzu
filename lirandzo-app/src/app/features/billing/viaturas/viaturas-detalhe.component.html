@@ -1,0 +1,74 @@
+<app-billing-section-header
+  [showBack]="true"
+  [showHelp]="false"
+  [backLink]="'/billing/viaturas'"
+  title="Detalhes da Viatura"
+  subtitle="Visualização completa da viatura"
+></app-billing-section-header>
+
+@if (loading) {
+  <div class="loading-state">
+    <p>A carregar dados da viatura...</p>
+  </div>
+} @else if (error) {
+  <div class="error-state">
+    <p>{{ error }}</p>
+    <button type="button" class="btn-secondary" (click)="carregarViatura()">Tentar Novamente</button>
+    <a routerLink="/billing/viaturas" class="btn-secondary" style="margin-left: 0.5rem;">Voltar</a>
+  </div>
+} @else if (viatura) {
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h3>{{ viatura.matricula }}</h3>
+        <p class="text-muted">{{ viatura.marca }} {{ viatura.modelo }}</p>
+      </div>
+      <div>
+        <span [class]="'badge ' + getStatusClass(viatura.status)">
+          {{ formatarStatus(viatura.status) }}
+        </span>
+        <button type="button" class="btn-primary" (click)="editar()" style="margin-left: 1rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="margin-right: 0.5rem;">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Editar
+        </button>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-section">
+        <h4>Identificação</h4>
+        <div class="detail-item">
+          <span class="detail-label">Matrícula:</span>
+          <span class="detail-value highlight">{{ viatura.matricula }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Marca:</span>
+          <span class="detail-value">{{ viatura.marca }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Modelo:</span>
+          <span class="detail-value">{{ viatura.modelo }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Tipo:</span>
+          <span class="detail-value">{{ viatura.tipo || 'N/A' }}</span>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h4>Especificações</h4>
+        <div class="detail-item">
+          <span class="detail-label">Capacidade:</span>
+          <span class="detail-value">{{ (viatura.capacidade || 0) | number:'1.0-0' }} ton</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Status:</span>
+          <span class="detail-value">{{ formatarStatus(viatura.status) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+}

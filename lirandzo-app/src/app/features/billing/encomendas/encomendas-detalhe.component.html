@@ -1,0 +1,98 @@
+<app-billing-section-header
+  [showBack]="true"
+  [showHelp]="false"
+  [backLink]="'/billing/encomendas'"
+  title="Detalhes da Encomenda"
+  subtitle="Visualização completa da factura"
+></app-billing-section-header>
+
+@if (loading) {
+  <div class="loading-state">
+    <p>A carregar dados da encomenda...</p>
+  </div>
+} @else if (error) {
+  <div class="error-state">
+    <p>{{ error }}</p>
+    <button type="button" class="btn-secondary" (click)="carregarEncomenda()">Tentar Novamente</button>
+    <a routerLink="/billing/encomendas" class="btn-secondary" style="margin-left: 0.5rem;">Voltar</a>
+  </div>
+} @else if (encomenda) {
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h3>Encomenda {{ formatarNumero(encomenda.numeroEncomenda) }}</h3>
+        <p class="text-muted">Data: {{ formatarData(encomenda.dataEncomenda) }}</p>
+      </div>
+      <div>
+        <span [class]="'badge ' + getStatusClass(encomenda.status)">
+          {{ formatarStatus(encomenda.status) }}
+        </span>
+        <button type="button" class="btn-primary" (click)="editar()" style="margin-left: 1rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="margin-right: 0.5rem;">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Editar
+        </button>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-section">
+        <h4>Informações do Cliente</h4>
+        <div class="detail-item">
+          <span class="detail-label">Nome:</span>
+          <span class="detail-value">{{ encomenda.cliente?.nome || 'Não especificado' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Telefone:</span>
+          <span class="detail-value">{{ encomenda.cliente?.telefone || 'Não especificado' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Email:</span>
+          <span class="detail-value">{{ encomenda.cliente?.email || 'Não especificado' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Endereço:</span>
+          <span class="detail-value">{{ encomenda.cliente?.endereco || 'Não especificado' }}</span>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h4>Informações da Encomenda</h4>
+        <div class="detail-item">
+          <span class="detail-label">Produto:</span>
+          <span class="detail-value">{{ encomenda.produto }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Origem:</span>
+          <span class="detail-value">{{ encomenda.origem }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Destino:</span>
+          <span class="detail-value">{{ encomenda.destino }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Data:</span>
+          <span class="detail-value">{{ formatarData(encomenda.dataEncomenda) }}</span>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h4>Valores</h4>
+        <div class="detail-item">
+          <span class="detail-label">Valor Total:</span>
+          <span class="detail-value highlight">{{ encomenda.valorTotal | number:'1.2-2' }} MZN</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Valor Pago:</span>
+          <span class="detail-value success">{{ encomenda.valorPago | number:'1.2-2' }} MZN</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Valor em Dívida:</span>
+          <span class="detail-value danger">{{ encomenda.valorDivida | number:'1.2-2' }} MZN</span>
+        </div>
+      </div>
+    </div>
+  </div>
+}

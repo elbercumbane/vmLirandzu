@@ -140,3 +140,11 @@
     <button type="button" class="btn-primary" (click)="salvar()">Guardar Factura</button>
   </div>
 </div>
+
+<!-- Popup de Notificação -->
+<app-notification-popup 
+  *ngIf="showNotification"
+  [message]="notificationMessage"
+  [type]="notificationType"
+  [duration]="7000">
+</app-notification-popup>

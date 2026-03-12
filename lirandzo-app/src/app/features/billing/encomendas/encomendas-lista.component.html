@@ -114,72 +114,83 @@
   </div>
 
   <div class="table-wrapper">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Nº Encomenda</th>
-          <th>Cliente</th>
-          <th>Produto</th>
-          <th>Origem→Destino</th>
-          <th>Total</th>
-          <th>Pago</th>
-          <th>Dívida</th>
-          <th>Status</th>
-          <th>Data</th>
-          <th>Acções</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (e of filteredEncomendas; track e.id) {
+    @if (loading) {
+      <div class="loading-state">
+        <p>A carregar encomendas da base de dados...</p>
+      </div>
+    } @else if (error) {
+      <div class="error-state">
+        <p>{{ error }}</p>
+        <button type="button" class="btn-secondary" (click)="carregarEncomendas()">Tentar Novamente</button>
+      </div>
+    } @else {
+      <table class="data-table">
+        <thead>
           <tr>
-            <td>{{ e.numero }}</td>
-            <td>{{ e.cliente }}</td>
-            <td>{{ e.produto }}</td>
-            <td>{{ e.origem }} → {{ e.destino }}</td>
-            <td>{{ e.total | number:'1.0-0' }} MZN</td>
-            <td>{{ e.pago | number:'1.0-0' }} MZN</td>
-            <td>{{ e.divida | number:'1.0-0' }} MZN</td>
-            <td>
-              @switch (e.status) {
-                @case ('PAGO') {
-                  <span class="badge badge-success">{{ e.status }}</span>
-                }
-                @case ('PARCIAL') {
-                  <span class="badge badge-warning">{{ e.status }}</span>
-                }
-                @case ('NÃO PAGO') {
-                  <span class="badge badge-danger">{{ e.status }}</span>
-                }
-                @default {
-                  <span class="badge badge-neutral">{{ e.status }}</span>
-                }
-              }
-            </td>
-            <td>{{ e.data }}</td>
-            <td>
-              <a [routerLink]="['/billing/encomendas', e.id]" class="action-btn" title="Ver">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                  <circle cx="12" cy="12" r="3"/>
-                </svg>
-              </a>
-              <a [routerLink]="['/billing/encomendas', e.id, 'editar']" class="action-btn" title="Editar">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-              </a>
-            </td>
+            <th>Nº Encomenda</th>
+            <th>Cliente</th>
+            <th>Produto</th>
+            <th>Origem→Destino</th>
+            <th>Total</th>
+            <th>Pago</th>
+            <th>Dívida</th>
+            <th>Status</th>
+            <th>Data</th>
+            <th>Acções</th>
           </tr>
-        } @empty {
-          <tr>
-            <td colspan="10" class="empty-state">
-              <p>Nenhuma encomenda encontrada.</p>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (e of filteredEncomendas; track e.id) {
+            <tr>
+              <td>{{ e.numero }}</td>
+              <td>{{ e.cliente }}</td>
+              <td>{{ e.produto }}</td>
+              <td>{{ e.origem }} → {{ e.destino }}</td>
+              <td>{{ e.total | number:'1.0-0' }} MZN</td>
+              <td>{{ e.pago | number:'1.0-0' }} MZN</td>
+              <td>{{ e.divida | number:'1.0-0' }} MZN</td>
+              <td>
+                @switch (e.status) {
+                  @case ('PAGO') {
+                    <span class="badge badge-success">{{ e.status }}</span>
+                  }
+                  @case ('PARCIAL') {
+                    <span class="badge badge-warning">{{ e.status }}</span>
+                  }
+                  @case ('NÃO PAGO') {
+                    <span class="badge badge-danger">{{ e.status }}</span>
+                  }
+                  @default {
+                    <span class="badge badge-neutral">{{ e.status }}</span>
+                  }
+                }
+              </td>
+              <td>{{ e.data }}</td>
+              <td>
+                <a [routerLink]="['/billing/encomendas', e.id]" class="action-btn" title="Ver">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </a>
+                <a [routerLink]="['/billing/encomendas', e.id, 'editar']" class="action-btn" title="Editar">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </a>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="10" class="empty-state">
+                <p>Nenhuma encomenda encontrada na base de dados.</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
   </div>
 
   <div class="table-footer">

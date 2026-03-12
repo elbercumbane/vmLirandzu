@@ -18,16 +18,16 @@
   <div class="form-grid">
     <div class="form-group">
       <label class="form-label">Motorista</label>
-      <select class="form-control" [(ngModel)]="viagem.motorista">
-        <option value="">Seleccionar...</option>
-        <option *ngFor="let m of motoristasDisponiveis" [value]="m">{{ m }}</option>
+      <select class="form-control" [(ngModel)]="viagem.motoristaId">
+        <option [value]="null">Seleccionar...</option>
+        <option *ngFor="let m of motoristas" [value]="m.id">{{ m.nome }} {{ m.telefone ? '(' + m.telefone + ')' : '' }}</option>
       </select>
     </div>
     <div class="form-group">
       <label class="form-label">Viatura</label>
-      <select class="form-control" [(ngModel)]="viagem.viatura">
-        <option value="">Seleccionar...</option>
-        <option *ngFor="let v of viaturasDisponiveis" [value]="v">{{ v }}</option>
+      <select class="form-control" [(ngModel)]="viagem.viaturaId">
+        <option [value]="null">Seleccionar...</option>
+        <option *ngFor="let v of viaturas" [value]="v.id">{{ v.matricula }} ({{ v.marca }} {{ v.modelo }})</option>
       </select>
     </div>
   </div>
@@ -107,6 +107,19 @@
 
   <div class="form-actions">
     <a routerLink="/billing/viagens" class="btn-secondary">Cancelar</a>
-    <button type="button" class="btn-primary" (click)="salvar()">Guardar e Gerar Guia de Remessa</button>
+    <button type="button" class="btn-primary" (click)="salvar()" [disabled]="loading">
+      @if (loading) {
+        Guardando...
+      } @else {
+        Guardar Viagem
+      }
+    </button>
   </div>
 </div>
+
+<app-notification-popup
+  *ngIf="showNotification"
+  [message]="notificationMessage"
+  [type]="notificationType"
+  [duration]="7000">
+</app-notification-popup>

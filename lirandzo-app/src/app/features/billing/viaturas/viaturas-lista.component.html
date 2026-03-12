@@ -80,61 +80,66 @@
     <button type="button" class="filter-chip" [class.active]="activeFilter === 'PARADO'" (click)="setFilter('PARADO')">Parado</button>
   </div>
 
-  <div class="table-wrapper">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Matrícula</th>
-          <th>Marca/Modelo</th>
-          <th>Tipo</th>
-          <th>Ano</th>
-          <th>KM Actual</th>
-          <th>Última Manutenção</th>
-          <th>Consumo (L/100km)</th>
-          <th>Status</th>
-          <th>Acções</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (v of filteredViaturas; track v.id) {
+  @if (loading) {
+    <div class="loading-state">
+      <p>A carregar viaturas...</p>
+    </div>
+  } @else if (error) {
+    <div class="error-state">
+      <p>{{ error }}</p>
+      <button type="button" class="btn-secondary" (click)="carregarViaturas()">Tentar Novamente</button>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
           <tr>
-            <td><strong>{{ v.matricula }}</strong></td>
-            <td>{{ v.marca }}</td>
-            <td>{{ v.tipo }}</td>
-            <td>{{ v.ano }}</td>
-            <td>{{ v.kmActual | number }}</td>
-            <td>{{ v.ultimaManutencao }}</td>
-            <td>{{ v.consumoMedio }}</td>
-            <td>
-              <span class="badge" [class.badge-success]="v.status === 'OPERACIONAL'" [class.badge-warning]="v.status === 'MANUTENÇÃO'" [class.badge-danger]="v.status === 'PARADO'">
-                {{ v.status }}
-              </span>
-            </td>
-            <td>
-              <button type="button" class="action-btn" title="Editar">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-              </button>
-              <button type="button" class="action-btn" title="Ver">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                  <circle cx="12" cy="12" r="3"/>
-                </svg>
-              </button>
-            </td>
+            <th>Matrícula</th>
+            <th>Marca/Modelo</th>
+            <th>Tipo</th>
+            <th>Capacidade (ton)</th>
+            <th>Status</th>
+            <th>Acções</th>
           </tr>
-        } @empty {
-          <tr>
-            <td colspan="9" class="empty-state">Nenhuma viatura encontrada.</td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          @for (v of filteredViaturas; track v.id) {
+            <tr>
+              <td><strong>{{ v.matricula }}</strong></td>
+              <td>{{ v.marca }} {{ v.modelo }}</td>
+              <td>{{ v.tipo }}</td>
+              <td>{{ v.capacidade | number:'1.0-0' }}</td>
+              <td>
+                <span class="badge" [class.badge-success]="v.status === 'OPERACIONAL'" [class.badge-warning]="v.status === 'MANUTENÇÃO'" [class.badge-danger]="v.status === 'PARADO'">
+                  {{ v.status }}
+                </span>
+              </td>
+              <td>
+                <a [routerLink]="['/billing/viaturas', v.id]" class="action-btn" title="Ver">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </a>
+                <a [routerLink]="['/billing/viaturas', v.id, 'editar']" class="action-btn" title="Editar">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </a>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-state">Nenhuma viatura encontrada.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
 
-  <div class="table-footer">
-    <span>Mostrando {{ filteredViaturas.length }} de {{ viaturas.length }} viaturas</span>
-  </div>
+    <div class="table-footer">
+      <span>Mostrando {{ filteredViaturas.length }} de {{ viaturas.length }} viaturas</span>
+    </div>
+  }
 </div>

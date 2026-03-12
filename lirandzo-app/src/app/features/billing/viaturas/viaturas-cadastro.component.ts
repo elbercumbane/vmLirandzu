@@ -1,13 +1,15 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
+import { ViaturaService, Viatura } from '../../../services/viatura.service';
+import { NotificationPopupComponent } from '../../../shared/components/notification-popup/notification-popup.component';
 
 @Component({
   selector: 'app-viaturas-cadastro',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, BillingSectionHeaderComponent],
+  imports: [CommonModule, RouterLink, FormsModule, BillingSectionHeaderComponent, NotificationPopupComponent],
   templateUrl: './viaturas-cadastro.component.html',
   styleUrls: ['../shared/billing-page.css', './viaturas-cadastro.component.css']
 })
@@ -17,35 +19,67 @@ export class ViaturasCadastroComponent {
     marca: '',
     modelo: '',
     tipo: '',
-    ano: null as number | null,
-    cor: '',
-    chassi: '',
-    kmActual: null as number | null,
-    capacidadeCarga: null as number | null,
-    consumoMedio: null as number | null,
-    observacoes: ''
+    capacidade: null as number | null,
+    status: 'ATIVA'
   };
 
   tiposViatura = ['Camião Pesado', 'Camião Médio', 'Camião Leve', 'Reboque', 'Semi-Reboque'];
 
-  fotoPreview: string | null = null;
+  loading = false;
+  showNotification = false;
+  notificationMessage = '';
+  notificationType: 'success' | 'error' = 'success';
 
-  onFotoSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.fotoPreview = e.target?.result as string;
-      };
-      reader.readAsDataURL(input.files[0]);
-    }
-  }
-
-  removerFoto(): void {
-    this.fotoPreview = null;
-  }
+  constructor(
+    private viaturaService: ViaturaService,
+    private router: Router
+  ) {}
 
   salvar() {
-    console.log('Salvar viatura:', this.viatura);
+    if (!this.viatura.matricula || !this.viatura.matricula.trim()) {
+      this.mostrarNotificacao('Por favor, preencha a matrícula da viatura.', 'error');
+      return;
+    }
+    if (!this.viatura.marca || !this.viatura.marca.trim()) {
+      this.mostrarNotificacao('Por favor, preencha a marca da viatura.', 'error');
+      return;
+    }
+    if (!this.viatura.modelo || !this.viatura.modelo.trim()) {
+      this.mostrarNotificacao('Por favor, preencha o modelo da viatura.', 'error');
+      return;
+    }
+
+    const viaturaData: Viatura = {
+      matricula: this.viatura.matricula.trim(),
+      marca: this.viatura.marca.trim(),
+      modelo: this.viatura.modelo.trim(),
+      tipo: this.viatura.tipo?.trim() || undefined,
+      capacidade: this.viatura.capacidade || undefined,
+      status: this.viatura.status as 'ATIVA' | 'EM_MANUTENCAO' | 'RESERVADA' | 'INATIVA'
+    };
+
+    this.loading = true;
+    this.viaturaService.criarViatura(viaturaData).subscribe({
+      next: (viatura) => {
+        this.mostrarNotificacao('Viatura guardada com sucesso!', 'success');
+        setTimeout(() => {
+          this.router.navigate(['/billing/viaturas', viatura.id]);
+        }, 1500);
+      },
+      error: (error) => {
+        console.error('Erro ao guardar viatura:', error);
+        this.mostrarNotificacao('Viatura não guardada. Tente novamente.', 'error');
+        this.loading = false;
+      }
+    });
+  }
+
+  mostrarNotificacao(message: string, type: 'success' | 'error') {
+    this.notificationMessage = message;
+    this.notificationType = type;
+    this.showNotification = true;
+    setTimeout(() => {
+      this.showNotification = false;
+    }, 7000);
   }
 }

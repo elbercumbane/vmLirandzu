@@ -1,8 +1,26 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
+import { CotacaoService, CotacaoResponse } from '../../../services/cotacao.service';
+
+interface PedidoCotacaoDisplay {
+  id: number;
+  ref: string;
+  cliente: string;
+  contacto: string;
+  telefone: string;
+  origem: string;
+  destino: string;
+  descricaoCarga: string;
+  dataEntrada: string;
+  horaEntrada: string;
+  estado: string;
+  operador: string;
+  dataResposta: string;
+  tempoResposta: string;
+}
 
 @Component({
   selector: 'app-cotacoes-lista',
@@ -11,18 +29,107 @@ import { BillingSectionHeaderComponent } from '../shared/billing-section-header.
   templateUrl: './cotacoes-lista.component.html',
   styleUrls: ['../shared/billing-page.css', './cotacoes-lista.component.css']
 })
-export class CotacoesListaComponent {
+export class CotacoesListaComponent implements OnInit {
   filtro = '';
   filtroEstado = 'TODOS';
+  pedidos: PedidoCotacaoDisplay[] = [];
+  loading = true;
+  error: string | null = null;
 
-  pedidos = [
-    { id: 1, ref: 'COT-2025-001', cliente: 'SLR Mining, Lda', contacto: 'Sr. Euclides', telefone: '847983277', origem: 'Maputo', destino: 'Cabo Delgado', descricaoCarga: 'Material de construção — 20 toneladas', dataEntrada: '20/01/2025', horaEntrada: '09:30', estado: 'PENDENTE', operador: '', dataResposta: '', tempoResposta: '' },
-    { id: 2, ref: 'COT-2025-002', cliente: 'Cervejas de Moçambique', contacto: 'Sr. António', telefone: '841234567', origem: 'Maputo', destino: 'Beira', descricaoCarga: 'Bebidas — carga completa', dataEntrada: '18/01/2025', horaEntrada: '14:15', estado: 'RESPONDIDO', operador: 'Ana Silva', dataResposta: '18/01/2025 16:00', tempoResposta: '1h 45min' },
-    { id: 3, ref: 'COT-2025-003', cliente: 'TotalEnergies Moçambique', contacto: 'Sra. Maria', telefone: '842345678', origem: 'Beira', destino: 'Tete', descricaoCarga: 'Equipamento industrial — 15 toneladas', dataEntrada: '15/01/2025', horaEntrada: '10:00', estado: 'COTAÇÃO GERADA', operador: 'João Macuácua', dataResposta: '15/01/2025 12:30', tempoResposta: '2h 30min' },
-    { id: 4, ref: 'COT-2025-004', cliente: 'Shoprite Moçambique', contacto: 'Sr. Pedro', telefone: '844567890', origem: 'Maputo', destino: 'Nampula', descricaoCarga: 'Produtos alimentares — 3 paletes', dataEntrada: '22/01/2025', horaEntrada: '08:00', estado: 'PENDENTE', operador: '', dataResposta: '', tempoResposta: '' },
-    { id: 5, ref: 'COT-2025-005', cliente: 'Kenmare Resources', contacto: 'Sr. James', telefone: '846789012', origem: 'Nampula', destino: 'Maputo', descricaoCarga: 'Minerais — 25 toneladas', dataEntrada: '12/01/2025', horaEntrada: '11:45', estado: 'RESPONDIDO', operador: 'Ana Silva', dataResposta: '13/01/2025 09:00', tempoResposta: '21h 15min' },
-    { id: 6, ref: 'COT-2025-006', cliente: 'Hidroeléctrica de Cahora Bassa', contacto: 'Eng. Fátima', telefone: '847890123', origem: 'Tete', destino: 'Maputo', descricaoCarga: 'Transformadores eléctricos — carga especial', dataEntrada: '10/01/2025', horaEntrada: '16:30', estado: 'COTAÇÃO GERADA', operador: 'João Macuácua', dataResposta: '11/01/2025 10:00', tempoResposta: '17h 30min' }
-  ];
+  constructor(private cotacaoService: CotacaoService) {}
+
+  ngOnInit() {
+    this.carregarCotacoes();
+  }
+
+  carregarCotacoes() {
+    this.loading = true;
+    this.error = null;
+
+    this.cotacaoService.listarCotacoes().subscribe({
+      next: (cotacoes: CotacaoResponse[]) => {
+        this.pedidos = cotacoes.map(c => this.mapearCotacao(c));
+        this.loading = false;
+      },
+      error: (error: unknown) => {
+        console.error('Erro ao carregar cotações:', error);
+        this.error = 'Erro ao carregar cotações da base de dados';
+        this.loading = false;
+        this.pedidos = [];
+      }
+    });
+  }
+
+  private mapearCotacao(c: CotacaoResponse): PedidoCotacaoDisplay {
+    const clienteNome = c.cliente?.nome || 'Cliente não especificado';
+    const telefone = c.cliente?.telefone || '';
+    const email = c.cliente?.email || '';
+    const contacto = telefone || email || '';
+
+    const dataCotacaoObj = c.dataCotacao ? new Date(c.dataCotacao) : null;
+    const dataEntrada = dataCotacaoObj
+      ? dataCotacaoObj.toLocaleDateString('pt-MZ', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        })
+      : '';
+    const horaEntrada = dataCotacaoObj
+      ? dataCotacaoObj.toLocaleTimeString('pt-MZ', {
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+      : '';
+
+    const dataResposta = c.dataResposta
+      ? new Date(c.dataResposta).toLocaleString('pt-MZ', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+      : '';
+
+    let tempoResposta = '';
+    if (c.dataCotacao && c.dataResposta) {
+      const inicio = new Date(c.dataCotacao);
+      const fim = new Date(c.dataResposta);
+      const diffMs = fim.getTime() - inicio.getTime();
+      if (diffMs > 0) {
+        const diffMin = Math.round(diffMs / 60000);
+        const horas = Math.floor(diffMin / 60);
+        const minutos = diffMin % 60;
+        tempoResposta = horas > 0 ? `${horas}h ${minutos}min` : `${minutos}min`;
+      }
+    }
+
+    const statusMap: { [key: string]: string } = {
+      'PENDENTE': 'PENDENTE',
+      'RESPONDIDO': 'RESPONDIDO',
+      'COTACAO_GERADA': 'COTAÇÃO GERADA',
+      'EXPIRADA': 'EXPIRADA',
+      'CANCELADA': 'CANCELADA'
+    };
+    const estado = statusMap[c.status?.toUpperCase() || ''] || 'PENDENTE';
+
+    return {
+      id: c.id,
+      ref: c.referencia || `COT-${new Date().getFullYear()}-${String(c.id).padStart(3, '0')}`,
+      cliente: clienteNome,
+      contacto,
+      telefone,
+      origem: c.origem || '',
+      destino: c.destino || '',
+      descricaoCarga: c.descricaoCarga || '',
+      dataEntrada,
+      horaEntrada,
+      estado,
+      operador: c.operador || '',
+      dataResposta,
+      tempoResposta: tempoResposta || '—'
+    };
+  }
 
   get pedidosFiltrados() {
     let lista = this.pedidos;
