@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { NavbarComponent } from './shared/navbar/navbar.component';
-import { FooterComponent } from './shared/footer/footer.component';
+import { NavbarComponent } from './portal/layout/navbar/navbar.component';
+import { FooterComponent } from './portal/layout/footer/footer.component';
 import { ThemeService } from './shared/services/theme.service';
 import { filter } from 'rxjs/operators';
 
