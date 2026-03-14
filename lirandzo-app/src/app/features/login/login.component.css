@@ -34,7 +34,7 @@
   height: 36px;
   font-size: 0.7rem;
   border-radius: 6px;
-  background: linear-gradient(135deg, #0066ff 0%, #0047b3 100%);
+  background: linear-gradient(135deg, var(--brand-red) 0%, var(--brand-red-hover) 100%);
 }
 
 .login-logo-name {

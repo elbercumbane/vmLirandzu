@@ -115,7 +115,7 @@
 }
 
 .radio-card:has(input:checked) {
-  border-color: #0066ff;
+  border-color: var(--brand-red);
   background: rgba(0, 102, 255, 0.06);
 }
 
@@ -162,7 +162,7 @@
 .form-row input:focus,
 .form-row textarea:focus {
   outline: none;
-  border-color: #0066ff;
+  border-color: var(--brand-red);
   box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
 }
 
@@ -174,7 +174,7 @@
 .avaliacoes-submit {
   width: 100%;
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #0066ff 0%, #0047b3 100%);
+  background: linear-gradient(135deg, var(--brand-red) 0%, var(--brand-red-hover) 100%);
   color: #fff;
   font-weight: 600;
   font-size: 1rem;
@@ -224,7 +224,7 @@
 
 .success-link {
   display: inline-block;
-  color: #0066ff;
+  color: var(--brand-red);
   font-weight: 600;
   text-decoration: none;
 }

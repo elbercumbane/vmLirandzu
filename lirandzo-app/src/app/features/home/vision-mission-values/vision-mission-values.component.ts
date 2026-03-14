@@ -1,5 +1,6 @@
-import { Component, AfterViewInit, ElementRef, inject } from '@angular/core';
+import { Component, AfterViewInit, ElementRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslocoModule, TranslocoService } from '@ngneat/transloco';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -21,42 +22,58 @@ interface Card {
 @Component({
   selector: 'app-vision-mission-values',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslocoModule],
   templateUrl: './vision-mission-values.component.html',
   styleUrl: './vision-mission-values.component.css'
 })
-export class VisionMissionValuesComponent implements AfterViewInit {
+export class VisionMissionValuesComponent implements OnInit, AfterViewInit {
   private el = inject(ElementRef);
-  cards: Card[] = [
-    {
-      type: 'missao',
-      title: 'Missão',
-      text: 'Promover e implementar estratégias de desenvolvimento logístico, estimulando a competitividade e a entrega de excelência em transporte e procurement.',
-      icon: 'target',
-      circleColor: '#13243A',
-      titleColor: '#f8fafc',
-      textColor: '#cbd5e1'
-    },
-    {
-      type: 'visao',
-      title: 'Visão',
-      text: 'Ser referência em transporte de cargas e procurement no corredor África do Sul–Moçambique, com operações robustas e sustentáveis.',
-      icon: 'eye',
-      circleColor: '#1a4a72',
-      titleColor: '#f8fafc',
-      textColor: '#cbd5e1'
-    },
-    {
-      type: 'valores',
-      title: 'Valores',
-      text: '',
-      icon: 'heart',
-      listItems: ['Integridade', 'Transparência', 'Inovação', 'Excelência'],
-      circleColor: '#0f5c6e',
-      titleColor: '#f8fafc',
-      textColor: '#cbd5e1'
-    }
-  ];
+  private transloco = inject(TranslocoService);
+  cards: Card[] = [];
+
+  ngOnInit(): void {
+    this.buildCards();
+    this.transloco.langChanges$.subscribe(() => this.buildCards());
+  }
+
+  private buildCards(): void {
+    const t = (k: string) => this.transloco.translate(k);
+    this.cards = [
+      {
+        type: 'missao',
+        title: t('vmv.mission.title'),
+        text: t('vmv.mission.text'),
+        icon: 'target',
+        circleColor: '#13243A',
+        titleColor: '#f8fafc',
+        textColor: '#cbd5e1'
+      },
+      {
+        type: 'visao',
+        title: t('vmv.vision.title'),
+        text: t('vmv.vision.text'),
+        icon: 'eye',
+        circleColor: '#1a4a72',
+        titleColor: '#f8fafc',
+        textColor: '#cbd5e1'
+      },
+      {
+        type: 'valores',
+        title: t('vmv.values.title'),
+        text: '',
+        icon: 'heart',
+        listItems: [
+          this.transloco.translate('vmv.values.item1'),
+          this.transloco.translate('vmv.values.item2'),
+          this.transloco.translate('vmv.values.item3'),
+          this.transloco.translate('vmv.values.item4')
+        ],
+        circleColor: '#0f5c6e',
+        titleColor: '#f8fafc',
+        textColor: '#cbd5e1'
+      }
+    ];
+  }
 
   ngAfterViewInit(): void {
     const host = this.el.nativeElement;

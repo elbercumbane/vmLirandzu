@@ -4,7 +4,7 @@
   background: linear-gradient(135deg, #13253C 0%, #0f1e2e 50%, #0b1825 100%);
   color: #e2e8f0;
   padding: 4rem 2rem 2.5rem;
-  border-top: none;
+  border-top: 4px solid var(--brand-red);
   overflow: hidden;
 }
 
@@ -54,10 +54,20 @@
   line-height: 1.5;
 }
 
+.footer-social-title {
+  margin: 1.5rem 0 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(226, 232, 240, 0.9);
+}
+
 .footer-social {
   display: flex;
   gap: 0.5rem;
-  margin-top: 1.5rem;
 }
 
 .footer-social-link {
@@ -74,9 +84,9 @@
 }
 
 .footer-social-link:hover {
-  background: #fff;
-  color: #13253C;
-  border-color: #fff;
+  background: var(--brand-red);
+  color: #fff;
+  border-color: var(--brand-red);
   transform: translateY(-2px);
 }
 
@@ -101,7 +111,7 @@
 }
 
 .footer-links a:hover {
-  color: #fff;
+  color: var(--brand-red-light);
 }
 
 .footer-avalia {
@@ -148,8 +158,8 @@
   display: inline-block;
   margin-top: 1.25rem;
   padding: 0.65rem 1.5rem;
-  background: #fff;
-  color: #13253C !important;
+  background: var(--brand-red);
+  color: #fff !important;
   font-weight: 600;
   font-size: 0.9rem;
   text-decoration: none;
@@ -158,8 +168,8 @@
 }
 
 .footer-avalia-btn:hover {
-  background: #cbd5e1;
-  color: #0f1e2e !important;
+  background: var(--brand-red-hover);
+  color: #fff !important;
   transform: translateY(-2px);
 }
 

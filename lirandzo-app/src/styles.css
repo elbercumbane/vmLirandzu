@@ -1,3 +1,28 @@
+/* Breakpoints (mobile-first): sm 640px, md 768px, lg 1024px, xl 1280px */
+:root {
+  --bp-sm: 640px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+  --container-max: none;
+  --container-px: 1.5rem;
+  --container-px-sm: 1rem;
+
+  /* VM Lirandzo – vermelho e branco */
+  --brand-red: #b91c1c;
+  --brand-red-hover: #991b1b;
+  --brand-red-soft: rgba(185, 28, 28, 0.08);
+  --brand-red-border: rgba(185, 28, 28, 0.25);
+  --brand-red-light: #dc2626;
+}
+
+@media (min-width: 640px) {
+  :root { --container-px: 1.75rem; }
+}
+@media (min-width: 1024px) {
+  :root { --container-px: 2rem; }
+}
+
 *,
 *::before,
 *::after {
@@ -8,9 +33,20 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Esconde a barra de scroll lateral na página Sobre */
+html:has(main.about-page),
+body:has(main.about-page) {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html:has(main.about-page)::-webkit-scrollbar,
+body:has(main.about-page)::-webkit-scrollbar {
+  display: none;
+}
+
 body {
   margin: 0;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   background: #fff;
   color: #1a1a24;
   -webkit-font-smoothing: antialiased;

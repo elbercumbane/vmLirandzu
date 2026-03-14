@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy, HostListener, ElementRef, ViewChild, inject, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ElementRef, ViewChild, Input, Output, EventEmitter, inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ThemeService } from '../services/theme.service';
 interface Notification {
   id: number;
@@ -20,14 +20,16 @@ const ROLE_LABELS: Record<string, string> = {
 @Component({
   selector: 'app-dashboard-navbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './dashboard-navbar.component.html',
   styleUrl: './dashboard-navbar.component.css'
 })
 export class DashboardNavbarComponent implements OnInit, OnDestroy {
-  @Input() sidebarOpen = false;
+  @Input() hideNavLinks = false;
   @Output() toggleSidebar = new EventEmitter<void>();
   @ViewChild('profileDropdown', { static: false }) profileDropdown?: ElementRef;
+  navMenuOpen = false;
+  navDropdownOpen: string | null = null;
 
   private auth = inject(AuthService);
 
@@ -160,11 +162,27 @@ export class DashboardNavbarComponent implements OnInit, OnDestroy {
     this.openDropdown = this.openDropdown === dropdown ? null : dropdown;
   }
 
+  toggleNavMenu(): void {
+    this.navMenuOpen = !this.navMenuOpen;
+  }
+
+  toggleNavDropdown(key: string): void {
+    this.navDropdownOpen = this.navDropdownOpen === key ? null : key;
+  }
+
+  closeNavDropdown(): void {
+    this.navDropdownOpen = null;
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    if (!this.openDropdown) return;
     const target = event.target as HTMLElement;
 
+    if (!target.closest('.navbar-nav-dropdown')) {
+      this.navDropdownOpen = null;
+    }
+
+    if (!this.openDropdown) return;
     if (this.openDropdown === 'calendario' && this.calendarDropdown &&
         !this.calendarDropdown.nativeElement.contains(target) && !target.closest('.navbar-calendar-button')) {
       this.openDropdown = null;

@@ -1,16 +1,13 @@
 <section class="testimonials" id="depoimentos">
   <div class="testimonials-container">
-    <h2 class="testimonials-title">O que nossos clientes dizem</h2>
-    <p class="testimonials-subtitle">Avaliações e depoimentos de quem confia na nossa logística</p>
+    <header class="testimonials-header">
+      <div class="testimonials-header-line"></div>
+      <p class="testimonials-eyebrow">{{ 'testimonials.eyebrow' | transloco }}</p>
+      <h2 class="testimonials-title">{{ 'testimonials.title' | transloco }}</h2>
+    </header>
     <div class="testimonials-grid">
       @for (t of testimonials; track t.author) {
         <article class="testimonial-card">
-          @if (t.deliveryPhoto) {
-            <div class="testimonial-delivery-photo">
-              <img [src]="t.deliveryPhoto" alt="Serviço entregue ao cliente" />
-              <span class="testimonial-photo-label">Recebido / realizado pelo cliente</span>
-            </div>
-          }
           <div class="testimonial-stars" aria-hidden="true">
             <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
           </div>
@@ -23,6 +20,14 @@
             </div>
           </div>
         </article>
+      }
+    </div>
+    <div class="testimonials-stats">
+      @for (s of stats; track s.label) {
+        <div class="testimonial-stat">
+          <span class="testimonial-stat-value">{{ s.value }}</span>
+          <span class="testimonial-stat-label">{{ s.label }}</span>
+        </div>
       }
     </div>
   </div>

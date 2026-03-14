@@ -10,6 +10,7 @@ export const routes: Routes = [
   { path: 'servicos', loadComponent: () => import('./features/all-services/all-services.component').then(m => m.AllServicesComponent) },
   { path: 'sobre', loadComponent: () => import('./features/about/about.component').then(m => m.AboutComponent) },
   { path: 'faq', loadComponent: () => import('./features/faq/faq.component').then(m => m.FaqComponent) },
+  { path: 'noticias/:id', loadComponent: () => import('./features/noticias/noticia-detalhe/noticia-detalhe.component').then(m => m.NoticiaDetalheComponent) },
   { path: 'noticias', loadComponent: () => import('./features/noticias/noticias.component').then(m => m.NoticiasComponent) },
   { path: 'contato', loadComponent: () => import('./features/contato/contato.component').then(m => m.ContatoComponent) },
   { path: 'avaliacoes', loadComponent: () => import('./features/avaliacoes/avaliacoes.component').then(m => m.AvaliacoesComponent) },

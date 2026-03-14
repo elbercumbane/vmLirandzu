@@ -1,9 +1,9 @@
 <section class="faq-preview">
   <div class="faq-preview-container">
     <div class="faq-preview-header">
-      <p class="faq-preview-eyebrow">Dúvidas frequentes</p>
-      <h2 class="faq-preview-title">Perguntas Frequentes</h2>
-      <p class="faq-preview-desc">Respostas rápidas às questões mais comuns dos nossos clientes.</p>
+      <p class="faq-preview-eyebrow">{{ 'faq.eyebrow' | transloco }}</p>
+      <h2 class="faq-preview-title">{{ 'faq.title' | transloco }}</h2>
+      <p class="faq-preview-desc">{{ 'faq.desc' | transloco }}</p>
     </div>
 
     <div class="faq-preview-list">
@@ -26,7 +26,7 @@
 
     <div class="faq-preview-footer">
       <a routerLink="/faq" class="faq-preview-link">
-        Ver todas as perguntas
+        {{ 'faq.seeAll' | transloco }}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
           <path d="M5 12h14M12 5l7 7-7 7"/>
         </svg>

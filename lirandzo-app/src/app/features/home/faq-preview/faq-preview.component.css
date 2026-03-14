@@ -5,8 +5,6 @@
 }
 
 .faq-preview-container {
-  max-width: 780px;
-  margin: 0 auto;
 }
 
 .faq-preview-header {
@@ -18,7 +16,7 @@
   font-size: 0.75rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #6366f1;
+  color: var(--brand-red);
   margin-bottom: 0.5rem;
 }
 
@@ -57,7 +55,7 @@
 }
 
 .faq-preview-item.open {
-  border-left-color: #6366f1;
+  border-left-color: var(--brand-red);
   border-color: rgba(99, 102, 241, 0.25);
   box-shadow: 0 6px 24px rgba(99, 102, 241, 0.08);
 }
@@ -95,7 +93,7 @@
 
 .faq-preview-item.open .faq-preview-icon {
   transform: rotate(180deg);
-  color: #6366f1;
+  color: var(--brand-red);
 }
 
 .faq-preview-answer-wrap {
@@ -127,7 +125,7 @@
   gap: 0.5rem;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #6366f1;
+  color: var(--brand-red);
   text-decoration: none;
   padding: 0.75rem 1.5rem;
   border: 1px solid rgba(99, 102, 241, 0.3);

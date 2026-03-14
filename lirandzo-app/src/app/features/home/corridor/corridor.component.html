@@ -4,13 +4,13 @@
   </video>
   <div class="corridor-overlay"></div>
   <div class="corridor-content">
-    <p class="corridor-eyebrow">A nossa frota em acção</p>
-    <h2 class="corridor-title">Camiões da Lirandzo nas estradas de Moçambique e África do Sul.</h2>
-    <p class="corridor-desc">Especialistas em transporte de mercadorias de <strong>Joanesburgo</strong> (e região) para <strong>Moçambique</strong>. Transporte rodoviário, procurement e logística integrada no mesmo parceiro.</p>
+    <p class="corridor-eyebrow">{{ 'corridor.eyebrow' | transloco }}</p>
+    <h2 class="corridor-title">{{ 'corridor.title' | transloco }}</h2>
+    <p class="corridor-desc" [innerHTML]="'corridor.desc' | transloco"></p>
     <div class="corridor-route">
-      <span class="route-point">Joanesburgo (ZA)</span>
+      <span class="route-point">{{ 'corridor.routeFrom' | transloco }}</span>
       <span class="route-arrow">→</span>
-      <span class="route-point">Maputo / Moçambique</span>
+      <span class="route-point">{{ 'corridor.routeTo' | transloco }}</span>
     </div>
   </div>
 </section>

@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { HeroComponent } from './hero/hero.component';
-import { CorridorComponent } from './corridor/corridor.component';
 import { VisionMissionValuesComponent } from './vision-mission-values/vision-mission-values.component';
 import { ServicesComponent } from './services/services.component';
-import { GalleryComponent } from './gallery/gallery.component';
+import { FrotaAccaoComponent } from './frota-accao/frota-accao.component';
+import { NoticiasPreviewComponent } from './noticias-preview/noticias-preview.component';
 import { PartnersComponent } from './partners/partners.component';
 import { TestimonialsComponent } from './testimonials/testimonials.component';
 import { CoverageComponent } from './coverage/coverage.component';
@@ -15,10 +15,10 @@ import { CeoMessageComponent } from '../../shared/ceo-message/ceo-message.compon
   standalone: true,
   imports: [
     HeroComponent,
-    CorridorComponent,
     VisionMissionValuesComponent,
     ServicesComponent,
-    GalleryComponent,
+    FrotaAccaoComponent,
+    NoticiasPreviewComponent,
     CeoMessageComponent,
     PartnersComponent,
     TestimonialsComponent,

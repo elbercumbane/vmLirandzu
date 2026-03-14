@@ -1,6 +1,7 @@
-import { Component, AfterViewInit, OnDestroy, ElementRef, inject } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, ElementRef, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { TranslocoModule, TranslocoService } from '@ngneat/transloco';
 import { gsap } from 'gsap';
 
 interface HeroStat {
@@ -19,56 +20,81 @@ interface Slide {
 @Component({
   selector: 'app-hero',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslocoModule],
   templateUrl: './hero.component.html',
   styleUrl: './hero.component.css'
 })
-export class HeroComponent implements AfterViewInit, OnDestroy {
+export class HeroComponent implements OnInit, AfterViewInit, OnDestroy {
   private el = inject(ElementRef);
+  private transloco = inject(TranslocoService);
   currentSlide = 0;
   currentDate = '';
   currentTime = '';
   private intervalId: ReturnType<typeof setInterval> | null = null;
   private timeIntervalId: ReturnType<typeof setInterval> | null = null;
 
-  slides: Slide[] = [
-    {
-      image: 'frota-camioes.jpg',
-      title: 'Boas-vindas à VM Lirandzo Transportes',
-      subtitle: 'Transporte de mercadorias da África do Sul (Joanesburgo) para Moçambique. Sua carga em boas mãos, com logística inteligente e rastreamento em tempo real.',
-      index: 0,
-      stats: [
-        { value: '+15', label: 'Anos de mercado' },
-        { value: '50k+', label: 'Entregas/ano' },
-        { value: '24h', label: 'Rastreamento' }
-      ]
-    },
-    {
-      image: 'motorista-cabine.jpg',
-      title: 'Tecnologia a Serviço da Sua Carga',
-      subtitle: 'Rota Joanesburgo–Maputo e todo o corredor. Frota moderna, rotas otimizadas e segurança em cada quilômetro.',
-      index: 1,
-      stats: [
-        { value: 'ZA → MZ', label: 'Corredor ativo' },
-        { value: '100%', label: 'Cargas rastreadas' },
-        { value: '7/7', label: 'Operação' }
-      ]
-    },
-    {
-      image: 'camiao-carga-sacos.jpeg',
-      title: 'Do Depósito até a Sua Porta',
-      subtitle: 'Transporte e procurement África do Sul–Moçambique. Parceria que gera resultados.',
-      index: 2,
-      stats: [
-        { value: 'Procurement', label: 'Compras & logística' },
-        { value: 'Door-to-door', label: 'Porta a porta' },
-        { value: 'Seguro', label: 'Carga segurada' }
-      ]
-    }
-  ];
+  slides: Slide[] = [];
+
+  ngOnInit(): void {
+    const build = () => this.buildSlides();
+    this.transloco.load(this.transloco.getActiveLang() || 'pt').subscribe(() => build());
+    this.transloco.langChanges$.subscribe(() => build());
+  }
+
+  private buildSlides(): void {
+    const t = (key: string) => this.transloco.translate(key);
+    this.slides = [
+      {
+        image: 'images/hero-truck-1.jpg',
+        title: t('hero.slide1.title'),
+        subtitle: t('hero.slide1.subtitle'),
+        index: 0,
+        stats: [
+          { value: t('hero.slide1.stat1'), label: t('hero.slide1.stat1Label') },
+          { value: t('hero.slide1.stat2'), label: t('hero.slide1.stat2Label') },
+          { value: t('hero.slide1.stat3'), label: t('hero.slide1.stat3Label') }
+        ]
+      },
+      {
+        image: 'images/hero-truck-2.jpg',
+        title: t('hero.slide2.title'),
+        subtitle: t('hero.slide2.subtitle'),
+        index: 1,
+        stats: [
+          { value: t('hero.slide2.stat1'), label: t('hero.slide2.stat1Label') },
+          { value: t('hero.slide2.stat2'), label: t('hero.slide2.stat2Label') },
+          { value: t('hero.slide2.stat3'), label: t('hero.slide2.stat3Label') }
+        ]
+      },
+      {
+        image: 'images/hero-warehouse-3.jpg',
+        title: t('hero.slide3.title'),
+        subtitle: t('hero.slide3.subtitle'),
+        index: 2,
+        stats: [
+          { value: t('hero.slide3.stat1'), label: t('hero.slide3.stat1Label') },
+          { value: t('hero.slide3.stat2'), label: t('hero.slide3.stat2Label') },
+          { value: t('hero.slide3.stat3'), label: t('hero.slide3.stat3Label') }
+        ]
+      }
+    ];
+  }
 
   get currentStats(): HeroStat[] {
-    return this.slides[this.currentSlide].stats;
+    return this.getCurrentSlide().stats;
+  }
+
+  get slideCounterCurrent(): string {
+    return (this.currentSlide + 1).toString().padStart(2, '0');
+  }
+
+  get slideCounterTotal(): string {
+    return this.slides.length.toString().padStart(2, '0');
+  }
+
+  getCurrentSlide(): Slide {
+    const s = this.slides[this.currentSlide] ?? this.slides[0];
+    return s ?? { image: '', title: '', subtitle: '', index: 0, stats: [] };
   }
 
   private updateDateTime(): void {

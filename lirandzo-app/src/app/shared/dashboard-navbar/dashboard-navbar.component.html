@@ -1,27 +1,89 @@
 <nav class="dashboard-navbar">
   <div class="navbar-left">
-    <button
-      type="button"
-      class="navbar-menu-toggle"
-      [class.open]="sidebarOpen"
-      (click)="toggleSidebar.emit()"
-      [attr.aria-label]="sidebarOpen ? 'Fechar menu' : 'Abrir menu'"
-      title="{{ sidebarOpen ? 'Fechar menu' : 'Abrir menu' }}"
-    >
-      <svg *ngIf="!sidebarOpen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-      <svg *ngIf="sidebarOpen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-    </button>
-    <div class="navbar-logo-mark">VM</div>
-    <div class="navbar-company-text">
-      <div class="navbar-company-name">VM LIRANDZU</div>
-      <div class="navbar-company-subtitle">Transportes & Logística</div>
-    </div>
-    <div class="navbar-separator"></div>
-    <div class="navbar-system-badge">
-      <span class="navbar-badge-dot"></span>
-      GESTÃO
-    </div>
+    @if (hideNavLinks) {
+      <button type="button" class="navbar-menu-toggle" (click)="toggleSidebar.emit()" aria-label="Abrir menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    }
+    <a routerLink="/billing" class="navbar-logo-link">
+      <div class="navbar-logo-mark">VM</div>
+      <div class="navbar-company-text">
+        <div class="navbar-company-name">VM LIRANDZU</div>
+        <div class="navbar-company-subtitle">Transportes &amp; Logística</div>
+      </div>
+    </a>
+    @if (!hideNavLinks) {
+      <div class="navbar-separator"></div>
+      <div class="navbar-system-badge">
+        <span class="navbar-badge-dot"></span>
+        GESTÃO
+      </div>
+    }
   </div>
+
+  <!-- Navegação horizontal (estilo modern) — escondida quando sidebar está à esquerda -->
+  @if (!hideNavLinks) {
+  <div class="navbar-nav">
+    <a routerLink="/billing" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="navbar-nav-link">Dashboard</a>
+    <div class="navbar-nav-dropdown" [class.open]="navDropdownOpen === 'encomendas'">
+      <button type="button" class="navbar-nav-link navbar-nav-dropdown-trigger" (click)="toggleNavDropdown('encomendas')">Encomendas</button>
+      <div class="navbar-nav-dropdown-menu">
+        <a routerLink="/billing/encomendas" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Visualizar</a>
+        <a routerLink="/billing/encomendas/nova" routerLinkActive="active" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Nova Factura</a>
+      </div>
+    </div>
+    <div class="navbar-nav-dropdown" [class.open]="navDropdownOpen === 'cotacoes'">
+      <button type="button" class="navbar-nav-link navbar-nav-dropdown-trigger" (click)="toggleNavDropdown('cotacoes')">Cotações</button>
+      <div class="navbar-nav-dropdown-menu">
+        <a routerLink="/billing/cotacoes" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Pedidos Recebidos</a>
+        <a routerLink="/billing/cotacoes/gerar" routerLinkActive="active" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Gerar Cotação</a>
+      </div>
+    </div>
+    <div class="navbar-nav-dropdown" [class.open]="navDropdownOpen === 'viagens'">
+      <button type="button" class="navbar-nav-link navbar-nav-dropdown-trigger" (click)="toggleNavDropdown('viagens')">Viagens</button>
+      <div class="navbar-nav-dropdown-menu">
+        <a routerLink="/billing/viagens" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Visualizar</a>
+        <a routerLink="/billing/viagens/nova" routerLinkActive="active" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Nova Viagem</a>
+      </div>
+    </div>
+    <div class="navbar-nav-dropdown" [class.open]="navDropdownOpen === 'guias'">
+      <button type="button" class="navbar-nav-link navbar-nav-dropdown-trigger" (click)="toggleNavDropdown('guias')">Guias de Remessa</button>
+      <div class="navbar-nav-dropdown-menu">
+        <a routerLink="/billing/guias" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Visualizar</a>
+        <a routerLink="/billing/guias/nova" routerLinkActive="active" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Gerar Guia</a>
+      </div>
+    </div>
+    <div class="navbar-nav-dropdown" [class.open]="navDropdownOpen === 'clientes'">
+      <button type="button" class="navbar-nav-link navbar-nav-dropdown-trigger" (click)="toggleNavDropdown('clientes')">Clientes</button>
+      <div class="navbar-nav-dropdown-menu">
+        <a routerLink="/billing/clientes" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Lista de Clientes</a>
+        <a routerLink="/billing/clientes/historico" routerLinkActive="active" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Histórico</a>
+      </div>
+    </div>
+    <div class="navbar-nav-dropdown" [class.open]="navDropdownOpen === 'viaturas'">
+      <button type="button" class="navbar-nav-link navbar-nav-dropdown-trigger" (click)="toggleNavDropdown('viaturas')">Viaturas</button>
+      <div class="navbar-nav-dropdown-menu">
+        <a routerLink="/billing/viaturas" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Visualizar</a>
+        <a routerLink="/billing/viaturas/nova" routerLinkActive="active" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Cadastrar</a>
+        <a routerLink="/billing/viaturas/estado" routerLinkActive="active" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Estado / Ocorrências</a>
+      </div>
+    </div>
+    <div class="navbar-nav-dropdown" [class.open]="navDropdownOpen === 'motoristas'">
+      <button type="button" class="navbar-nav-link navbar-nav-dropdown-trigger" (click)="toggleNavDropdown('motoristas')">Motoristas</button>
+      <div class="navbar-nav-dropdown-menu">
+        <a routerLink="/billing/motoristas" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Visualizar</a>
+        <a routerLink="/billing/motoristas/novo" routerLinkActive="active" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Cadastrar</a>
+        <a routerLink="/billing/motoristas/destaques" routerLinkActive="active" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Destaque & Desempenho</a>
+      </div>
+    </div>
+    <a routerLink="/billing/tesouraria" routerLinkActive="active" class="navbar-nav-link">Tesouraria</a>
+    <a routerLink="/billing/relatorios" routerLinkActive="active" class="navbar-nav-link">Relatórios</a>
+    @if (canAccessConfiguracoes) {
+      <a routerLink="/billing/configuracoes" routerLinkActive="active" class="navbar-nav-link">Configurações</a>
+    }
+    <a routerLink="/" class="navbar-nav-link navbar-nav-back">Voltar ao Portal</a>
+  </div>
+  }
 
   <div class="navbar-right">
     <!-- Data e Hora -->

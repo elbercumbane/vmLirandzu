@@ -3,18 +3,13 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 interface ServiceDetail {
+  id: string;
   icon: string;
+  badge: string;
   title: string;
   description: string;
   features: string[];
-  color: 'blue' | 'dark' | 'soft';
-}
-
-interface CompletedProject {
-  title: string;
-  description: string;
-  year: number;
-  client: string;
+  image: string;
 }
 
 @Component({
@@ -25,111 +20,73 @@ interface CompletedProject {
   styleUrl: './all-services.component.css'
 })
 export class AllServicesComponent {
+
+  metrics = [
+    { value: '+10', label: 'Anos de Experiência', trend: 'Desde 2014', fill: 100 },
+    { value: '50+', label: 'Veículos na Frota', trend: 'Rastreados 24/7', fill: 85 },
+    { value: '99%', label: 'Entregas no Prazo', trend: 'Confiabilidade', fill: 99 },
+    { value: '24/7', label: 'Monitoramento', trend: 'GPS em tempo real', fill: 100 }
+  ];
+
   services: ServiceDetail[] = [
     {
+      id: 'SRV-01',
       icon: 'truck',
+      badge: 'Frota Própria',
       title: 'Transporte Rodoviário',
-      description: 'Transporte de mercadorias nos corredores Joanesburgo–Maputo, Beira–Tete e outras rotas nacionais e regionais. Frota moderna com rastreamento GPS 24 horas e motoristas experientes.',
-      features: [
-        'Cobertura nacional e internacional',
-        'Frota própria rastreada por GPS',
-        'Cargas completas e fraccionadas',
-        'Entregas porta a porta',
-        'Motoristas certificados e treinados'
-      ],
-      color: 'blue'
+      description: 'Frota própria rastreada GPS 24 horas nos corredores Joanesburgo–Maputo e rotas nacionais.',
+      features: ['Cargas completas e fraccionadas', 'Rastreamento em tempo real', 'Motoristas certificados'],
+      image: '/images/hero-truck-1.jpg'
     },
     {
+      id: 'SRV-02',
       icon: 'procurement',
-      title: 'Procurement',
-      description: 'Serviço de compras e aquisição de mercadorias na África do Sul com entrega directa em Moçambique. Fonte única de abastecimento com logística integrada do fornecedor ao destino final.',
-      features: [
-        'Negociação com fornecedores na ZA',
-        'Consolidação de cargas',
-        'Documentação aduaneira incluída',
-        'Transporte integrado origem–destino',
-        'Relatórios e visibilidade total'
-      ],
-      color: 'dark'
+      badge: 'ZA → MZ',
+      title: 'Procurement & Sourcing',
+      description: 'Compra de mercadorias na África do Sul com entrega directa em Moçambique.',
+      features: ['Negociação com fornecedores', 'Consolidação de cargas', 'Documentação incluída'],
+      image: '/images/about-warehouse.jpg'
     },
     {
+      id: 'SRV-03',
       icon: 'tracking',
-      title: 'Rastreamento em Tempo Real',
-      description: 'Acompanhe a sua carga a qualquer momento através do nosso painel web ou aplicação móvel. Receba notificações automáticas em cada etapa do transporte, do depósito ao destino.',
-      features: [
-        'Painel de controlo online',
-        'Notificações por SMS e e-mail',
-        'Localização GPS em tempo real',
-        'Histórico completo de movimentações',
-        'Previsão de chegada actualizada'
-      ],
-      color: 'soft'
+      badge: 'GPS 24/7',
+      title: 'Rastreamento GPS',
+      description: 'Acompanhe sua carga em tempo real através do painel web ou app móvel.',
+      features: ['Localização precisa', 'Notificações automáticas', 'Histórico de viagens'],
+      image: '/camiao-terminal-carga.jpeg'
     },
     {
+      id: 'SRV-04',
       icon: 'logistics',
+      badge: 'End-to-End',
       title: 'Logística Integrada',
-      description: 'Armazenagem, picking, expedição e entrega porta a porta. Da África do Sul até Moçambique, toda a cadeia logística gerida por um único parceiro com processos optimizados.',
-      features: [
-        'Armazéns estratégicos',
-        'Picking e embalagem',
-        'Cross-docking',
-        'Gestão de inventário',
-        'Distribuição last-mile'
-      ],
-      color: 'blue'
+      description: 'Armazenagem, picking, expedição e entrega porta a porta na ZA e MZ.',
+      features: ['Armazéns estratégicos', 'Cross-docking', 'Distribuição last-mile'],
+      image: '/images/hero-warehouse-3.jpg'
     },
     {
+      id: 'SRV-05',
       icon: 'warehouse',
-      title: 'Armazenagem',
-      description: 'Espaços de armazenamento seguros e monitorizados para consolidação, stockagem temporária ou distribuição. Ideais para quem precisa de um hub logístico antes da entrega final.',
-      features: [
-        'Armazéns cobertos e seguros',
-        'Controlo de stock digital',
-        'Áreas por tipo de mercadoria',
-        'Carga e descarga mecanizada',
-        'Acesso 24/7 sob pedido'
-      ],
-      color: 'dark'
+      badge: 'Maputo',
+      title: 'Armazenagem & Stock',
+      description: 'Espaços seguros para consolidação, stockagem temporária ou distribuição.',
+      features: ['Armazéns cobertos', 'Controlo digital', 'Segurança 24h'],
+      image: '/images/about-warehouse.jpg'
     },
     {
+      id: 'SRV-06',
       icon: 'customs',
+      badge: '< 2h',
       title: 'Despacho Aduaneiro',
-      description: 'Tratamos de toda a documentação e formalidades aduaneiras para importações e exportações. Desalfandegamento ágil nas fronteiras entre Moçambique, África do Sul, Eswatini e Zimbabué.',
-      features: [
-        'Documentação de importação/exportação',
-        'Desalfandegamento em fronteiras',
-        'Assessoria em regulamentação',
-        'Coordenação com autoridades',
-        'Redução de tempos de espera'
-      ],
-      color: 'soft'
+      description: 'Documentação e formalidades aduaneiras para importações e exportações.',
+      features: ['Desalfandegamento ágil', 'Assessoria fiscal', '4 fronteiras'],
+      image: '/camiao-carga-sacos.jpeg'
     }
   ];
 
-  completed: CompletedProject[] = [
-    {
-      title: 'Entrega de equipamento industrial',
-      description: 'Transporte e desalfandegamento de máquinas pesadas de Joanesburgo para Maputo, com escolta especial.',
-      year: 2025,
-      client: 'Indústria ABC'
-    },
-    {
-      title: 'Procurement de materiais de construção',
-      description: 'Aquisição de materiais na África do Sul e entrega em obra em Moçambique, com rastreamento em tempo real.',
-      year: 2025,
-      client: 'Construtora XYZ'
-    },
-    {
-      title: 'Cargas refrigeradas Maputo–Joanesburgo',
-      description: 'Logística integrada de produtos perecíveis no corredor, com controlo de temperatura durante todo o percurso.',
-      year: 2024,
-      client: 'Distribuidora Norte'
-    },
-    {
-      title: 'Distribuição nacional de bens de consumo',
-      description: 'Armazenagem em Maputo e distribuição para Beira, Nampula e Tete com entregas semanais programadas.',
-      year: 2024,
-      client: 'Grupo Comercial Sul'
-    }
+  marqueeTags = [
+    'Rastreamento GPS', 'Gestão de Frota', 'Logística Integrada', 'Despacho Aduaneiro',
+    'Armazenagem', 'Transporte Rodoviário', 'Procurement', 'Cross-Border'
   ];
 }

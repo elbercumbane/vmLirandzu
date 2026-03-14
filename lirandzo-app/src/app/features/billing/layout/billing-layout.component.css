@@ -2,13 +2,22 @@
   min-height: 100vh;
   background: var(--bg-page);
   display: flex;
+  flex-direction: row;
+  position: relative;
+}
+
+.billing-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
   flex-direction: column;
-  transition: padding-left 0.3s ease;
+  transition: margin-left 0.3s ease;
 }
 
 @media (min-width: 1024px) {
-  .billing-shell.sidebar-open {
-    padding-left: 270px;
+  /* Em desktop: sidebar fixo à esquerda, conteúdo com margem */
+  .billing-body {
+    margin-left: 270px;
   }
 }
 
@@ -29,3 +38,4 @@
     padding: 1rem 0.75rem 2rem;
   }
 }
+

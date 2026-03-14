@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslocoModule } from '@ngneat/transloco';
 
 interface GalleryEvent {
   name: string;
@@ -10,7 +11,7 @@ interface GalleryEvent {
 @Component({
   selector: 'app-gallery',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslocoModule],
   templateUrl: './gallery.component.html',
   styleUrls: ['./gallery.component.css']
 })

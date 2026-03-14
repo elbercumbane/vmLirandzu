@@ -1,35 +1,92 @@
 <main class="noticias-page">
-  <section class="noticias-banner">
-    <div class="noticias-banner-overlay"></div>
-    <div class="noticias-banner-content">
-      <p class="noticias-banner-eyebrow">VM Lirandzo Transportes</p>
-      <h1 class="noticias-banner-title">Notícias</h1>
-      <p class="noticias-banner-desc">
-        Novidades, actualizações e novidades sobre a nossa operação, frota e serviços.
+  <!-- Hero -->
+  <section class="noticias-hero">
+    <div class="noticias-hero-bg">
+      <img src="/images/hero-warehouse-3.jpg" alt="Logística Lirandzo" class="noticias-hero-img" loading="eager">
+      <div class="noticias-hero-overlay"></div>
+    </div>
+    <div class="noticias-hero-content">
+      <div class="noticias-hero-badge">Blog & Avisos</div>
+      <h1 class="noticias-hero-title">Notícias e Avisos</h1>
+      <p class="noticias-hero-desc">
+        Actualizações sobre a nossa operação, avisos de tempo, novas rotas e tudo o que precisa saber sobre a Lirandzo.
       </p>
     </div>
   </section>
 
-  <section class="noticias-section">
-    <div class="noticias-container">
-      <div class="noticias-grid">
-        @for (noticia of noticias; track noticia.id) {
-          <article class="noticia-card">
-            <span class="noticia-categoria">{{ noticia.categoria }}</span>
-            <h3 class="noticia-titulo">{{ noticia.titulo }}</h3>
-            <p class="noticia-resumo">{{ noticia.resumo }}</p>
-            <time class="noticia-data">{{ formatarData(noticia.data) }}</time>
-          </article>
+  <!-- Conteúdo principal -->
+  <section class="noticias-main">
+    <div class="noticias-wrapper">
+      <div class="noticias-content">
+        <!-- Post em destaque -->
+        @if (noticiaDestaque) {
+          <a [routerLink]="['/noticias', noticiaDestaque.id]" class="noticia-destaque">
+            <div class="destaque-image">
+              <img [src]="noticiaDestaque.imagem" [alt]="noticiaDestaque.titulo" loading="eager">
+              <span class="destaque-badge">{{ noticiaDestaque.categoria }}</span>
+            </div>
+            <div class="destaque-body">
+              <time class="destaque-data">{{ formatarData(noticiaDestaque.data) }}</time>
+              <h2 class="destaque-titulo">{{ noticiaDestaque.titulo }}</h2>
+              <p class="destaque-resumo">{{ noticiaDestaque.resumo }}</p>
+            </div>
+          </a>
         }
+
+        <!-- Grid de notícias -->
+        <div class="noticias-grid">
+          @for (noticia of noticiasRecentes; track noticia.id) {
+            <a [routerLink]="['/noticias', noticia.id]" class="noticia-card">
+              <div class="noticia-card-image">
+                <img [src]="noticia.imagem" [alt]="noticia.titulo" loading="lazy">
+                <span class="noticia-card-badge">{{ noticia.categoria }}</span>
+              </div>
+              <div class="noticia-card-body">
+                <time class="noticia-data">{{ formatarData(noticia.data) }}</time>
+                <h3 class="noticia-titulo">{{ noticia.titulo }}</h3>
+                <p class="noticia-resumo">{{ noticia.resumo }}</p>
+              </div>
+            </a>
+          }
+        </div>
       </div>
+
+      <!-- Sidebar -->
+      <aside class="noticias-sidebar">
+        <div class="sidebar-card">
+          <h3 class="sidebar-title">Sobre este espaço</h3>
+          <p class="sidebar-text">
+            Aqui partilhamos avisos importantes (como condições meteorológicas), novidades da operação e actualizações que afectam as suas entregas.
+          </p>
+          <div class="sidebar-hint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <span>Avisos de tempo são actualizados consoante as condições.</span>
+          </div>
+        </div>
+        <div class="sidebar-card">
+          <h3 class="sidebar-title">Categorias</h3>
+          <ul class="sidebar-tags">
+            <li>Aviso</li>
+            <li>Operações</li>
+            <li>Tecnologia</li>
+            <li>Rotas</li>
+            <li>Infraestrutura</li>
+            <li>Qualidade</li>
+          </ul>
+        </div>
+      </aside>
     </div>
   </section>
 
+  <!-- CTA -->
   <section class="noticias-cta">
-    <div class="noticias-cta-content">
+    <div class="noticias-cta-wrapper">
       <h2 class="noticias-cta-title">Precisa de uma cotação?</h2>
       <p class="noticias-cta-text">Solicite uma cotação e a nossa equipa responderá em até 24 horas.</p>
-      <a routerLink="/orcamento" class="noticias-cta-btn">Solicitar Cotação</a>
+      <div class="noticias-cta-actions">
+        <a routerLink="/orcamento" class="noticias-cta-btn noticias-cta-btn--primary">Solicitar Cotação</a>
+        <a routerLink="/contato" class="noticias-cta-btn noticias-cta-btn--outline">Contactar-nos</a>
+      </div>
     </div>
   </section>
 </main>

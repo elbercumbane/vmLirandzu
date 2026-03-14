@@ -1,5 +1,6 @@
-import { Component, AfterViewInit, ElementRef, inject } from '@angular/core';
+import { Component, AfterViewInit, ElementRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslocoModule, TranslocoService } from '@ngneat/transloco';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -10,43 +11,73 @@ interface Testimonial {
   author: string;
   role: string;
   avatar: string;
-  /** Foto do serviço/entrega que o cliente recebeu ou realizou (estilo BeForward) */
-  deliveryPhoto?: string;
+}
+
+interface TestimonialStat {
+  value: string;
+  label: string;
 }
 
 @Component({
   selector: 'app-testimonials',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslocoModule],
   templateUrl: './testimonials.component.html',
   styleUrl: './testimonials.component.css'
 })
-export class TestimonialsComponent implements AfterViewInit {
+export class TestimonialsComponent implements OnInit, AfterViewInit {
   private el = inject(ElementRef);
-  testimonials: Testimonial[] = [
-    {
-      quote: 'Entregas sempre no prazo. O rastreamento em tempo real nos dá tranquilidade total.',
-      author: 'Maria Silva',
-      role: 'Gerente de Logística, Indústria ABC',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&q=80'
-    },
-    {
-      quote: 'Parceria de anos. Profissionalismo e tecnologia que fazem a diferença no dia a dia.',
-      author: 'Carlos Mendes',
-      role: 'Diretor Comercial, Comércio XYZ',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&q=80'
-    },
-    {
-      quote: 'Melhor custo-benefício do mercado. Recomendo a Lirandzo para quem precisa de confiança.',
-      author: 'Ana Costa',
-      role: 'CEO, Distribuidora Norte',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&q=80'
-    }
-  ];
+  private transloco = inject(TranslocoService);
+  testimonials: Testimonial[] = [];
+  stats: TestimonialStat[] = [];
+
+  ngOnInit(): void {
+    this.buildTestimonials();
+    this.buildStats();
+    this.transloco.langChanges$.subscribe(() => {
+      this.buildTestimonials();
+      this.buildStats();
+    });
+  }
+
+  private buildStats(): void {
+    const t = (k: string) => this.transloco.translate(k);
+    this.stats = [
+      { value: t('testimonials.stat1Value'), label: t('testimonials.stat1Label') },
+      { value: t('testimonials.stat2Value'), label: t('testimonials.stat2Label') },
+      { value: t('testimonials.stat3Value'), label: t('testimonials.stat3Label') },
+      { value: t('testimonials.stat4Value'), label: t('testimonials.stat4Label') }
+    ];
+  }
+
+  private buildTestimonials(): void {
+    const t = (k: string) => this.transloco.translate(k);
+    this.testimonials = [
+      {
+        quote: t('testimonials.t1.quote'),
+        author: t('testimonials.t1.author'),
+        role: t('testimonials.t1.role'),
+        avatar: 'images/testimonial-1.jpg'
+      },
+      {
+        quote: t('testimonials.t2.quote'),
+        author: t('testimonials.t2.author'),
+        role: t('testimonials.t2.role'),
+        avatar: 'images/testimonial-2.jpg'
+      },
+      {
+        quote: t('testimonials.t3.quote'),
+        author: t('testimonials.t3.author'),
+        role: t('testimonials.t3.role'),
+        avatar: 'images/testimonial-3.jpg'
+      }
+    ];
+  }
 
   ngAfterViewInit(): void {
     const host = this.el.nativeElement;
     const cards = host.querySelectorAll('.testimonial-card');
+    const stats = host.querySelectorAll('.testimonial-stat');
     const section = host.querySelector('.testimonials');
     if (cards.length && section) {
       gsap.fromTo(cards, { opacity: 0, y: 30 }, {
@@ -56,6 +87,16 @@ export class TestimonialsComponent implements AfterViewInit {
         stagger: 0.15,
         ease: 'power3.out',
         scrollTrigger: { trigger: section, start: 'top 85%' }
+      });
+    }
+    if (stats.length && section) {
+      gsap.fromTo(stats, { opacity: 0, y: 20 }, {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        stagger: 0.1,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: section, start: 'top 70%' }
       });
     }
   }

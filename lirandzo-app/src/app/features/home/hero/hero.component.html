@@ -11,6 +11,11 @@
     }
   </div>
   <div class="hero-bottom-left">
+    <div class="hero-slide-counter">
+      <span class="hero-slide-current">{{ slideCounterCurrent }}</span>
+      <span class="hero-slide-sep">/</span>
+      <span class="hero-slide-total">{{ slideCounterTotal }}</span>
+    </div>
     <div class="hero-dots">
       @for (slide of slides; track slide.index) {
         <button
@@ -29,8 +34,8 @@
   </div>
   <div class="hero-inner">
     <div class="hero-content">
-      <h1 class="hero-title">{{ slides[currentSlide].title }}</h1>
-      <p class="hero-subtitle">{{ slides[currentSlide].subtitle }}</p>
+      <h1 class="hero-title">{{ getCurrentSlide().title }}</h1>
+      <p class="hero-subtitle">{{ getCurrentSlide().subtitle }}</p>
       <div class="hero-stats">
         @for (stat of currentStats; track stat.label) {
           <div class="hero-stat">
@@ -43,11 +48,11 @@
   </div>
   <div class="hero-cta-buttons">
     <a routerLink="/rastreio" class="btn-hero-cta btn-hero-primary">
-      <span class="btn-label">Rastrear Pedido</span>
+      <span class="btn-label">{{ 'hero.trackOrder' | transloco }}</span>
       <span class="btn-arrow" aria-hidden="true">→</span>
     </a>
     <a routerLink="/orcamento" class="btn-hero-cta btn-hero-secondary">
-      <span class="btn-label">Solicitar Cotação</span>
+      <span class="btn-label">{{ 'hero.requestQuote' | transloco }}</span>
       <span class="btn-arrow" aria-hidden="true">→</span>
     </a>
   </div>

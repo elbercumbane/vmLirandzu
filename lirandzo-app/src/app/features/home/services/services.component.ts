@@ -1,6 +1,7 @@
-import { Component, AfterViewInit, ElementRef, inject } from '@angular/core';
+import { Component, AfterViewInit, ElementRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslocoModule, TranslocoService } from '@ngneat/transloco';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -15,34 +16,29 @@ interface Service {
 @Component({
   selector: 'app-services',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslocoModule],
   templateUrl: './services.component.html',
   styleUrl: './services.component.css'
 })
-export class ServicesComponent implements AfterViewInit {
+export class ServicesComponent implements OnInit, AfterViewInit {
   private el = inject(ElementRef);
-  services: Service[] = [
-    {
-      image: 'camiao-carga-sacos.jpeg',
-      title: 'Transporte Rodoviário',
-      description: 'Transporte de mercadorias no corredor Joanesburgo–Maputo e rotas regionais. Frota moderna e rastreamento 24h.'
-    },
-    {
-      image: 'frota-camioes.jpg',
-      title: 'Procurement',
-      description: 'Compras e aquisição de mercadorias na África do Sul com entrega em Moçambique. Fonte única, logística integrada.'
-    },
-    {
-      image: 'motorista-cabine.jpg',
-      title: 'Rastreamento em Tempo Real',
-      description: 'Acompanhe sua carga a qualquer momento por aplicativo ou painel web, do depósito ao destino.'
-    },
-    {
-      image: 'frota-lirandzo-armazem.jpeg',
-      title: 'Logística Integrada',
-      description: 'Armazenagem, picking, expedição e entrega porta a porta. África do Sul até Moçambique sob um único parceiro.'
-    }
-  ];
+  private transloco = inject(TranslocoService);
+  services: Service[] = [];
+
+  ngOnInit(): void {
+    this.buildServices();
+    this.transloco.langChanges$.subscribe(() => this.buildServices());
+  }
+
+  private buildServices(): void {
+    const t = (k: string) => this.transloco.translate(k);
+    this.services = [
+      { image: 'images/hero-truck-1.jpg', title: t('services.transport.title'), description: t('services.transport.desc') },
+      { image: 'images/about-warehouse.jpg', title: t('services.procurement.title'), description: t('services.procurement.desc') },
+      { image: 'images/event-1.jpg', title: t('services.tracking.title'), description: t('services.tracking.desc') },
+      { image: 'images/hero-warehouse-3.jpg', title: t('services.logistics.title'), description: t('services.logistics.desc') }
+    ];
+  }
 
   ngAfterViewInit(): void {
     const host = this.el.nativeElement;

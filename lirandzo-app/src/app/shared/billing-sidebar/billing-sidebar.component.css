@@ -381,4 +381,9 @@
   .billing-sidebar-overlay {
     display: none;
   }
+
+  /* Em desktop: sidebar sempre visível à esquerda */
+  .billing-sidebar {
+    transform: translateX(0);
+  }
 }

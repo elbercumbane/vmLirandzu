@@ -38,7 +38,7 @@
   font-size: 0.75rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #bfdbfe;
+  color: var(--brand-red-light);
   margin-bottom: 0.4rem;
 }
 
@@ -58,7 +58,7 @@
 }
 
 .corridor-desc strong {
-  color: #93c5fd;
+  color: var(--brand-red-light);
 }
 
 .corridor-route {
@@ -66,11 +66,11 @@
   align-items: center;
   gap: 1rem;
   padding: 0.6rem 1.25rem;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(185, 28, 28, 0.2);
   border-radius: 999px;
   font-weight: 600;
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid var(--brand-red-border);
 }
 
 .route-point {

@@ -1,4 +1,4 @@
-/* Secção com quase o mesmo tamanho do hero; descrição à esquerda, cards à direita; imagem de fundo */
+/* Secção serviços – fundo neutro, visual WordPress */
 .services {
   width: 100%;
   min-height: 90vh;
@@ -6,17 +6,14 @@
   align-items: center;
   padding: 4rem 2rem 5rem;
   position: relative;
-  background-image: url('/frota-camioes.jpg');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
+  background: #f8f9fb;
 }
 
 .services::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(105deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.65) 45%, rgba(248, 250, 252, 0.58) 100%);
+  background: linear-gradient(180deg, rgba(248, 249, 251, 0.95) 0%, rgba(241, 245, 249, 0.98) 100%);
   z-index: 0;
 }
 
@@ -27,8 +24,6 @@
 
 .services-layout {
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
   display: grid;
   grid-template-columns: 0.95fr 1.05fr;
   gap: 4rem;
@@ -42,22 +37,23 @@
 
 .services-heading {
   font-size: clamp(2.5rem, 5vw, 3.75rem);
-  font-weight: 800;
-  color: #0a0a0f;
+  font-weight: 700;
+  color: #1e293b;
   margin: 0 0 1.75rem;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
 }
 
 .services-intro-text {
-  font-size: clamp(1.15rem, 2vw, 1.4rem);
-  color: #3a3a4a;
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  color: #475569;
   line-height: 1.75;
   margin: 0 0 2.25rem;
 }
 
 .services-intro-text strong {
-  color: #0047b3;
+  color: var(--brand-red);
+  font-weight: 600;
 }
 
 .services-ctas {
@@ -68,37 +64,34 @@
 
 .services-cta {
   display: inline-block;
-  padding: 1.1rem 2.25rem;
+  padding: 1rem 1.75rem;
   font-weight: 600;
-  font-size: 1.05rem;
-  background: #0066ff;
+  font-size: 0.95rem;
+  background: var(--brand-red);
   color: #fff;
   text-decoration: none;
-  border-radius: 999px;
+  border-radius: 8px;
   transition: background 0.2s, transform 0.2s;
-  box-shadow: 0 4px 20px rgba(0, 102, 255, 0.3);
 }
 
 .services-cta:hover {
-  background: #0052cc;
-  transform: translateY(-3px);
-  box-shadow: 0 8px 28px rgba(0, 102, 255, 0.35);
+  background: var(--brand-red-hover);
+  transform: translateY(-2px);
 }
 
 .services-cta--secondary {
   background: transparent;
-  color: #0066ff;
-  border: 2px solid #0066ff;
-  box-shadow: none;
+  color: #475569;
+  border: 1px solid var(--brand-red-border);
 }
 
 .services-cta--secondary:hover {
-  background: rgba(0, 102, 255, 0.08);
-  color: #0052cc;
-  border-color: #0052cc;
+  background: var(--brand-red-soft);
+  color: var(--brand-red);
+  border-color: var(--brand-red);
 }
 
-/* Parte direita: grid de serviços com imagens */
+/* Grid de cards – visual WordPress */
 .services-cards {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -107,59 +100,84 @@
 
 .service-card {
   background: #fff;
-  border-radius: 20px;
+  border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(203, 213, 225, 0.6);
-  border-left: 4px solid #6366f1;
-  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
-  transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.2s;
 }
 
-.service-card:nth-child(2) { border-left-color: #0ea5e9; }
-.service-card:nth-child(3) { border-left-color: #10b981; }
-.service-card:nth-child(4) { border-left-color: #8b5cf6; }
-
 .service-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 16px 48px rgba(99, 102, 241, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(185, 28, 28, 0.08);
+  border-color: var(--brand-red-border);
+}
+
+.service-image-wrap {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
 }
 
 .service-image {
   width: 100%;
-  height: 180px;
+  height: 100%;
   background-size: cover;
   background-position: center;
+  transition: transform 0.5s ease;
+}
+
+.service-card:hover .service-image {
+  transform: scale(1.05);
+}
+
+.service-image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.15) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 .service-body {
-  padding: 1.35rem;
+  padding: 1.5rem 1.5rem 1.75rem;
 }
 
 .service-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #0a0a0f;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
   margin: 0 0 0.5rem;
+  letter-spacing: -0.01em;
 }
 
 .service-desc {
-  font-size: 0.95rem;
-  color: #4a4a5a;
-  line-height: 1.55;
-  margin: 0 0 0.75rem;
+  font-size: 0.9375rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0 0 1rem;
 }
 
 .service-more {
-  display: inline-block;
-  font-size: 0.88rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  color: #0066ff;
+  color: var(--brand-red);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: color 0.2s, gap 0.2s;
+}
+
+.service-more svg {
+  transition: transform 0.2s;
 }
 
 .service-more:hover {
-  color: #0047b3;
+  color: var(--brand-red);
+}
+
+.service-more:hover svg {
+  transform: translateX(4px);
 }
 
 @media (max-width: 1000px) {

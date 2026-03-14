@@ -1,6 +1,6 @@
 <section class="vmv" id="visao-missao-valores">
   <div class="vmv-container">
-    <h2 class="vmv-title">Identidade Corporativa</h2>
+    <h2 class="vmv-title">{{ 'vmv.title' | transloco }}</h2>
     <div class="vmv-rings">
       @for (card of cards; track card.type; let i = $index) {
         <article class="vmv-card" [class.vmv-card--large]="i === 1" [attr.data-type]="card.type">
