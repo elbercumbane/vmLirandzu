@@ -1,7 +1,10 @@
 package com.lirandzo.service;
 
+import com.lirandzo.dto.CotacaoPortalRequestDTO;
+import com.lirandzo.entity.Cliente;
 import com.lirandzo.entity.Cotacao;
 import com.lirandzo.entity.Cotacao.StatusCotacao;
+import com.lirandzo.repository.ClienteRepository;
 import com.lirandzo.repository.CotacaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,9 @@ public class CotacaoService {
 
     @Autowired
     private CotacaoRepository cotacaoRepository;
+
+    @Autowired
+    private ClienteRepository clienteRepository;
 
     public List<Cotacao> findAll() {
         return cotacaoRepository.findAllWithCliente();
@@ -43,6 +49,38 @@ public class CotacaoService {
         return saved;
     }
 
+    public void criarPedidoAPartirDoPortal(CotacaoPortalRequestDTO dto) {
+        // Tentar localizar cliente pelo e-mail, caso exista
+        Cliente cliente = null;
+        if (dto.email() != null && !dto.email().isBlank()) {
+            cliente = clienteRepository.findAll().stream()
+                    .filter(c -> dto.email().equalsIgnoreCase(c.getEmail()))
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        if (cliente == null) {
+            cliente = new Cliente();
+            cliente.setNome(dto.nome() != null && !dto.nome().isBlank() ? dto.nome() : "Cliente Portal");
+            cliente.setEmail(dto.email());
+            cliente.setTelefone(dto.telefone1() != null && !dto.telefone1().isBlank()
+                    ? dto.telefone1()
+                    : dto.telefone2());
+            cliente = clienteRepository.save(cliente);
+        }
+
+        Cotacao cotacao = new Cotacao();
+        cotacao.setCliente(cliente);
+        cotacao.setOrigem(dto.origem());
+        cotacao.setDestino(dto.destino());
+        cotacao.setDescricaoCarga(dto.mensagem());
+        cotacao.setStatus(Cotacao.StatusCotacao.PENDENTE);
+        cotacao.setObservacoes("Pedido vindo do portal");
+        cotacao.setFormaEnvioPreferida(dto.formaEnvioPreferida());
+
+        cotacaoRepository.save(cotacao);
+    }
+
     public Optional<Cotacao> update(Long id, Cotacao cotacaoAtualizada) {
         return cotacaoRepository.findById(id)
                 .map(cotacao -> {
@@ -61,6 +99,8 @@ public class CotacaoService {
                     cotacao.setObservacoes(cotacaoAtualizada.getObservacoes());
                     cotacao.setCondicoes(cotacaoAtualizada.getCondicoes());
                     cotacao.setOperador(cotacaoAtualizada.getOperador());
+                    cotacao.setFormaEnvioPreferida(cotacaoAtualizada.getFormaEnvioPreferida());
+                    cotacao.setFormaEnvioRealizada(cotacaoAtualizada.getFormaEnvioRealizada());
                     if (cotacaoAtualizada.getStatus() == StatusCotacao.RESPONDIDO || 
                         cotacaoAtualizada.getStatus() == StatusCotacao.COTACAO_GERADA) {
                         cotacao.setDataResposta(java.time.LocalDateTime.now());

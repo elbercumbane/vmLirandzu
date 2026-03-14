@@ -64,12 +64,26 @@
             <label for="destination">Destino (cidade/estado) <span class="required">*</span></label>
             <input id="destination" type="text" [(ngModel)]="form.destination" name="destination" placeholder="Ex: Johannesburg, África do Sul" required />
           </div>
+          <div class="form-row">
+            <label for="deliveryMethod">Como prefere receber a cotação? <span class="required">*</span></label>
+            <select id="deliveryMethod" [(ngModel)]="form.deliveryMethod" name="deliveryMethod" required>
+              <option [ngValue]="''">Selecione uma opção</option>
+              <option [ngValue]="'whatsapp'">Por mensagem WhatsApp</option>
+              <option [ngValue]="'pdf'">Físico / PDF para impressão</option>
+              <option [ngValue]="'chamada'">Por chamada telefónica</option>
+            </select>
+          </div>
           <div class="form-row full message-block">
             <label for="message" class="message-label">Escreva aqui tudo o que deseja (origem, destino, prazos, detalhes da carga, etc.)</label>
             <p class="message-hint">Use Enter para nova linha. Ao sair do campo, o texto será organizado em lista numerada para facilitar a análise.</p>
             <textarea id="message" [(ngModel)]="form.message" name="message" rows="6" placeholder="Descreva o que precisa... (cada linha vira um item numerado)" (blur)="formatMessageToList()"></textarea>
           </div>
-          <button type="submit" class="quote-submit">Enviar solicitação</button>
+          @if (error) {
+            <p class="quote-error">{{ error }}</p>
+          }
+          <button type="submit" class="quote-submit" [disabled]="loading">
+            {{ loading ? 'A enviar...' : 'Enviar solicitação' }}
+          </button>
         </form>
       } @else {
         <div class="quote-success">

@@ -1,0 +1,114 @@
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="'/billing'"
+  [showHelp]="true"
+  title="Cotações Enviadas"
+  subtitle="Visualize todas as cotações que foram enviadas aos clientes"
+  helpTitle="Como usar Cotações Enviadas"
+  [helpItems]="[
+    'Esta página mostra apenas cotações que foram respondidas ou geradas e enviadas.',
+    'Use os filtros para ver cotações respondidas ou com cotação gerada.',
+    'Pesquise por cliente, referência, destino ou forma de envio para localizar cotações específicas.'
+  ]"
+></app-billing-section-header>
+
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--accent)"></div>
+    <div class="kpi-icon" style="color: var(--accent)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+      </svg>
+    </div>
+    <div class="kpi-label">Total Enviadas</div>
+    <div class="kpi-value">{{ cotacoes.length }}</div>
+    <div class="kpi-sub">{{ cotacoesFiltradas.length }} visível(is)</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--success)"></div>
+    <div class="kpi-icon" style="color: var(--success)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+    </div>
+    <div class="kpi-label">Cotações Geradas</div>
+    <div class="kpi-value" style="color: var(--success)">{{ cotacoes.length }}</div>
+    <div class="kpi-sub">enviadas aos clientes</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <input type="text" class="search-input" [(ngModel)]="filtro" placeholder="Pesquisar por cliente, referência, destino, forma de envio...">
+    <div class="filter-chips">
+      <button class="filter-chip" [class.active]="filtroEstado === 'TODOS'" (click)="filtroEstado = 'TODOS'">Todos</button>
+      <button class="filter-chip" [class.active]="filtroEstado === 'COTAÇÃO GERADA'" (click)="filtroEstado = 'COTAÇÃO GERADA'">Cotação Gerada</button>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state">
+      <p>A carregar cotações...</p>
+    </div>
+  } @else if (error) {
+    <div class="error-state">
+      <p>{{ error }}</p>
+      <button type="button" class="btn-secondary" (click)="carregarCotacoes()">Tentar Novamente</button>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Ref.</th>
+            <th>Cliente</th>
+            <th>Rota</th>
+            <th>Carga</th>
+            <th>Entrada</th>
+            <th>Estado</th>
+            <th>Forma de Envio</th>
+            <th>Operador</th>
+            <th>Tempo Resposta</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of cotacoesFiltradas; track c.id) {
+          <tr>
+            <td style="font-weight: 600; color: var(--accent)">{{ c.ref }}</td>
+            <td>
+              <div style="font-weight: 600; color: var(--text-primary)">{{ c.cliente }}</div>
+              @if (c.telefone) {
+              <div style="font-size: 0.75rem; color: var(--text-muted)">{{ c.telefone }}</div>
+              }
+            </td>
+            <td>{{ c.origem }} → {{ c.destino }}</td>
+            <td style="max-width: 200px">{{ c.descricaoCarga }}</td>
+            <td>
+              <div>{{ c.dataEntrada }}</div>
+              @if (c.horaEntrada) {
+              <div style="font-size: 0.75rem; color: var(--text-muted)">{{ c.horaEntrada }}</div>
+              }
+            </td>
+            <td><span [class]="getBadgeClass(c.estado)">{{ c.estado }}</span></td>
+            <td>
+              <span class="badge badge-info" style="font-size: 0.75rem;">{{ c.formaEnvio }}</span>
+            </td>
+            <td>{{ c.operador || '—' }}</td>
+            <td>{{ c.tempoResposta || '—' }}</td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="9" class="empty-state">
+              <p>Nenhuma cotação enviada encontrada</p>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

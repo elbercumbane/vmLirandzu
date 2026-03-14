@@ -19,6 +19,8 @@ export interface CotacaoRequest {
   observacoes?: string;
   condicoes?: string;
   operador?: string;
+  formaEnvioPreferida?: string;
+  formaEnvioRealizada?: string;
 }
 
 export interface CotacaoResponse {
@@ -40,6 +42,21 @@ export interface CotacaoResponse {
   condicoes?: string;
   operador?: string;
   dataResposta?: string;
+  formaEnvioPreferida?: string;
+  formaEnvioRealizada?: string;
+}
+
+export interface CotacaoPortalRequest {
+  nome: string;
+  email: string;
+  telefone1?: string;
+  hasWhatsApp1?: boolean;
+  telefone2?: string;
+  hasWhatsApp2?: boolean;
+  origem: string;
+  destino: string;
+  mensagem?: string;
+  formaEnvioPreferida: 'whatsapp' | 'pdf' | 'chamada';
 }
 
 @Injectable({
@@ -52,6 +69,10 @@ export class CotacaoService {
 
   criarCotacao(cotacao: CotacaoRequest): Observable<CotacaoResponse> {
     return this.http.post<CotacaoResponse>(`${this.apiUrl}/cotacoes`, cotacao);
+  }
+
+  criarPedidoPortal(pedido: CotacaoPortalRequest): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/cotacoes/portal`, pedido);
   }
 
   listarCotacoes(status?: string): Observable<CotacaoResponse[]> {

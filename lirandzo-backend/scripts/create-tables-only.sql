@@ -210,6 +210,8 @@ CREATE TABLE IF NOT EXISTS cotacoes (
     observacoes VARCHAR(500),
     condicoes VARCHAR(500),
     operador VARCHAR(200),
+    forma_envio_preferida VARCHAR(50),
+    forma_envio_realizada VARCHAR(50),
     data_resposta TIMESTAMP,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP

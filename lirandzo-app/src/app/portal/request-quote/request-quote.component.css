@@ -128,6 +128,22 @@
   border: 1px solid #d0d0dc;
   border-radius: 10px;
   background: #fff;
+  color: #1a1a24;
+}
+
+.form-row input::placeholder,
+.form-row textarea::placeholder {
+  color: #94a3b8;
+  opacity: 1;
+}
+
+.form-row select {
+  color: #1a1a24;
+}
+
+.form-row select option {
+  color: #1a1a24;
+  background: #fff;
 }
 
 .form-row input:focus,
