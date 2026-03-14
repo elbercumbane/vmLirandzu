@@ -1,0 +1,213 @@
+{
+  "nav": {
+    "home": "Início",
+    "about": "Sobre nós",
+    "services": "Serviços",
+    "portfolio": "Portfólio",
+    "news": "Notícias",
+    "quote": "Solicitar Cotação",
+    "tracking": "Rastrear Pedido",
+    "faq": "FAQ",
+    "contact": "Contato",
+    "clientArea": "Área do Cliente"
+  },
+  "hero": {
+    "slide1": {
+      "title": "Boas-vindas à VM Lirandzo Transportes",
+      "subtitle": "Transporte de mercadorias da África do Sul (Joanesburgo) para Moçambique. Sua carga em boas mãos, com logística inteligente e rastreamento em tempo real.",
+      "stat1": "+15",
+      "stat1Label": "Anos de mercado",
+      "stat2": "50k+",
+      "stat2Label": "Entregas/ano",
+      "stat3": "24h",
+      "stat3Label": "Rastreamento"
+    },
+    "slide2": {
+      "title": "Tecnologia a Serviço da Sua Carga",
+      "subtitle": "Rota Joanesburgo–Maputo e todo o corredor. Frota moderna, rotas otimizadas e segurança em cada quilômetro.",
+      "stat1": "ZA → MZ",
+      "stat1Label": "Corredor ativo",
+      "stat2": "100%",
+      "stat2Label": "Cargas rastreadas",
+      "stat3": "7/7",
+      "stat3Label": "Operação"
+    },
+    "slide3": {
+      "title": "Do Depósito até a Sua Porta",
+      "subtitle": "Transporte e procurement África do Sul–Moçambique. Parceria que gera resultados.",
+      "stat1": "Procurement",
+      "stat1Label": "Compras & logística",
+      "stat2": "Door-to-door",
+      "stat2Label": "Porta a porta",
+      "stat3": "Seguro",
+      "stat3Label": "Carga segurada"
+    },
+    "trackOrder": "Rastrear Pedido",
+    "requestQuote": "Solicitar Cotação"
+  },
+  "vmv": {
+    "title": "Identidade Corporativa",
+    "mission": {
+      "title": "Missão",
+      "text": "Promover e implementar estratégias de desenvolvimento logístico, estimulando a competitividade e a entrega de excelência em transporte e procurement."
+    },
+    "vision": {
+      "title": "Visão",
+      "text": "Ser referência em transporte de cargas e procurement no corredor África do Sul–Moçambique, com operações robustas e sustentáveis."
+    },
+    "values": {
+      "title": "Valores",
+      "item1": "Integridade",
+      "item2": "Transparência",
+      "item3": "Inovação",
+      "item4": "Excelência"
+    }
+  },
+  "services": {
+    "title": "Nossos Serviços",
+    "intro": "Transportamos e gerimos a sua carga no corredor <strong>Joanesburgo–Maputo</strong>, com procurement na África do Sul e entrega em Moçambique. Frota moderna, rastreamento em tempo real e logística integrada porta a porta — tudo com um único parceiro.",
+    "contact": "Contacto",
+    "seeMore": "Ver mais",
+    "learnMore": "Saber mais →",
+    "transport": {
+      "title": "Transporte Rodoviário",
+      "desc": "Transporte de mercadorias no corredor Joanesburgo–Maputo e rotas regionais. Frota moderna e rastreamento 24h."
+    },
+    "procurement": {
+      "title": "Procurement",
+      "desc": "Compras e aquisição de mercadorias na África do Sul com entrega em Moçambique. Fonte única, logística integrada."
+    },
+    "tracking": {
+      "title": "Rastreamento em Tempo Real",
+      "desc": "Acompanhe sua carga a qualquer momento por aplicativo ou painel web, do depósito ao destino."
+    },
+    "logistics": {
+      "title": "Logística Integrada",
+      "desc": "Armazenagem, picking, expedição e entrega porta a porta. África do Sul até Moçambique sob um único parceiro."
+    }
+  },
+  "ceo": {
+    "title": "MENSAGEM DO CEO",
+    "quote": "Nossa missão é conectar pessoas e negócios através de soluções logísticas de excelência. Cada entrega representa nosso compromisso com a qualidade e a confiança que nossos clientes depositam em nós.",
+    "name": "Vasco M. Lirandzo",
+    "position": "Fundador e CEO",
+    "stat1": "10+",
+    "stat1Label": "Anos de Experiência",
+    "stat2": "500+",
+    "stat2Label": "Clientes Satisfeitos",
+    "stat3": "50k+",
+    "stat3Label": "Entregas Realizadas"
+  },
+  "gallery": {
+    "title": "Galeria de Eventos",
+    "subtitle": "Momentos dos nossos <strong>eventos e operações</strong> no corredor Joanesburgo–Maputo. Clique numa foto para ver mais.",
+    "photos": "fotos",
+    "close": "Fechar"
+  },
+  "corridor": {
+    "eyebrow": "A nossa frota em acção",
+    "title": "Camiões da Lirandzo nas estradas de Moçambique e África do Sul.",
+    "desc": "Especialistas em transporte de mercadorias de <strong>Joanesburgo</strong> (e região) para <strong>Moçambique</strong>. Transporte rodoviário, procurement e logística integrada no mesmo parceiro.",
+    "routeFrom": "Joanesburgo (ZA)",
+    "routeTo": "Maputo / Moçambique"
+  },
+  "coverage": {
+    "subtitle": "Atuamos em todo Moçambique e África do Sul",
+    "title": "Áreas de Cobertura",
+    "mozambique": {
+      "title": "Moçambique",
+      "description": "Cobertura completa em todas as províncias: Maputo, Gaza, Inhambane, Sofala, Manica, Tete, Zambézia, Nampula, Niassa, Cabo Delgado.",
+      "l1": "Maputo, Gaza, Inhambane",
+      "l2": "Sofala, Manica, Tete",
+      "l3": "Zambézia, Nampula, Niassa"
+    },
+    "southAfrica": {
+      "title": "África do Sul",
+      "description": "Compras e coletas em Johannesburg, Pretória, Durban, Cape Town e todas as principais cidades.",
+      "l1": "Johannesburg & Pretória",
+      "l2": "Durban & Cape Town",
+      "l3": "Port Elizabeth"
+    },
+    "international": {
+      "title": "Rota Internacional",
+      "description": "Rota direta e segura entre a África do Sul e Moçambique, com toda documentação necessária.",
+      "l1": "Documentação Completa",
+      "l2": "Rota Direta e Segura",
+      "l3": "Aduaneiro Incluso"
+    },
+    "mapTitle": "Conectando Dois Países",
+    "mapDesc": "Nossa rota principal conecta as principais cidades da África do Sul a todas as províncias de Moçambique, garantindo entregas rápidas e seguras.",
+    "labelMozambique": "Moçambique",
+    "labelSouthAfrica": "África do Sul",
+    "labelRoute": "Rota"
+  },
+  "partners": {
+    "title": "PARCEIROS",
+    "subtitle": "Empresas que confiam em nosso trabalho",
+    "ctaText": "Quer se tornar um parceiro? Entre em contato conosco.",
+    "becomePartner": "Seja um Parceiro"
+  },
+  "testimonials": {
+    "eyebrow": "Depoimentos de quem já experimentou nossos serviços",
+    "title": "O QUE NOSSOS CLIENTES DIZEM",
+    "photoLabel": "Recebido / realizado pelo cliente",
+    "t1": {
+      "quote": "Excelente serviço! Minhas compras da África do Sul chegaram em perfeitas condições e no prazo combinado. Recomendo a todos.",
+      "author": "Carlos Manuel",
+      "role": "Empresário"
+    },
+    "t2": {
+      "quote": "Profissionalismo e comprometimento definem a VM Lirandzo Trans. São nosso parceiro logístico há mais de 3 anos.",
+      "author": "Ana Fernandes",
+      "role": "Gerente Comercial"
+    },
+    "t3": {
+      "quote": "Rastreamento em tempo real e equipe sempre disponível. Tranquilidade total para nossa carga.",
+      "author": "Roberto Silva",
+      "role": "Diretor de Operações"
+    },
+    "stat1Value": "98%",
+    "stat1Label": "Clientes Satisfeitos",
+    "stat2Value": "4.9",
+    "stat2Label": "Avaliação Média",
+    "stat3Value": "500+",
+    "stat3Label": "Depoimentos",
+    "stat4Value": "99%",
+    "stat4Label": "Entregas no Prazo"
+  },
+  "faq": {
+    "eyebrow": "Dúvidas frequentes",
+    "title": "Perguntas Frequentes",
+    "desc": "Respostas rápidas às questões mais comuns dos nossos clientes.",
+    "seeAll": "Ver todas as perguntas",
+    "q1": {
+      "question": "Quais tipos de carga a Lirandzo transporta?",
+      "answer": "Transportamos cargas gerais, fraccionadas, contentorizadas e volumes especiais."
+    },
+    "q2": {
+      "question": "Como posso rastrear o meu envio?",
+      "answer": "Aceda à página \"Rastrear Pedido\" e introduza o código de rastreio fornecido na expedição."
+    },
+    "q3": {
+      "question": "Qual é o prazo de entrega?",
+      "answer": "Entregas nacionais demoram entre 1 a 5 dias úteis. Rotas internacionais entre 5 a 15 dias úteis."
+    },
+    "q4": {
+      "question": "Como solicito uma cotação?",
+      "answer": "Preencha o formulário na página \"Solicitar Cotação\". Respondemos em até 24 horas úteis."
+    }
+  },
+  "footer": {
+    "brand": "VM Lirandzo Transportes",
+    "tagline": "Transporte de cargas com precisão e tecnologia.",
+    "socialNetworks": "Redes Sociais",
+    "navigation": "Navegação",
+    "contact": "Contato",
+    "address": "Endereço",
+    "hours": "Horário",
+    "addressValue": "Av. Marginal, 1234<br>Maputo, Moçambique",
+    "hoursValue": "Seg–Sex: 08h00–17h30<br>Sáb: 08h00–12h00",
+    "rateUs": "Avalie-nos",
+    "copyright": "© {{year}} Lirandzo. Todos os direitos reservados."
+  }
+}

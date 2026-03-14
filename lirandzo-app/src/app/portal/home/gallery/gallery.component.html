@@ -1,0 +1,78 @@
+<section class="gallery" id="galeria">
+  <div class="gallery-header">
+    <div class="gallery-intro">
+      <h2 class="gallery-title">{{ 'gallery.title' | transloco }}</h2>
+      <p class="gallery-subtitle" [innerHTML]="'gallery.subtitle' | transloco"></p>
+    </div>
+    <ol class="gallery-events-list">
+      @for (event of events; track event.name; let i = $index) {
+        <li class="gallery-events-list-item">
+          <span class="gallery-events-list-num">{{ getEventNumber(i) }}</span>
+          <span class="gallery-events-list-name">{{ event.name }}</span>
+        </li>
+      }
+    </ol>
+  </div>
+
+  <div class="gallery-grid-wrap">
+    <div class="gallery-grid">
+      @for (event of events; track event.name; let i = $index) {
+        <button
+          type="button"
+          class="gallery-card"
+          (click)="openLightbox(event)"
+          [attr.aria-label]="'Ver fotos do evento ' + event.name"
+        >
+          <span class="gallery-card-num">{{ getEventNumber(i) }}</span>
+          <div
+            class="gallery-card-image"
+            [style.backgroundImage]="'url(' + event.photos[0] + ')'"
+          ></div>
+          <div class="gallery-card-overlay">
+            <span class="gallery-card-name">{{ event.name }}</span>
+            <p class="gallery-card-desc">{{ event.description }}</p>
+            @if (event.photos.length > 1) {
+              <span class="gallery-card-count">{{ event.photos.length }} {{ 'gallery.photos' | transloco }}</span>
+            }
+          </div>
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (lightboxEvent) {
+    <div class="gallery-lightbox-backdrop" (click)="closeLightbox()">
+      <div class="gallery-lightbox" (click)="$event.stopPropagation()">
+        <header class="gallery-lightbox-header">
+          <h3>{{ lightboxEvent.name }}</h3>
+          <button
+            type="button"
+            class="gallery-lightbox-close"
+            (click)="closeLightbox()"
+            [attr.aria-label]="'gallery.close' | transloco"
+          >✕</button>
+        </header>
+        <div class="gallery-lightbox-body">
+          <div
+            class="gallery-lightbox-main-photo"
+            [style.backgroundImage]="'url(' + lightboxEvent.photos[lightboxPhotoIndex] + ')'"
+          ></div>
+          @if (lightboxEvent.photos.length > 1) {
+            <div class="gallery-lightbox-thumbs">
+              @for (photo of lightboxEvent.photos; track photo; let idx = $index) {
+                <button
+                  type="button"
+                  class="gallery-lightbox-thumb"
+                  [class.gallery-lightbox-thumb--active]="idx === lightboxPhotoIndex"
+                  (click)="setActivePhoto(idx)"
+                  [style.backgroundImage]="'url(' + photo + ')'"
+                  [attr.aria-label]="'Foto ' + (idx + 1)"
+                ></button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</section>

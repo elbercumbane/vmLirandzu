@@ -1,0 +1,208 @@
+<main class="services-page">
+  <!-- Hero -->
+  <section class="hero-section">
+    <div class="hero-bg-image"></div>
+    <div class="hero-grid-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-pulse"></span>
+        Lirandzo Transportes
+      </div>
+      <h1 class="hero-title">
+        Soluções Logísticas
+        <span class="gradient-text">Integradas</span>
+        <span class="subtitle">Excelência em Transporte</span>
+      </h1>
+      <p class="hero-description">
+        Mais de 10 anos conectando <span class="highlight">Joanesburgo</span> e <span class="highlight">Maputo</span>
+        com serviços de transporte rodoviário, logística e despacho aduaneiro.
+      </p>
+      <div class="metrics-dashboard">
+        <div class="metric-card" *ngFor="let m of metrics; let i = index" [style.animation-delay]="(i + 1) * 100 + 'ms'">
+          <div class="metric-value">{{ m.value }}</div>
+          <div class="metric-label">{{ m.label }}</div>
+          <div class="metric-trend">{{ m.trend }}</div>
+          <div class="metric-bar">
+            <div class="metric-fill" [style.width.%]="m.fill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-showcase">
+      <img src="/images/hero-truck-1.jpg" alt="Camiões Lirandzo na estrada" loading="lazy">
+      <div class="hero-showcase-overlay">
+        <div class="showcase-stats">
+          <div class="showcase-stat">
+            <span class="showcase-stat-value">545km</span>
+            <span class="showcase-stat-label">Corredor Principal</span>
+          </div>
+          <div class="showcase-stat">
+            <span class="showcase-stat-value">2 Países</span>
+            <span class="showcase-stat-label">ZA ↔ MZ</span>
+          </div>
+          <div class="showcase-stat">
+            <span class="showcase-stat-value">500+</span>
+            <span class="showcase-stat-label">Clientes Atendidos</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Grid -->
+  <section class="services-section">
+    <div class="container">
+      <header class="section-header">
+        <div class="header-line"></div>
+        <span class="section-eyebrow">NOSSOS SERVIÇOS</span>
+        <h2 class="section-title">Soluções Completas em Logística</h2>
+        <p class="section-subtitle">Do transporte ao despacho aduaneiro, tudo num único parceiro</p>
+      </header>
+      <div class="services-grid">
+        @for (svc of services; track svc.id; let i = $index) {
+          <article class="service-card">
+            <img [src]="svc.image" [alt]="svc.title" class="service-image" loading="lazy">
+            <div class="service-content">
+              <div class="service-header">
+                <div class="service-icon">
+                  @switch (svc.icon) {
+                    @case ('truck') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                    }
+                    @case ('procurement') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    }
+                    @case ('tracking') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    }
+                    @case ('logistics') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 16v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="12" height="12" rx="2"/><path d="M12 6h4"/><path d="M12 10h4"/></svg>
+                    }
+                    @case ('warehouse') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21V12h6v9"/></svg>
+                    }
+                    @case ('customs') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></svg>
+                    }
+                  }
+                </div>
+                <div class="service-badge">{{ svc.badge }}</div>
+              </div>
+              <h3 class="service-title">{{ svc.title }}</h3>
+              <p class="service-description">{{ svc.description }}</p>
+              <ul class="service-features">
+                @for (feat of svc.features; track feat) {
+                  <li><span class="feature-bullet">›</span>{{ feat }}</li>
+                }
+              </ul>
+            </div>
+            <div class="service-footer">
+              <span class="service-id">{{ svc.id }}</span>
+              <div class="service-status">
+                <span class="status-dot"></span>
+                DISPONÍVEL
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Corridor -->
+  <section class="corridor-section">
+    <div class="container">
+      <div class="corridor-visual">
+        <img src="/images/hero-truck-2.jpg" alt="Estrada Joanesburgo Maputo" class="corridor-image" loading="lazy">
+        <div class="corridor-content">
+          <div class="map-route">
+            <div class="route-line"></div>
+            <div class="route-node start">
+              <span class="node-label">JNB</span>
+              <span class="node-city">Joanesburgo</span>
+            </div>
+            <div class="route-node mid">
+              <span class="node-label">Ressano Garcia</span>
+              <span class="node-city">Fronteira ZA-MZ</span>
+            </div>
+            <div class="route-node end">
+              <span class="node-label">MPM</span>
+              <span class="node-city">Maputo</span>
+            </div>
+          </div>
+          <div class="map-stats">
+            <div class="map-stat">
+              <span class="stat-label">Distância</span>
+              <span class="stat-value">545 KM</span>
+            </div>
+            <div class="map-stat">
+              <span class="stat-label">Tempo Médio</span>
+              <span class="stat-value">18-24 HORAS</span>
+            </div>
+            <div class="map-stat">
+              <span class="stat-label">Frequência</span>
+              <span class="stat-value">DIÁRIA</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Portfolio Link -->
+  <section class="portfolio-section">
+    <div class="container">
+      <div class="portfolio-card">
+        <div class="portfolio-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        </div>
+        <h2 class="portfolio-title">Conheça Nosso Portfólio</h2>
+        <p class="portfolio-description">
+          Explore nossos case studies, projetos realizados e histórias de sucesso com clientes em Moçambique e África do Sul.
+        </p>
+        <a routerLink="/noticias" class="portfolio-btn">
+          Ver Portfólio Completo
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Marquee -->
+  <section class="tech-marquee">
+    <div class="marquee-track">
+      @for (tag of marqueeTags; track tag) {
+        <span>{{ tag }}</span>
+      }
+      @for (tag of marqueeTags; track tag) {
+        <span>{{ tag }}</span>
+      }
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-container">
+      <div class="cta-card">
+        <div class="cta-inner">
+          <h2 class="cta-title">Pronto para otimizar a sua logística?</h2>
+          <p class="cta-subtitle">Fale connosco e descubra como podemos ajudar o seu negócio a crescer com soluções de transporte fiáveis e eficientes.</p>
+          <div class="cta-actions">
+            <a routerLink="/orcamento" class="btn-primary">Solicitar orçamento</a>
+            <a routerLink="/contato" class="btn-outline">Contactar equipa</a>
+          </div>
+          <div class="cta-stats">
+            <div class="cta-stat">
+              <span class="label">Resposta</span>
+              <span class="value">&lt; 2h</span>
+            </div>
+            <div class="cta-stat">
+              <span class="label">Suporte</span>
+              <span class="value">24/7</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

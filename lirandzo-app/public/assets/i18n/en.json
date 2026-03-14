@@ -1,0 +1,213 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "services": "Services",
+    "portfolio": "Portfolio",
+    "news": "News",
+    "quote": "Request Quote",
+    "tracking": "Track Order",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "clientArea": "Client Area"
+  },
+  "hero": {
+    "slide1": {
+      "title": "Welcome to VM Lirandzo Transport",
+      "subtitle": "Cargo transport from South Africa (Johannesburg) to Mozambique. Your cargo in good hands, with smart logistics and real-time tracking.",
+      "stat1": "+15",
+      "stat1Label": "Years in market",
+      "stat2": "50k+",
+      "stat2Label": "Deliveries/year",
+      "stat3": "24h",
+      "stat3Label": "Tracking"
+    },
+    "slide2": {
+      "title": "Technology at the Service of Your Cargo",
+      "subtitle": "Johannesburg–Maputo route and the whole corridor. Modern fleet, optimised routes and safety at every kilometre.",
+      "stat1": "ZA → MZ",
+      "stat1Label": "Active corridor",
+      "stat2": "100%",
+      "stat2Label": "Tracked cargo",
+      "stat3": "7/7",
+      "stat3Label": "Operation"
+    },
+    "slide3": {
+      "title": "From Warehouse to Your Door",
+      "subtitle": "Transport and procurement South Africa–Mozambique. Partnership that delivers results.",
+      "stat1": "Procurement",
+      "stat1Label": "Purchases & logistics",
+      "stat2": "Door-to-door",
+      "stat2Label": "Door to door",
+      "stat3": "Insured",
+      "stat3Label": "Cargo insured"
+    },
+    "trackOrder": "Track Order",
+    "requestQuote": "Request Quote"
+  },
+  "vmv": {
+    "title": "Corporate Identity",
+    "mission": {
+      "title": "Mission",
+      "text": "Promote and implement logistics development strategies, stimulating competitiveness and excellence in transport and procurement delivery."
+    },
+    "vision": {
+      "title": "Vision",
+      "text": "To be a reference in cargo transport and procurement on the South Africa–Mozambique corridor, with robust and sustainable operations."
+    },
+    "values": {
+      "title": "Values",
+      "item1": "Integrity",
+      "item2": "Transparency",
+      "item3": "Innovation",
+      "item4": "Excellence"
+    }
+  },
+  "services": {
+    "title": "Our Services",
+    "intro": "We transport and manage your cargo on the <strong>Johannesburg–Maputo</strong> corridor, with procurement in South Africa and delivery in Mozambique. Modern fleet, real-time tracking and integrated door-to-door logistics — all with a single partner.",
+    "contact": "Contact",
+    "seeMore": "See more",
+    "learnMore": "Learn more →",
+    "transport": {
+      "title": "Road Transport",
+      "desc": "Cargo transport on the Johannesburg–Maputo corridor and regional routes. Modern fleet and 24h tracking."
+    },
+    "procurement": {
+      "title": "Procurement",
+      "desc": "Purchase and acquisition of goods in South Africa with delivery in Mozambique. Single source, integrated logistics."
+    },
+    "tracking": {
+      "title": "Real-Time Tracking",
+      "desc": "Track your cargo at any time via app or web panel, from warehouse to destination."
+    },
+    "logistics": {
+      "title": "Integrated Logistics",
+      "desc": "Warehousing, picking, despatch and door-to-door delivery. South Africa to Mozambique with a single partner."
+    }
+  },
+  "ceo": {
+    "title": "MESSAGE FROM THE CEO",
+    "quote": "Our mission is to connect people and businesses through excellent logistics solutions. Each delivery represents our commitment to quality and the trust our customers place in us.",
+    "name": "Vasco M. Lirandzo",
+    "position": "Founder and CEO",
+    "stat1": "10+",
+    "stat1Label": "Years of Experience",
+    "stat2": "500+",
+    "stat2Label": "Satisfied Customers",
+    "stat3": "50k+",
+    "stat3Label": "Deliveries Completed"
+  },
+  "gallery": {
+    "title": "Events Gallery",
+    "subtitle": "Moments from our <strong>events and operations</strong> on the Johannesburg–Maputo corridor. Click a photo to see more.",
+    "photos": "photos",
+    "close": "Close"
+  },
+  "corridor": {
+    "eyebrow": "Our fleet in action",
+    "title": "Lirandzo trucks on the roads of Mozambique and South Africa.",
+    "desc": "Specialists in cargo transport from <strong>Johannesburg</strong> (and region) to <strong>Mozambique</strong>. Road transport, procurement and integrated logistics with the same partner.",
+    "routeFrom": "Johannesburg (ZA)",
+    "routeTo": "Maputo / Mozambique"
+  },
+  "coverage": {
+    "subtitle": "We operate throughout Mozambique and South Africa",
+    "title": "Coverage Areas",
+    "mozambique": {
+      "title": "Mozambique",
+      "description": "Complete coverage in all provinces: Maputo, Gaza, Inhambane, Sofala, Manica, Tete, Zambezia, Nampula, Niassa, Cabo Delgado.",
+      "l1": "Maputo, Gaza, Inhambane",
+      "l2": "Sofala, Manica, Tete",
+      "l3": "Zambezia, Nampula, Niassa"
+    },
+    "southAfrica": {
+      "title": "South Africa",
+      "description": "Purchases and collections in Johannesburg, Pretoria, Durban, Cape Town and all major cities.",
+      "l1": "Johannesburg & Pretoria",
+      "l2": "Durban & Cape Town",
+      "l3": "Port Elizabeth"
+    },
+    "international": {
+      "title": "International Route",
+      "description": "Direct and safe route between South Africa and Mozambique, with all necessary documentation.",
+      "l1": "Complete Documentation",
+      "l2": "Direct and Safe Route",
+      "l3": "Customs Included"
+    },
+    "mapTitle": "Connecting Two Countries",
+    "mapDesc": "Our main route connects the major cities of South Africa to all provinces of Mozambique, ensuring fast and secure deliveries.",
+    "labelMozambique": "Mozambique",
+    "labelSouthAfrica": "South Africa",
+    "labelRoute": "Route"
+  },
+  "partners": {
+    "title": "PARTNERS",
+    "subtitle": "Companies that trust our work",
+    "ctaText": "Want to become a partner? Contact us.",
+    "becomePartner": "Become a Partner"
+  },
+  "testimonials": {
+    "eyebrow": "Testimonials from those who have tried our services",
+    "title": "WHAT OUR CUSTOMERS SAY",
+    "photoLabel": "Received / completed by customer",
+    "t1": {
+      "quote": "Excellent service! My purchases from South Africa arrived in perfect condition and on the agreed deadline. I recommend to everyone.",
+      "author": "Carlos Manuel",
+      "role": "Entrepreneur"
+    },
+    "t2": {
+      "quote": "Professionalism and commitment define VM Lirandzo Trans. They have been our logistics partner for over 3 years.",
+      "author": "Ana Fernandes",
+      "role": "Commercial Manager"
+    },
+    "t3": {
+      "quote": "Real-time tracking and team always available. Total peace of mind for our cargo.",
+      "author": "Roberto Silva",
+      "role": "Operations Director"
+    },
+    "stat1Value": "98%",
+    "stat1Label": "Satisfied Customers",
+    "stat2Value": "4.9",
+    "stat2Label": "Average Rating",
+    "stat3Value": "500+",
+    "stat3Label": "Testimonials",
+    "stat4Value": "99%",
+    "stat4Label": "On-Time Deliveries"
+  },
+  "faq": {
+    "eyebrow": "Frequently asked questions",
+    "title": "Frequently Asked Questions",
+    "desc": "Quick answers to our customers' most common questions.",
+    "seeAll": "See all questions",
+    "q1": {
+      "question": "What types of cargo does Lirandzo transport?",
+      "answer": "We transport general, fractional, containerised and special volume cargo."
+    },
+    "q2": {
+      "question": "How can I track my shipment?",
+      "answer": "Go to the \"Track Order\" page and enter the tracking code provided on dispatch."
+    },
+    "q3": {
+      "question": "What is the delivery time?",
+      "answer": "National deliveries take 1 to 5 business days. International routes between 5 to 15 business days."
+    },
+    "q4": {
+      "question": "How do I request a quote?",
+      "answer": "Fill out the form on the \"Request Quote\" page. We respond within 24 business hours."
+    }
+  },
+  "footer": {
+    "brand": "VM Lirandzo Transport",
+    "tagline": "Cargo transport with precision and technology.",
+    "socialNetworks": "Social Networks",
+    "navigation": "Navigation",
+    "contact": "Contact",
+    "address": "Address",
+    "hours": "Hours",
+    "addressValue": "Av. Marginal, 1234<br>Maputo, Mozambique",
+    "hoursValue": "Mon–Fri: 08:00–17:30<br>Sat: 08:00–12:00",
+    "rateUs": "Rate us",
+    "copyright": "© {{year}} Lirandzo. All rights reserved."
+  }
+}

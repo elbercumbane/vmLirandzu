@@ -1,0 +1,34 @@
+<section class="testimonials" id="depoimentos">
+  <div class="testimonials-container">
+    <header class="testimonials-header">
+      <div class="testimonials-header-line"></div>
+      <p class="testimonials-eyebrow">{{ 'testimonials.eyebrow' | transloco }}</p>
+      <h2 class="testimonials-title">{{ 'testimonials.title' | transloco }}</h2>
+    </header>
+    <div class="testimonials-grid">
+      @for (t of testimonials; track t.author) {
+        <article class="testimonial-card">
+          <div class="testimonial-stars" aria-hidden="true">
+            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+          </div>
+          <blockquote class="testimonial-quote">"{{ t.quote }}"</blockquote>
+          <div class="testimonial-author">
+            <img [src]="t.avatar" [alt]="t.author" class="testimonial-avatar" />
+            <div class="testimonial-info">
+              <strong class="testimonial-name">{{ t.author }}</strong>
+              <span class="testimonial-role">{{ t.role }}</span>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+    <div class="testimonials-stats">
+      @for (s of stats; track s.label) {
+        <div class="testimonial-stat">
+          <span class="testimonial-stat-value">{{ s.value }}</span>
+          <span class="testimonial-stat-label">{{ s.label }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,36 @@
+<section class="faq-preview">
+  <div class="faq-preview-container">
+    <div class="faq-preview-header">
+      <p class="faq-preview-eyebrow">{{ 'faq.eyebrow' | transloco }}</p>
+      <h2 class="faq-preview-title">{{ 'faq.title' | transloco }}</h2>
+      <p class="faq-preview-desc">{{ 'faq.desc' | transloco }}</p>
+    </div>
+
+    <div class="faq-preview-list">
+      @for (faq of faqs; track $index) {
+        <div class="faq-preview-item" [class.open]="faq.open">
+          <button class="faq-preview-question" (click)="toggle($index)">
+            <span>{{ faq.question }}</span>
+            <span class="faq-preview-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 9l6 6 6-6"/>
+              </svg>
+            </span>
+          </button>
+          <div class="faq-preview-answer-wrap">
+            <p class="faq-preview-answer">{{ faq.answer }}</p>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="faq-preview-footer">
+      <a routerLink="/faq" class="faq-preview-link">
+        {{ 'faq.seeAll' | transloco }}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>

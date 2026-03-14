@@ -1,0 +1,41 @@
+.billing-shell {
+  min-height: 100vh;
+  background: var(--bg-page);
+  display: flex;
+  flex-direction: row;
+  position: relative;
+}
+
+.billing-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease;
+}
+
+@media (min-width: 1024px) {
+  /* Em desktop: sidebar fixo à esquerda, conteúdo com margem */
+  .billing-body {
+    margin-left: 270px;
+  }
+}
+
+.billing-main {
+  flex: 1;
+  padding: 2rem 2.5rem 3rem;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .billing-main {
+    padding: 1.25rem 1rem 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .billing-main {
+    padding: 1rem 0.75rem 2rem;
+  }
+}
+
