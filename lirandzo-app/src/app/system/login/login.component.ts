@@ -17,6 +17,7 @@ export class LoginComponent {
 
   username = '';
   password = '';
+  showPassword = false;
   loading = false;
   error = '';
 
@@ -30,17 +31,20 @@ export class LoginComponent {
     }
     this.loading = true;
     this.auth.login(u, p).subscribe({
-      next: (user) => {
+      next: () => {
         this.loading = false;
-        if (user) {
-          this.router.navigate(['/billing']);
-        } else {
-          this.error = 'Utilizador ou senha incorrectos.';
-        }
+        this.router.navigate(['/billing']);
       },
-      error: () => {
+      error: (err) => {
         this.loading = false;
-        this.error = 'Erro de ligação. Verifique se o backend está em execução.';
+        const status = err?.status ?? 0;
+        if (status === 401) {
+          this.error = 'Utilizador ou senha incorrectos.';
+        } else if (status === 0 || status === 404 || status === 502 || status === 504) {
+          this.error = 'Backend não acessível. Verifique: 1) PostgreSQL em execução, 2) Base lirandzo_db criada, 3) Backend a correr (mvnw.cmd spring-boot:run na pasta lirandzo-backend).';
+        } else {
+          this.error = 'Erro de ligação. Verifique se o backend está em execução (porta 8080) e se a base de dados está acessível.';
+        }
       }
     });
   }

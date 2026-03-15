@@ -36,6 +36,7 @@ export class HeroComponent implements OnInit, AfterViewInit, OnDestroy {
   slides: Slide[] = [];
 
   ngOnInit(): void {
+    this.updateDateTime();
     const build = () => this.buildSlides();
     this.transloco.load(this.transloco.getActiveLang() || 'pt').subscribe(() => build());
     this.transloco.langChanges$.subscribe(() => build());
@@ -124,7 +125,6 @@ export class HeroComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.updateDateTime();
     this.timeIntervalId = setInterval(() => this.updateDateTime(), 1000);
     this.intervalId = setInterval(() => this.next(), 6000);
 

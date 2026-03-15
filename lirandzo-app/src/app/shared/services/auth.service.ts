@@ -1,6 +1,6 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, catchError, of } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '@environments/environment';
 
 export type UserRole = 'admin' | 'gestor' | 'tecnico' | null;
@@ -61,7 +61,7 @@ export class AuthService {
   canDeactivateAccount(): boolean { return this.role === 'admin' || this.role === 'gestor'; }
   canAccessConfiguracoes(): boolean { return this.role === 'admin' || this.role === 'gestor'; }
 
-  login(username: string, password: string): Observable<UserProfile | null> {
+  login(username: string, password: string): Observable<UserProfile> {
     return this.http.post<AuthApiResponse>(`${this.apiUrl}/auth/login`, { username, password }).pipe(
       map(res => {
         const profile: UserProfile = {
@@ -74,8 +74,7 @@ export class AuthService {
         this.currentUser.set(profile);
         this.loginTime = Date.now();
         return profile;
-      }),
-      catchError(() => of(null))
+      })
     );
   }
 
