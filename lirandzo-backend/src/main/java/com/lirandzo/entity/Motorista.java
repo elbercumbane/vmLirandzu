@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "motoristas")
+@Table(name = "drivers")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,30 +21,30 @@ public class Motorista {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Nome é obrigatório")
-    @Column(nullable = false, length = 200)
+    @NotBlank(message = "Name is required")
+    @Column(name = "name", nullable = false, length = 200)
     private String nome;
 
-    @Column(length = 50)
+    @Column(name = "phone", length = 50)
     private String telefone;
 
-    @Column(name = "numero_carta", length = 50)
+    @Column(name = "license_number", length = 50)
     private String numeroCarta;
 
-    @Column(name = "avaliacao_media", columnDefinition = "DECIMAL(3,2)")
+    @Column(name = "average_rating", columnDefinition = "DECIMAL(3,2)")
     private Double avaliacaoMedia = 0.0;
 
-    @Column(name = "numero_viagens")
+    @Column(name = "trip_count")
     private Integer numeroViagens = 0;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private StatusMotorista status = StatusMotorista.ATIVO;
+    private StatusMotorista status = StatusMotorista.ACTIVE;
 
-    @Column(name = "data_criacao")
+    @Column(name = "created_at")
     private LocalDateTime dataCriacao;
 
-    @Column(name = "data_atualizacao")
+    @Column(name = "updated_at")
     private LocalDateTime dataAtualizacao;
 
     @OneToMany(mappedBy = "motorista", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -62,6 +62,6 @@ public class Motorista {
     }
 
     public enum StatusMotorista {
-        ATIVO, INATIVO
+        ACTIVE, INACTIVE
     }
 }

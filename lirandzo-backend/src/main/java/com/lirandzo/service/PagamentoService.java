@@ -32,7 +32,7 @@ public class PagamentoService {
     public Pagamento save(Pagamento pagamento) {
         Pagamento saved = pagamentoRepository.save(pagamento);
         
-        // Atualizar valores da encomenda
+        // Update order amounts
         if (saved.getEncomenda() != null) {
             Encomenda encomenda = encomendaRepository.findById(saved.getEncomenda().getNumeroEncomenda()).orElse(null);
             if (encomenda != null) {
@@ -56,7 +56,7 @@ public class PagamentoService {
                     pagamento.setObservacoes(pagamentoAtualizado.getObservacoes());
                     Pagamento saved = pagamentoRepository.save(pagamento);
                     
-                    // Atualizar valores da encomenda
+                    // Update order amounts
                     if (saved.getEncomenda() != null) {
                         Encomenda encomenda = encomendaRepository.findById(saved.getEncomenda().getNumeroEncomenda()).orElse(null);
                         if (encomenda != null) {
@@ -78,7 +78,7 @@ public class PagamentoService {
             Encomenda encomenda = pagamentoOpt.get().getEncomenda();
             pagamentoRepository.deleteById(id);
             
-            // Atualizar valores da encomenda
+            // Update order amounts
             if (encomenda != null) {
                 double totalPago = pagamentoRepository.findByEncomendaNumeroEncomenda(encomenda.getNumeroEncomenda()).stream()
                         .mapToDouble(p -> p.getValor() != null ? p.getValor() : 0.0)

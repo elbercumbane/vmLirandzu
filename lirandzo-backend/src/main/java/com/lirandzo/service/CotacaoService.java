@@ -24,10 +24,10 @@ public class CotacaoService {
 
     public Optional<Cotacao> findById(Long id) {
         Optional<Cotacao> cotacao = cotacaoRepository.findById(id);
-        // Garantir que o cliente está carregado
+        // Ensure customer is loaded
         cotacao.ifPresent(c -> {
             if (c.getCliente() != null) {
-                c.getCliente().getId(); // Força carregamento lazy
+                c.getCliente().getId(); // Force lazy loading
             }
         });
         return cotacao;
@@ -35,7 +35,7 @@ public class CotacaoService {
 
     public Cotacao save(Cotacao cotacao) {
         Cotacao saved = cotacaoRepository.save(cotacao);
-        // Gerar referência se não existir
+        // Generate reference if it does not exist
         if (saved.getReferencia() == null || saved.getReferencia().isEmpty()) {
             saved.setReferencia("COT-" + LocalDate.now().getYear() + "-" + String.format("%04d", saved.getId()));
             saved = cotacaoRepository.save(saved);
@@ -61,8 +61,8 @@ public class CotacaoService {
                     cotacao.setObservacoes(cotacaoAtualizada.getObservacoes());
                     cotacao.setCondicoes(cotacaoAtualizada.getCondicoes());
                     cotacao.setOperador(cotacaoAtualizada.getOperador());
-                    if (cotacaoAtualizada.getStatus() == StatusCotacao.RESPONDIDO || 
-                        cotacaoAtualizada.getStatus() == StatusCotacao.COTACAO_GERADA) {
+                    if (cotacaoAtualizada.getStatus() == StatusCotacao.RESPONDED ||
+                        cotacaoAtualizada.getStatus() == StatusCotacao.QUOTATION_GENERATED) {
                         cotacao.setDataResposta(java.time.LocalDateTime.now());
                     }
                     return cotacaoRepository.save(cotacao);

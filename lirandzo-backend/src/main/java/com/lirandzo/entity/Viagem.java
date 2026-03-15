@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "viagens")
+@Table(name = "trips")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,44 +23,44 @@ public class Viagem {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "motorista_id")
+    @JoinColumn(name = "driver_id")
     private Motorista motorista;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "viatura_id")
+    @JoinColumn(name = "vehicle_id")
     private Viatura viatura;
 
-    @NotBlank(message = "Origem é obrigatória")
-    @Column(nullable = false, length = 200)
+    @NotBlank(message = "Origin is required")
+    @Column(name = "origin", nullable = false, length = 200)
     private String origem;
 
-    @NotBlank(message = "Destino é obrigatório")
-    @Column(nullable = false, length = 200)
+    @NotBlank(message = "Destination is required")
+    @Column(name = "destination", nullable = false, length = 200)
     private String destino;
 
-    @Column(name = "data_partida")
+    @Column(name = "departure_date")
     private LocalDate dataPartida;
 
-    @Column(name = "data_chegada_prevista")
+    @Column(name = "expected_arrival_date")
     private LocalDate dataChegadaPrevista;
 
-    @Column(name = "data_chegada_real")
+    @Column(name = "actual_arrival_date")
     private LocalDate dataChegadaReal;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private StatusViagem status = StatusViagem.PLANEADA;
+    private StatusViagem status = StatusViagem.PLANNED;
 
-    @Column(name = "combustivel_consumido", columnDefinition = "DECIMAL(10,2)")
+    @Column(name = "fuel_consumed", columnDefinition = "DECIMAL(10,2)")
     private Double combustivelConsumido;
 
-    @Column(name = "custo_combustivel", columnDefinition = "DECIMAL(15,2)")
+    @Column(name = "fuel_cost", columnDefinition = "DECIMAL(15,2)")
     private Double custoCombustivel;
 
-    @Column(name = "data_criacao")
+    @Column(name = "created_at")
     private LocalDateTime dataCriacao;
 
-    @Column(name = "data_atualizacao")
+    @Column(name = "updated_at")
     private LocalDateTime dataAtualizacao;
 
     @OneToMany(mappedBy = "viagem", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -78,6 +78,6 @@ public class Viagem {
     }
 
     public enum StatusViagem {
-        PLANEADA, EM_CURSO, CONCLUIDA, CANCELADA
+        PLANNED, IN_PROGRESS, COMPLETED, CANCELLED
     }
 }

@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "pagamentos")
+@Table(name = "payments")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,25 +20,25 @@ public class Pagamento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "Encomenda é obrigatória")
+    @NotNull(message = "Order is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "encomenda_id", nullable = false)
+    @JoinColumn(name = "order_id", nullable = false)
     private Encomenda encomenda;
 
-    @NotNull(message = "Valor é obrigatório")
-    @Column(nullable = false, columnDefinition = "DECIMAL(15,2)")
+    @NotNull(message = "Amount is required")
+    @Column(name = "amount", nullable = false, columnDefinition = "DECIMAL(15,2)")
     private Double valor;
 
-    @Column(name = "data_pagamento")
+    @Column(name = "payment_date")
     private LocalDate dataPagamento;
 
-    @Column(length = 100)
+    @Column(name = "reference", length = 100)
     private String referencia;
 
-    @Column(length = 500)
+    @Column(name = "notes", length = 500)
     private String observacoes;
 
-    @Column(name = "data_criacao")
+    @Column(name = "created_at")
     private LocalDateTime dataCriacao;
 
     @PrePersist

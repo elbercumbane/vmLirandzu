@@ -35,10 +35,10 @@ public class EncomendaService {
 
     public Optional<Encomenda> findById(Long id) {
         Optional<Encomenda> encomenda = encomendaRepository.findById(id);
-        // Garantir que o cliente está carregado
+        // Ensure customer is loaded
         encomenda.ifPresent(e -> {
             if (e.getCliente() != null) {
-                e.getCliente().getId(); // Força carregamento lazy
+                e.getCliente().getId(); // Force lazy loading
             }
         });
         return encomenda;

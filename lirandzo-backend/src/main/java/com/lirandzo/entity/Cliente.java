@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "clientes")
+@Table(name = "customers")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,35 +22,35 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Nome é obrigatório")
-    @Column(nullable = false, length = 200)
+    @NotBlank(message = "Name is required")
+    @Column(name = "name", nullable = false, length = 200)
     private String nome;
 
-    @Column(length = 50)
+    @Column(name = "phone", length = 50)
     private String telefone;
 
-    @Column(length = 100)
+    @Column(name = "email", length = 100)
     private String email;
 
-    @Column(length = 200)
+    @Column(name = "address", length = 200)
     private String endereco;
 
-    @Column(length = 50)
+    @Column(name = "tax_id", length = 50)
     private String nif;
 
-    @Column(name = "valor_total_faturado", columnDefinition = "DECIMAL(15,2)")
+    @Column(name = "total_invoiced_amount", columnDefinition = "DECIMAL(15,2)")
     private Double valorTotalFaturado = 0.0;
 
-    @Column(name = "valor_em_divida", columnDefinition = "DECIMAL(15,2)")
+    @Column(name = "debt_amount", columnDefinition = "DECIMAL(15,2)")
     private Double valorEmDivida = 0.0;
 
-    @Column(name = "numero_encomendas")
+    @Column(name = "order_count")
     private Integer numeroEncomendas = 0;
 
-    @Column(name = "data_criacao")
+    @Column(name = "created_at")
     private LocalDateTime dataCriacao;
 
-    @Column(name = "data_atualizacao")
+    @Column(name = "updated_at")
     private LocalDateTime dataAtualizacao;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)

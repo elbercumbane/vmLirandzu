@@ -22,7 +22,7 @@ public class ViagemService {
 
     public Optional<Viagem> findById(Long id) {
         Optional<Viagem> viagem = viagemRepository.findById(id);
-        // Garantir que relacionamentos estão carregados
+        // Ensure relationships are loaded
         viagem.ifPresent(v -> {
             if (v.getMotorista() != null) v.getMotorista().getId();
             if (v.getViatura() != null) v.getViatura().getId();

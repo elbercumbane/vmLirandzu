@@ -39,7 +39,7 @@ public class GuiaRemessaService {
 
     public Optional<GuiaRemessa> findById(Long id) {
         Optional<GuiaRemessa> guia = guiaRemessaRepository.findById(id);
-        // Garantir que relacionamentos estão carregados
+        // Ensure relationships are loaded
         guia.ifPresent(g -> {
             if (g.getMotorista() != null) g.getMotorista().getId();
             if (g.getViatura() != null) g.getViatura().getId();
@@ -55,7 +55,7 @@ public class GuiaRemessaService {
     }
 
     public GuiaRemessa save(GuiaRemessa guiaRemessa) {
-        // Buscar e associar objetos relacionados
+        // Fetch and associate related objects
         if (guiaRemessa.getMotorista() != null && guiaRemessa.getMotorista().getId() != null) {
             motoristaRepository.findById(guiaRemessa.getMotorista().getId())
                 .ifPresent(guiaRemessa::setMotorista);
@@ -71,18 +71,18 @@ public class GuiaRemessaService {
                 .ifPresent(guiaRemessa::setViagem);
         }
         
-        // Processar e associar itens
+        // Process and associate items
         if (guiaRemessa.getItens() != null && !guiaRemessa.getItens().isEmpty()) {
             guiaRemessa.getItens().forEach(item -> {
                 item.setGuiaRemessa(guiaRemessa);
                 
-                // Buscar cliente se fornecido
+                // Fetch customer if provided
                 if (item.getCliente() != null && item.getCliente().getId() != null) {
                     clienteRepository.findById(item.getCliente().getId())
                         .ifPresent(item::setCliente);
                 }
                 
-                // Buscar encomenda se fornecida
+                // Fetch order if provided
                 if (item.getEncomenda() != null && item.getEncomenda().getNumeroEncomenda() != null) {
                     encomendaRepository.findById(item.getEncomenda().getNumeroEncomenda())
                         .ifPresent(item::setEncomenda);
@@ -92,13 +92,13 @@ public class GuiaRemessaService {
         
         GuiaRemessa saved = guiaRemessaRepository.save(guiaRemessa);
         
-        // Gerar referência se não existir
+        // Generate reference if it does not exist
         if (saved.getReferencia() == null || saved.getReferencia().isEmpty()) {
             saved.setReferencia("GR-" + LocalDate.now().getYear() + "-" + String.format("%04d", saved.getId()));
             saved = guiaRemessaRepository.save(saved);
         }
         
-        // Calcular km percorridos
+        // Calculate distance travelled
         if (saved.getKmSaida() != null && saved.getKmChegada() != null) {
             saved.setKmPercorridos(saved.getKmChegada() - saved.getKmSaida());
             saved = guiaRemessaRepository.save(saved);
@@ -110,7 +110,7 @@ public class GuiaRemessaService {
     public Optional<GuiaRemessa> update(Long id, GuiaRemessa guiaAtualizada) {
         return guiaRemessaRepository.findById(id)
                 .map(guia -> {
-                    // Buscar e associar objetos relacionados
+                    // Fetch and associate related objects
                     if (guiaAtualizada.getMotorista() != null && guiaAtualizada.getMotorista().getId() != null) {
                         motoristaRepository.findById(guiaAtualizada.getMotorista().getId())
                             .ifPresent(guia::setMotorista);
@@ -141,20 +141,20 @@ public class GuiaRemessaService {
                     guia.setObservacoes(guiaAtualizada.getObservacoes());
                     guia.setDataGuia(guiaAtualizada.getDataGuia());
                     
-                    // Atualizar itens
+                    // Update items
                     if (guiaAtualizada.getItens() != null) {
                         guia.getItens().clear();
                         guia.getItens().addAll(guiaAtualizada.getItens());
                         guia.getItens().forEach(item -> {
                             item.setGuiaRemessa(guia);
                             
-                            // Buscar cliente se fornecido
+                            // Fetch customer if provided
                             if (item.getCliente() != null && item.getCliente().getId() != null) {
                                 clienteRepository.findById(item.getCliente().getId())
                                     .ifPresent(item::setCliente);
                             }
                             
-                            // Buscar encomenda se fornecida
+                            // Fetch order if provided
                             if (item.getEncomenda() != null && item.getEncomenda().getNumeroEncomenda() != null) {
                                 encomendaRepository.findById(item.getEncomenda().getNumeroEncomenda())
                                     .ifPresent(item::setEncomenda);
@@ -162,7 +162,7 @@ public class GuiaRemessaService {
                         });
                     }
                     
-                    // Calcular km percorridos
+                    // Calculate distance travelled
                     if (guia.getKmSaida() != null && guia.getKmChegada() != null) {
                         guia.setKmPercorridos(guia.getKmChegada() - guia.getKmSaida());
                     }

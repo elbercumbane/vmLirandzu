@@ -17,7 +17,7 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         
-        // Permitir origens do Angular (desenvolvimento e produção)
+        // Allow Angular origins (development and production)
         config.setAllowedOrigins(Arrays.asList(
             "http://localhost:4200",
             "http://localhost:4201"
@@ -26,13 +26,13 @@ public class CorsConfig {
         // Permitir métodos HTTP
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         
-        // Permitir headers
+        // Allow headers
         config.setAllowedHeaders(Arrays.asList("*"));
         
-        // Permitir credenciais
+        // Allow credentials
         config.setAllowCredentials(true);
         
-        // Cache de preflight requests
+        // Cache preflight requests
         config.setMaxAge(3600L);
         
         source.registerCorsConfiguration("/**", config);

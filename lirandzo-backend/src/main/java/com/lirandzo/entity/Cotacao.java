@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "cotacoes")
+@Table(name = "quotations")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,66 +22,66 @@ public class Cotacao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, length = 50)
+    @Column(name = "reference", unique = true, length = 50)
     private String referencia;
 
-    @NotNull(message = "Cliente é obrigatório")
+    @NotNull(message = "Customer is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cliente_id", nullable = false)
+    @JoinColumn(name = "customer_id", nullable = false)
     private Cliente cliente;
 
-    @NotBlank(message = "Origem é obrigatória")
-    @Column(nullable = false, length = 200)
+    @NotBlank(message = "Origin is required")
+    @Column(name = "origin", nullable = false, length = 200)
     private String origem;
 
-    @NotBlank(message = "Destino é obrigatório")
-    @Column(nullable = false, length = 200)
+    @NotBlank(message = "Destination is required")
+    @Column(name = "destination", nullable = false, length = 200)
     private String destino;
 
-    @Column(name = "tipo_veiculo", length = 100)
+    @Column(name = "vehicle_type", length = 100)
     private String tipoVeiculo;
 
-    @Column(name = "descricao_carga", length = 500)
+    @Column(name = "cargo_description", length = 500)
     private String descricaoCarga;
 
-    @Column(name = "valor_total", columnDefinition = "DECIMAL(15,2)")
+    @Column(name = "total_amount", columnDefinition = "DECIMAL(15,2)")
     private Double valorTotal;
 
-    @Column(name = "custo_transporte", columnDefinition = "DECIMAL(15,2)")
+    @Column(name = "transport_cost", columnDefinition = "DECIMAL(15,2)")
     private Double custoTransporte;
 
-    @Column(name = "custo_recolha", columnDefinition = "DECIMAL(15,2)")
+    @Column(name = "collection_cost", columnDefinition = "DECIMAL(15,2)")
     private Double custoRecolha;
 
-    @Column(name = "custo_bill_of_entry", columnDefinition = "DECIMAL(15,2)")
+    @Column(name = "bill_of_entry_cost", columnDefinition = "DECIMAL(15,2)")
     private Double custoBillOfEntry;
 
-    @Column(name = "data_cotacao")
+    @Column(name = "quotation_date")
     private LocalDate dataCotacao;
 
-    @Column(name = "data_validade")
+    @Column(name = "validity_date")
     private LocalDate dataValidade;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private StatusCotacao status = StatusCotacao.PENDENTE;
+    private StatusCotacao status = StatusCotacao.PENDING;
 
-    @Column(length = 500)
+    @Column(name = "notes", length = 500)
     private String observacoes;
 
-    @Column(length = 500)
+    @Column(name = "terms", length = 500)
     private String condicoes;
 
-    @Column(name = "operador", length = 200)
+    @Column(name = "operator", length = 200)
     private String operador;
 
-    @Column(name = "data_resposta")
+    @Column(name = "response_date")
     private LocalDateTime dataResposta;
 
-    @Column(name = "data_criacao")
+    @Column(name = "created_at")
     private LocalDateTime dataCriacao;
 
-    @Column(name = "data_atualizacao")
+    @Column(name = "updated_at")
     private LocalDateTime dataAtualizacao;
 
     @PrePersist
@@ -106,6 +106,6 @@ public class Cotacao {
     }
 
     public enum StatusCotacao {
-        PENDENTE, RESPONDIDO, COTACAO_GERADA, EXPIRADA, CANCELADA
+        PENDING, RESPONDED, QUOTATION_GENERATED, EXPIRED, CANCELLED
     }
 }

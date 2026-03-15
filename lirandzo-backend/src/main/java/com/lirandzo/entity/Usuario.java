@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,42 +24,42 @@ public class Usuario {
     private String username;
 
     @Column(nullable = false, length = 255)
-    private String password; // Será encriptado com BCrypt
+    private String password;  // BCrypt encrypted
 
-    @Column(nullable = false, length = 200)
+    @Column(name = "name", nullable = false, length = 200)
     private String nome;
 
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(length = 50)
+    @Column(name = "phone", length = 50)
     private String telefone;
 
-    @Column(name = "ativo", nullable = false)
+    @Column(name = "active", nullable = false)
     private Boolean ativo = true;
 
-    @Column(name = "conta_nao_expirada", nullable = false)
+    @Column(name = "account_non_expired", nullable = false)
     private Boolean contaNaoExpirada = true;
 
-    @Column(name = "credenciais_nao_expiradas", nullable = false)
+    @Column(name = "credentials_non_expired", nullable = false)
     private Boolean credenciaisNaoExpiradas = true;
 
-    @Column(name = "conta_nao_bloqueada", nullable = false)
+    @Column(name = "account_non_locked", nullable = false)
     private Boolean contaNaoBloqueada = true;
 
-    @Column(name = "ultimo_login")
+    @Column(name = "last_login")
     private LocalDateTime ultimoLogin;
 
-    @Column(name = "data_criacao")
+    @Column(name = "created_at")
     private LocalDateTime dataCriacao;
 
-    @Column(name = "data_atualizacao")
+    @Column(name = "updated_at")
     private LocalDateTime dataAtualizacao;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-        name = "usuarios_roles",
-        joinColumns = @JoinColumn(name = "usuario_id"),
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private List<Role> roles = new ArrayList<>();

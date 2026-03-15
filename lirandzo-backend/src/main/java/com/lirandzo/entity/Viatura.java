@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "viaturas")
+@Table(name = "vehicles")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,35 +21,35 @@ public class Viatura {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Marca é obrigatória")
-    @Column(nullable = false, length = 100)
+    @NotBlank(message = "Brand is required")
+    @Column(name = "brand", nullable = false, length = 100)
     private String marca;
 
-    @NotBlank(message = "Modelo é obrigatório")
-    @Column(nullable = false, length = 100)
+    @NotBlank(message = "Model is required")
+    @Column(name = "model", nullable = false, length = 100)
     private String modelo;
 
-    @NotBlank(message = "Matrícula é obrigatória")
-    @Column(nullable = false, length = 20, unique = true)
+    @NotBlank(message = "License plate is required")
+    @Column(name = "license_plate", nullable = false, length = 20, unique = true)
     private String matricula;
 
-    @Column(length = 50)
+    @Column(name = "type", length = 50)
     private String tipo;
 
-    @Column(columnDefinition = "DECIMAL(10,2)")
+    @Column(name = "capacity", columnDefinition = "DECIMAL(10,2)")
     private Double capacidade;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private StatusViatura status = StatusViatura.ATIVA;
+    private StatusViatura status = StatusViatura.ACTIVE;
 
-    @Column(name = "numero_viagens")
+    @Column(name = "trip_count")
     private Integer numeroViagens = 0;
 
-    @Column(name = "data_criacao")
+    @Column(name = "created_at")
     private LocalDateTime dataCriacao;
 
-    @Column(name = "data_atualizacao")
+    @Column(name = "updated_at")
     private LocalDateTime dataAtualizacao;
 
     @OneToMany(mappedBy = "viatura", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -67,6 +67,6 @@ public class Viatura {
     }
 
     public enum StatusViatura {
-        ATIVA, EM_MANUTENCAO, RESERVADA, INATIVA
+        ACTIVE, UNDER_MAINTENANCE, RESERVED, INACTIVE
     }
 }
