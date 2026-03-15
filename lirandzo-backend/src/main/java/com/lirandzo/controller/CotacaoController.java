@@ -1,5 +1,6 @@
 package com.lirandzo.controller;
 
+import com.lirandzo.dto.CotacaoPortalRequestDTO;
 import com.lirandzo.entity.Cotacao;
 import com.lirandzo.entity.Cotacao.StatusCotacao;
 import com.lirandzo.service.CotacaoService;
@@ -38,6 +39,12 @@ public class CotacaoController {
     public ResponseEntity<Cotacao> createCotacao(@Valid @RequestBody Cotacao cotacao) {
         Cotacao saved = cotacaoService.save(cotacao);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
+
+    @PostMapping("/portal")
+    public ResponseEntity<Void> createCotacaoFromPortal(@RequestBody CotacaoPortalRequestDTO pedido) {
+        cotacaoService.criarPedidoAPartirDoPortal(pedido);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/{id}")

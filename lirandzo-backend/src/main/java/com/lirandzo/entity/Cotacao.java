@@ -75,6 +75,12 @@ public class Cotacao {
     @Column(name = "operator", length = 200)
     private String operador;
 
+    @Column(name = "preferred_delivery_method", length = 50)
+    private String formaEnvioPreferida;
+
+    @Column(name = "actual_delivery_method", length = 50)
+    private String formaEnvioRealizada;
+
     @Column(name = "response_date")
     private LocalDateTime dataResposta;
 

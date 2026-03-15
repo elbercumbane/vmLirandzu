@@ -1,6 +1,6 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, map, of } from 'rxjs';
 import { environment } from '@environments/environment';
 
 export type UserRole = 'admin' | 'gestor' | 'tecnico' | null;
@@ -61,7 +61,23 @@ export class AuthService {
   canDeactivateAccount(): boolean { return this.role === 'admin' || this.role === 'gestor'; }
   canAccessConfiguracoes(): boolean { return this.role === 'admin' || this.role === 'gestor'; }
 
-  login(username: string, password: string): Observable<UserProfile> {
+  login(username: string, password: string): Observable<UserProfile | null> {
+    // MODO DESENVOLVIMENTO: não validar credenciais, entrar sempre no dashboard
+    if (!environment.production) {
+      const nome = username || 'Admin Dev';
+      const profile: UserProfile = {
+        id: 1,
+        nome,
+        email: `${(username || 'admin').toLowerCase()}@dev.local`,
+        role: 'admin',
+        avatar: nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+      };
+      this.currentUser.set(profile);
+      this.loginTime = Date.now();
+      return of(profile);
+    }
+
+    // MODO PRODUÇÃO: usar autenticação real no backend
     return this.http.post<AuthApiResponse>(`${this.apiUrl}/auth/login`, { username, password }).pipe(
       map(res => {
         const profile: UserProfile = {

@@ -191,7 +191,7 @@ CREATE INDEX IF NOT EXISTS idx_payments_payment_date ON payments(payment_date);
 -- QUOTATIONS MANAGEMENT
 -- ============================================================================
 
--- Quotations table
+-- Quotations table (schema em inglês - sua config + colunas novas do Elber)
 CREATE TABLE IF NOT EXISTS quotations (
     id BIGSERIAL PRIMARY KEY,
     reference VARCHAR(50) UNIQUE,
@@ -210,6 +210,8 @@ CREATE TABLE IF NOT EXISTS quotations (
     notes VARCHAR(500),
     terms VARCHAR(500),
     operator VARCHAR(200),
+    preferred_delivery_method VARCHAR(50),
+    actual_delivery_method VARCHAR(50),
     response_date TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

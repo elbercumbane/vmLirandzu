@@ -37,6 +37,7 @@
       <div class="navbar-nav-dropdown-menu">
         <a routerLink="/billing/cotacoes" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Pedidos Recebidos</a>
         <a routerLink="/billing/cotacoes/gerar" routerLinkActive="active" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Gerar Cotação</a>
+        <a routerLink="/billing/cotacoes/enviadas" routerLinkActive="active" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Cotações Enviadas</a>
       </div>
     </div>
     <div class="navbar-nav-dropdown" [class.open]="navDropdownOpen === 'viagens'">
