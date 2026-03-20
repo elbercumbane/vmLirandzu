@@ -97,12 +97,56 @@ public class CotacaoService {
                     cotacao.setCustoTransporte(cotacaoAtualizada.getCustoTransporte());
                     cotacao.setCustoRecolha(cotacaoAtualizada.getCustoRecolha());
                     cotacao.setCustoBillOfEntry(cotacaoAtualizada.getCustoBillOfEntry());
+
+                    // Campos financeiros: só sobrescrever se vierem preenchidos.
+                    // Caso contrário, preservamos o valor existente (evita gravar null vindo do frontend).
+                    if (cotacaoAtualizada.getDiscountAmount() != null) {
+                        cotacao.setDiscountAmount(cotacaoAtualizada.getDiscountAmount());
+                    } else if (cotacao.getDiscountAmount() == null) {
+                        cotacao.setDiscountAmount(0.00);
+                    }
+                    if (cotacaoAtualizada.getVatAmount() != null) {
+                        cotacao.setVatAmount(cotacaoAtualizada.getVatAmount());
+                    } else if (cotacao.getVatAmount() == null) {
+                        cotacao.setVatAmount(0.00);
+                    }
+                    if (cotacaoAtualizada.getVatRate() != null) {
+                        cotacao.setVatRate(cotacaoAtualizada.getVatRate());
+                    } else if (cotacao.getVatRate() == null) {
+                        cotacao.setVatRate(0.00);
+                    }
+                    if (cotacaoAtualizada.getVatReason() != null) {
+                        cotacao.setVatReason(cotacaoAtualizada.getVatReason());
+                    } else if (cotacao.getVatReason() == null || cotacao.getVatReason().isBlank()) {
+                        cotacao.setVatReason("ISENTO");
+                    }
+
+                    // Regras financeiras automáticas:
+                    // - Quando o tipo de serviço é "COMPRA_TRANSPORTE", aplica IVA de 16% (se não houver desconto, desconto=0).
+                    // - Caso contrário, IVA fica ISENTO.
+                    double desconto = cotacao.getDiscountAmount() != null ? cotacao.getDiscountAmount() : 0.0;
+                    double base = cotacao.getValorTotal() != null ? cotacao.getValorTotal() : 0.0;
+                    double baseAposDesconto = base - desconto;
+                    if (baseAposDesconto < 0) baseAposDesconto = 0.0;
+
+                    boolean temIva = cotacao.getTipoServico() != null
+                            && "COMPRA_TRANSPORTE".equalsIgnoreCase(cotacao.getTipoServico());
+
+                    if (temIva) {
+                        cotacao.setVatRate(16.0);
+                        cotacao.setVatReason("IVA 16%");
+                        cotacao.setVatAmount(baseAposDesconto * 0.16);
+                    } else {
+                        cotacao.setVatRate(0.0);
+                        cotacao.setVatAmount(0.0);
+                        cotacao.setVatReason("ISENTO");
+                    }
                     // dataCotacao e validade devem ser imutáveis:
                     //  - vêm do portal (quando fontePedido=PORTAL)
                     //  - ou correspondem à data "manual" de criação
-                    // Mantemos o valor existente e recalculamos apenas a validade = dataCotacao + 3 dias.
+                    // Mantemos o valor existente e recalculamos apenas a validade = dataCotacao + 7 dias.
                     if (cotacao.getDataCotacao() != null) {
-                        cotacao.setDataValidade(cotacao.getDataCotacao().plusDays(3));
+                        cotacao.setDataValidade(cotacao.getDataCotacao().plusDays(7));
                     }
                     cotacao.setStatus(cotacaoAtualizada.getStatus());
                     cotacao.setObservacoes(cotacaoAtualizada.getObservacoes());

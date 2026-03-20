@@ -69,6 +69,18 @@ public class Cotacao {
     @Column(name = "bill_of_entry_cost", columnDefinition = "DECIMAL(15,2)")
     private Double custoBillOfEntry;
 
+    @Column(name = "discount_amount", columnDefinition = "DECIMAL(15,2)")
+    private Double discountAmount;
+
+    @Column(name = "vat_amount", columnDefinition = "DECIMAL(15,2)")
+    private Double vatAmount;
+
+    @Column(name = "vat_rate", columnDefinition = "DECIMAL(5,2)")
+    private Double vatRate;
+
+    @Column(name = "vat_reason", length = 200)
+    private String vatReason;
+
     @Column(name = "quotation_date")
     private LocalDate dataCotacao;
 
@@ -117,8 +129,14 @@ public class Cotacao {
             dataCotacao = LocalDate.now();
         }
 
-        // Validade sempre = dataCotacao + 3 dias (mesmo que o frontend não envie).
-        dataValidade = dataCotacao.plusDays(3);
+        // Validade sempre = dataCotacao + 7 dias (mesmo que o frontend não envie).
+        dataValidade = dataCotacao.plusDays(7);
+
+        // Regras padrão financeiras (para o cenário atual de isenção)
+        if (discountAmount == null) discountAmount = 0.00;
+        if (vatAmount == null) vatAmount = 0.00;
+        if (vatRate == null) vatRate = 0.00;
+        if (vatReason == null || vatReason.isBlank()) vatReason = "ISENTO";
     }
 
     @PostPersist

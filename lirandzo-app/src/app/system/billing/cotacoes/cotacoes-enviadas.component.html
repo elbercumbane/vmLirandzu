@@ -46,8 +46,9 @@
     <input type="text" class="search-input" [(ngModel)]="filtro" placeholder="Pesquisar por cliente, referência, destino, forma de envio...">
     <div class="filter-chips">
       <button class="filter-chip" [class.active]="filtroEstado === 'TODOS'" (click)="filtroEstado = 'TODOS'">Todos</button>
-      <button class="filter-chip" [class.active]="filtroEstado === 'COTAÇÃO GERADA'" (click)="filtroEstado = 'COTAÇÃO GERADA'">Cotação Gerada</button>
+        <button class="filter-chip" [class.active]="filtroEstado === 'COTAÇÃO GERADA'" (click)="filtroEstado = 'COTAÇÃO GERADA'">Pendente de Confirmação</button>
       <button class="filter-chip" [class.active]="filtroEstado === 'RESPONDIDO'" (click)="filtroEstado = 'RESPONDIDO'">Enviadas</button>
+        <button class="filter-chip" [class.active]="filtroEstado === 'CANCELADA'" (click)="filtroEstado = 'CANCELADA'">Canceladas</button>
     </div>
   </div>
 
@@ -79,7 +80,7 @@
         </thead>
         <tbody>
           @for (c of cotacoesFiltradas; track c.id) {
-          <tr>
+          <tr [attr.data-cotacao-id]="c.id" [class.cotacao-highlight]="c.id === highlightId">
             <td style="font-weight: 600; color: var(--accent)">{{ c.ref }}</td>
             <td>
               <div style="font-weight: 600; color: var(--text-primary)">{{ c.cliente }}</div>
@@ -106,12 +107,14 @@
                 <button type="button" class="btn-secondary btn-sm" (click)="baixarOuVerPdf(c)">
                   PDF
                 </button>
-                <button type="button" class="btn-primary btn-sm" (click)="confirmarEnvio(c)">
-                  Confirmar envio
-                </button>
-                <button type="button" class="btn-danger btn-sm" (click)="cancelarCotacao(c)">
-                  Cancelar
-                </button>
+                @if (c.estado === 'COTAÇÃO GERADA') {
+                  <button type="button" class="btn-primary btn-sm" (click)="confirmarEnvio(c)">
+                    Confirmar envio
+                  </button>
+                  <button type="button" class="btn-danger btn-sm" (click)="cancelarCotacao(c)">
+                    Cancelar
+                  </button>
+                }
               </div>
             </td>
           </tr>

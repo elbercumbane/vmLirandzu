@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
 import { CotacaoService, CotacaoResponse } from '../../../services/cotacao.service';
@@ -39,6 +39,8 @@ export class CotacoesEnviadasComponent implements OnInit {
   loading = true;
   error: string | null = null;
 
+  highlightId: number | null = null;
+
   showNotification = false;
   notificationMessage = '';
   notificationType: 'success' | 'error' = 'success';
@@ -48,11 +50,20 @@ export class CotacoesEnviadasComponent implements OnInit {
 
   constructor(
     private cotacaoService: CotacaoService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
-    this.carregarCotacoes();
+    this.route.queryParams.subscribe(params => {
+      const raw = params['highlightId'];
+      this.highlightId = raw ? Number(raw) : null;
+      if (this.highlightId) {
+        // Forçar o filtro para mostrar apenas as cotações pendentes de confirmação
+        this.filtroEstado = 'COTAÇÃO GERADA';
+      }
+      this.carregarCotacoes();
+    });
   }
 
   carregarCotacoes() {
@@ -71,12 +82,17 @@ export class CotacoesEnviadasComponent implements OnInit {
             statusUpper === 'COTACAO_GERADA' ||
             statusUpper === 'COTACAO GERADA' ||
             statusUpper === 'RESPONDED' ||
-            statusUpper === 'RESPONDIDO'
+            statusUpper === 'RESPONDIDO' ||
+            statusUpper === 'CANCELLED' ||
+            statusUpper === 'CANCELADA'
           );
         });
         console.log('Cotações enviadas filtradas:', enviadas);
         this.cotacoes = enviadas.map(c => this.mapearCotacao(c));
         this.loading = false;
+
+        // Depois de renderizar a tabela, destaca e faz scroll.
+        setTimeout(() => this.destaquearLinha(), 50);
       },
       error: (error: unknown) => {
         console.error('Erro ao carregar cotações:', error);
@@ -87,22 +103,30 @@ export class CotacoesEnviadasComponent implements OnInit {
     });
   }
 
+  private destaquearLinha(): void {
+    if (!this.highlightId) return;
+    const row = document.querySelector(`[data-cotacao-id="${this.highlightId}"]`) as HTMLElement | null;
+    if (!row) return;
+    row.classList.add('cotacao-highlight');
+    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
   private mapearCotacao(c: CotacaoResponse): CotacaoEnviadaDisplay {
     const clienteNome = c.cliente?.nome || 'Cliente não especificado';
     const telefone = c.cliente?.telefone || '';
     const email = c.cliente?.email || '';
     const contacto = telefone || email || '';
 
-    const dataCotacaoObj = c.dataCotacao ? new Date(c.dataCotacao) : null;
-    const dataEntrada = dataCotacaoObj
-      ? dataCotacaoObj.toLocaleDateString('pt-MZ', {
+    const dataCriacaoObj = c.dataCriacao ? new Date(c.dataCriacao) : null;
+    const dataEntrada = dataCriacaoObj
+      ? dataCriacaoObj.toLocaleDateString('pt-MZ', {
           day: '2-digit',
           month: '2-digit',
           year: 'numeric'
         })
       : '';
-    const horaEntrada = dataCotacaoObj
-      ? dataCotacaoObj.toLocaleTimeString('pt-MZ', {
+    const horaEntrada = dataCriacaoObj
+      ? dataCriacaoObj.toLocaleTimeString('pt-MZ', {
           hour: '2-digit',
           minute: '2-digit'
         })
@@ -120,20 +144,23 @@ export class CotacoesEnviadasComponent implements OnInit {
 
     const statusUpper = (c.status || '').toUpperCase();
     let tempoResposta = '—';
-    if (c.dataCotacao) {
+    if (c.dataCriacao && c.dataResposta) {
       const isRespondido = statusUpper === 'RESPONDED' || statusUpper === 'RESPONDIDO';
-      // Para pedidos do portal, `dataCotacao` corresponde à data de registo do pedido.
-      const inicioMs = new Date(c.dataCotacao).getTime();
-      const fimMs = isRespondido && c.dataResposta ? new Date(c.dataResposta).getTime() : Date.now();
-      const diffMs = fimMs - inicioMs;
-      tempoResposta = diffMs >= 0 ? this.formatarDuracao(diffMs) : '—';
+      if (isRespondido) {
+        const inicioMs = new Date(c.dataCriacao).getTime();
+        const fimMs = new Date(c.dataResposta).getTime();
+        const diffMs = fimMs - inicioMs;
+        tempoResposta = diffMs >= 0 ? this.formatarDuracao(diffMs) : '—';
+      }
     }
     const statusMap: { [key: string]: string } = {
       'RESPONDED': 'RESPONDIDO',
       'RESPONDIDO': 'RESPONDIDO',
       'QUOTATION_GENERATED': 'COTAÇÃO GERADA',
       'COTACAO_GERADA': 'COTAÇÃO GERADA',
-      'COTACAO GERADA': 'COTAÇÃO GERADA'
+      'COTACAO GERADA': 'COTAÇÃO GERADA',
+      'CANCELLED': 'CANCELADA',
+      'CANCELADA': 'CANCELADA'
     };
     const estado = statusMap[statusUpper] || 'RESPONDIDO';
 
@@ -229,6 +256,8 @@ export class CotacoesEnviadasComponent implements OnInit {
   getBadgeClass(estado: string): string {
     switch (estado) {
       case 'COTAÇÃO GERADA': return 'badge badge-success';
+      case 'RESPONDIDO': return 'badge badge-info';
+      case 'CANCELADA': return 'badge badge-danger';
       default: return 'badge badge-success';
     }
   }
@@ -276,6 +305,7 @@ export class CotacoesEnviadasComponent implements OnInit {
 
         this.cotacaoService.atualizarCotacao(c.id, payload).subscribe({
           next: () => {
+            this.filtroEstado = 'TODOS';
             this.carregarCotacoes();
             this.mostrarNotificacao('Cotação enviada e confirmada com sucesso!', 'success');
           },
@@ -327,6 +357,7 @@ export class CotacoesEnviadasComponent implements OnInit {
 
         this.cotacaoService.atualizarCotacao(c.id, payload).subscribe({
           next: () => {
+            this.filtroEstado = 'TODOS';
             this.carregarCotacoes();
             this.mostrarNotificacao('Cotação cancelada com sucesso!', 'success');
           },

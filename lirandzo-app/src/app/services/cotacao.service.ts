@@ -8,11 +8,16 @@ export interface CotacaoRequest {
   origem: string;
   destino: string;
   tipoVeiculo?: string;
+  tipoServico?: string;
   descricaoCarga?: string;
   valorTotal?: number;
   custoTransporte?: number;
   custoRecolha?: number;
   custoBillOfEntry?: number;
+  discountAmount?: number;
+  vatAmount?: number;
+  vatRate?: number;
+  vatReason?: string;
   dataCotacao?: string;
   dataValidade?: string;
   status?: string;
@@ -36,6 +41,7 @@ export interface CotacaoResponse {
   custoRecolha?: number;
   custoBillOfEntry?: number;
   dataCotacao: string;
+  dataCriacao?: string;
   dataValidade?: string;
   status: string;
   observacoes?: string;
@@ -45,6 +51,11 @@ export interface CotacaoResponse {
   dataResposta?: string;
   formaEnvioPreferida?: string;
   formaEnvioRealizada?: string;
+  tipoServico?: string;
+  discountAmount?: number;
+  vatAmount?: number;
+  vatRate?: number;
+  vatReason?: string;
 }
 
 export interface CotacaoPortalRequest {

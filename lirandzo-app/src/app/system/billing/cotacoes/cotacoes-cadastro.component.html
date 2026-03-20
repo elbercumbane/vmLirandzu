@@ -120,11 +120,61 @@
     </div>
   </div>
 
+  <h3 class="form-section-title">Desconto e IVA</h3>
+  <div class="form-grid">
+    <div class="form-group">
+      <label class="form-label">Desconto (MZN)</label>
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="cotacao.discountAmount"
+        (ngModelChange)="recalcularCamposFinanceiros()"
+        placeholder="0.00"
+        step="0.01"
+      >
+    </div>
+    <div class="form-group">
+      <label class="form-label">IVA</label>
+      <div class="iva-toggle">
+        <button
+          type="button"
+          class="iva-toggle-btn"
+          [class.active]="ivaAtivoPreview"
+          (click)="setIvaAtivo(true)"
+        >
+          Sim
+        </button>
+        <button
+          type="button"
+          class="iva-toggle-btn"
+          [class.active]="!ivaAtivoPreview"
+          (click)="setIvaAtivo(false)"
+        >
+          Não
+        </button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">IVA (%)</label>
+      <input type="number" class="form-control" [value]="vatRatePreview" readonly>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Valor IVA (MZN)</label>
+      <input type="number" class="form-control" [value]="vatAmountPreview" readonly>
+    </div>
+    <div class="form-group full-width">
+      <label class="form-label">Motivo IVA</label>
+      <input type="text" class="form-control" [value]="vatReasonPreview" readonly>
+    </div>
+  </div>
+
   <!-- Totais -->
   <div class="quote-totals">
     <div class="quote-total-row"><span>Subtotal Itens</span><span>{{ subtotalItens | number:'1.2-2' }} MZN</span></div>
     <div class="quote-total-row"><span>Recolha</span><span>{{ (cotacao.custoRecolha || 0) | number:'1.2-2' }} MZN</span></div>
-    <div class="quote-total-row quote-total-final"><span>TOTAL</span><span>{{ totalGeral | number:'1.2-2' }} MZN</span></div>
+    <div class="quote-total-row"><span>Desconto</span><span>{{ (cotacao.discountAmount || 0) | number:'1.2-2' }} MZN</span></div>
+    <div class="quote-total-row"><span>IVA</span><span>{{ vatAmountPreview | number:'1.2-2' }} MZN</span></div>
+    <div class="quote-total-row quote-total-final"><span>TOTAL</span><span>{{ totalFinalPreview | number:'1.2-2' }} MZN</span></div>
   </div>
 
   @if (!modoPdfOnly) {
@@ -157,7 +207,27 @@
   <div class="preview-modal" (click)="$event.stopPropagation()">
     <div class="preview-modal-header">
       <h3>
-        {{ modoConfirmacaoGeracao ? 'Confirmar dados da cotação e gerar PDF' : 'Preview da Cotação' }}
+        @if (modoConfirmacaoGeracao) {
+          <span class="preview-confirm-title">
+            <svg
+              class="preview-confirm-icon"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="preview-confirm-text">Confirmar cotação</span>
+          </span>
+        } @else {
+          Preview da Cotação
+        }
       </h3>
       <button type="button" class="preview-modal-close" (click)="fecharPreview()" aria-label="Fechar">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -171,8 +241,9 @@
         <div class="qpdf-quotation-container">
           <div class="qpdf-header">
             <div class="qpdf-company-info">
-              <div class="qpdf-company-name">VM - LIRANDZO TRANSPORTES</div>
+              <div class="qpdf-company-name">VM TRANSPORTES</div>
               <div class="qpdf-company-details">
+                Lirandzo — Transporte de Cargas<br>
                 Boane, Djuba, Celula "D" Q.1, Casa nº07, Matola<br>
                 <strong>NUIT:</strong> 400872473<br>
                 <strong>Cell:</strong> +258 84 841 0008 / 84 831 0348<br>
@@ -180,52 +251,23 @@
               </div>
             </div>
 
-            <div class="qpdf-quotation-badge">
-              <div class="qpdf-quotation-label">Quotation</div>
-              <div class="qpdf-quotation-number">{{ getQuotationDocumentName() }}</div>
-              <div class="qpdf-quotation-date">{{ formatarData(cotacao.data) }}</div>
-            </div>
-          </div>
-
-          <div class="qpdf-client-section">
-            <div class="qpdf-client-info">
-              <div class="qpdf-section-label">Client</div>
-              <div class="qpdf-client-name">{{ cotacao.clienteNome || 'N/A' }}</div>
-              <div class="qpdf-client-details">
-                <div>{{ cotacao.origem || '—' }} → {{ cotacao.destino || '—' }}</div>
-                <div><strong>Phone:</strong> {{ cotacao.clienteTelefone || '—' }}</div>
-                <div><strong>Email:</strong> {{ cotacao.clienteEmail || '—' }}</div>
+            <div class="qpdf-top-right">
+              <div class="qpdf-quotation-ref-line">
+                <span class="qpdf-quotation-ref-label">Quotation</span>
+                <span class="qpdf-quotation-ref-number">{{ cotacao.referencia || 'N/A' }}</span>
               </div>
-            </div>
+              <div class="qpdf-quotation-date-line">Data: {{ formatarData(cotacao.data) }}</div>
 
-            <div class="qpdf-quotation-meta">
-              <div class="qpdf-section-label">Quotation details</div>
-              <div class="qpdf-meta-grid">
-                <div class="qpdf-meta-item">
-                  <div class="qpdf-meta-label">Validity</div>
-                  <div class="qpdf-meta-value">{{ formatarData(cotacao.validade) }}</div>
-                </div>
-                <div class="qpdf-meta-item">
-                  <div class="qpdf-meta-label">Conditions</div>
-                  <div class="qpdf-meta-value">Pronto Pagamento</div>
-                </div>
-                <div class="qpdf-meta-item">
-                  <div class="qpdf-meta-label">Currency</div>
-                  <div class="qpdf-meta-value">MZN (MT)</div>
-                </div>
-                <div class="qpdf-meta-item">
-                  <div class="qpdf-meta-label">Delivery</div>
-                  <div class="qpdf-meta-value">As agreed</div>
+              <div class="qpdf-client-info">
+                <div class="qpdf-section-label">Client</div>
+                <div class="qpdf-client-name">Exmo. Sr. {{ cotacao.clienteNome || 'N/A' }}</div>
+                <div class="qpdf-client-details">
+                  <div>{{ cotacao.origem || '—' }} → {{ cotacao.destino || '—' }}</div>
+                  <div><strong>Phone:</strong> {{ cotacao.clienteTelefone || '—' }}</div>
+                  <div><strong>Email:</strong> {{ cotacao.clienteEmail || '—' }}</div>
                 </div>
               </div>
             </div>
-          </div>
-
-          <div class="qpdf-validity-notice">
-            <span class="qpdf-validity-icon">⏱️</span>
-            <span class="qpdf-validity-text">
-              <strong>Note:</strong> This quotation is valid until the validity date shown above.
-            </span>
           </div>
 
           <div class="qpdf-items-section">
@@ -261,49 +303,59 @@
             </table>
           </div>
 
-          <div class="qpdf-summary-section">
-            <div class="qpdf-summary-box">
-              <div class="qpdf-summary-row">
-                <span>Subtotal</span>
-                <span>{{ subtotalItens | number:'1.2-2' }} MT</span>
-              </div>
-              <div class="qpdf-summary-row">
-                <span>Recolha</span>
-                <span>{{ (cotacao.custoRecolha || 0) | number:'1.2-2' }} MT</span>
-              </div>
-              <div class="qpdf-summary-row qpdf-summary-total">
-                <span>Total</span>
-                <span>{{ totalGeral | number:'1.2-2' }} MT</span>
-              </div>
+          <div class="qpdf-valor-sem-iva">
+            <div class="qpdf-valor-sem-iva-title">Valor sem iva</div>
+
+            <div class="qpdf-valor-sem-iva-row">
+              <span>Subtotal (Itens + Recolha)</span>
+              <span>{{ totalGeral | number:'1.2-2' }} MT</span>
+            </div>
+
+            <div class="qpdf-valor-sem-iva-row">
+              <span>Desconto</span>
+              <span>{{ (cotacao.discountAmount || 0) | number:'1.2-2' }} MT</span>
+            </div>
+
+            <div class="qpdf-valor-sem-iva-row qpdf-valor-sem-iva-total">
+              <span>Valor total sem iva</span>
+              <span>{{ baseAposDescontoPreview | number:'1.2-2' }} MT</span>
             </div>
           </div>
 
-          <div class="qpdf-payment-section">
-            <div class="qpdf-payment-title">Accepted payment methods</div>
-            <div class="qpdf-payment-methods">
-              <span class="qpdf-payment-method">Cheque</span>
-              <span class="qpdf-payment-method">Bank deposit</span>
-              <span class="qpdf-payment-method">Bank transfer</span>
-            </div>
+          <div class="qpdf-tax-summary">
+            <div class="qpdf-tax-title">VAT Summary</div>
+            <table class="qpdf-tax-table">
+              <thead>
+                <tr>
+                  <th>Tax</th>
+                  <th>Base</th>
+                  <th>Value</th>
+                  <th>Exemption reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>VAT</td>
+                  <td>{{ ((totalGeral || 0) - (cotacao.discountAmount || 0)) | number:'1.2-2' }} MT</td>
+                  <td>{{ (vatAmountPreview || 0) | number:'1.2-2' }} MT</td>
+                  <td>{{ vatReasonPreview || 'ISENTO' }}</td>
+                </tr>
+              </tbody>
+            </table>
 
-            <div class="qpdf-bank-details">
-              <div class="qpdf-bank-item">
-                <div class="qpdf-bank-label">Bank</div>
-                <div class="qpdf-bank-value">BCI</div>
-              </div>
-              <div class="qpdf-bank-item">
-                <div class="qpdf-bank-label">Account</div>
-                <div class="qpdf-bank-value">19219609210001</div>
-              </div>
-              <div class="qpdf-bank-item">
-                <div class="qpdf-bank-label">NIB</div>
-                <div class="qpdf-bank-value">000800009219609210195</div>
-              </div>
+            <div class="qpdf-tax-lines">
+              <div class="qpdf-tax-line"><span>Discounts</span><span>{{ (cotacao.discountAmount || 0) | number:'1.2-2' }} MT</span></div>
+              <div class="qpdf-tax-line"><span>Total VAT</span><span>{{ (vatAmountPreview || 0) | number:'1.2-2' }} MT</span></div>
+              <div class="qpdf-tax-line qpdf-tax-grand"><span>Total (MT)</span><span>{{ ((totalGeral || 0) - (cotacao.discountAmount || 0) + (vatAmountPreview || 0)) | number:'1.2-2' }} MT</span></div>
             </div>
+          </div>
+
+          <div class="qpdf-validity-section">
+            <strong>Note:</strong> This quotation is valid for 7 days from the issue date.
           </div>
 
           <div class="qpdf-footer">
-            Processed by computer • VM-Lirandzo Transportes • Valid for 3 days
+            Processed by computer • VM-Lirandzo Transportes
           </div>
         </div>
       </div>
@@ -324,14 +376,4 @@
   </div>
 }
 
-@if (completionOpen) {
-  <div class="completion-overlay" role="dialog" aria-modal="true">
-    <div class="completion-modal" role="document">
-      <h3 class="completion-title">{{ completionMessage }}</h3>
-      <p class="completion-subtitle">Clique em concluir para ir para “Cotações Enviadas”.</p>
-      <div class="completion-actions">
-        <button type="button" class="btn-primary" (click)="concludeCompletion()">Concluir</button>
-      </div>
-    </div>
-  </div>
-}
+<!-- completionOpen removed: we rely on toast feedback -->

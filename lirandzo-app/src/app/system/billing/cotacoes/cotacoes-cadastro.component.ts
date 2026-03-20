@@ -26,7 +26,7 @@ export class CotacoesCadastroComponent implements OnInit {
 
   private readonly STATUS_PENDENTE_BACKEND = 'PENDING';
   private readonly STATUS_COTACAO_GERADA_BACKEND = 'QUOTATION_GENERATED';
-  private readonly VALIDIDADE_DIAS = 3;
+  private readonly VALIDIDADE_DIAS = 7;
 
   cotacao = {
     referencia: '',
@@ -39,9 +39,14 @@ export class CotacoesCadastroComponent implements OnInit {
     origem: '',
     destino: '',
     tipoVeiculo: '',
+    tipoServico: 'TRANSPORTE',
     custoTransporte: null as number | null,
     custoRecolha: null as number | null,
     custoBillOfEntry: null as number | null,
+    discountAmount: 0,
+    vatAmount: 0,
+    vatRate: 0,
+    vatReason: 'ISENTO',
     // Nesta tela, "observacoes" será usado como "Origem" automática (PORTAL / MANUAL)
     observacoes: 'MANUAL',
     formaEnvioPreferida: 'whatsapp' as string
@@ -63,8 +68,6 @@ export class CotacoesCadastroComponent implements OnInit {
   showPreview: boolean = false;
   modoPdfOnly: boolean = false;
   modoConfirmacaoGeracao: boolean = false;
-  completionOpen: boolean = false;
-  completionMessage: string = '';
 
   ultimaCotacaoId: number | null = null;
   private ultimaCotacaoRef: string = '';
@@ -117,11 +120,24 @@ export class CotacoesCadastroComponent implements OnInit {
         this.cotacao.origem = cotacao.origem || '';
         this.cotacao.destino = cotacao.destino || '';
 
+        // Tipo de serviço define se existe IVA (ex: COMPRA_TRANSPORTE => IVA 16%)
+        this.cotacao.tipoServico = cotacao.tipoServico || 'TRANSPORTE';
+
         // Data da cotação vem do portal (não deve ser alterada pelo utilizador)
         if (cotacao.dataCotacao) {
           this.cotacao.data = this.normalizarISODate(cotacao.dataCotacao);
-          this.cotacao.validade = this.calcularValidadeISO(this.cotacao.data);
+          // Preferir validade vinda do backend (alinhado à regra atual)
+          this.cotacao.validade = cotacao.dataValidade ? this.normalizarISODate(cotacao.dataValidade) : this.calcularValidadeISO(this.cotacao.data);
         }
+
+        // Valores financeiros (defaults do backend)
+        this.cotacao.discountAmount = cotacao.discountAmount ?? 0;
+        this.cotacao.vatAmount = cotacao.vatAmount ?? 0;
+        this.cotacao.vatRate = cotacao.vatRate ?? 0;
+        this.cotacao.vatReason = cotacao.vatReason || 'ISENTO';
+
+        // Garantir coerência no preview quando o operador alterar desconto.
+        this.recalcularCamposFinanceiros();
         
         // Preencher tipo de veículo se existir
         if (cotacao.tipoVeiculo) {
@@ -154,8 +170,6 @@ export class CotacoesCadastroComponent implements OnInit {
         this.cotacao.referencia = cotacao.referencia || '';
         this.ultimaCotacaoRef = cotacao.referencia || '';
         
-        this.mostrarNotificacao('Dados do pedido carregados automaticamente', 'success');
-
         // Se veio pelo botão "PDF" da lista, gerar automaticamente e voltar para "enviadas"
         if (this.modoPdfOnly) {
           setTimeout(() => {
@@ -287,9 +301,11 @@ export class CotacoesCadastroComponent implements OnInit {
         origem: this.cotacao.origem,
         destino: this.cotacao.destino,
         tipoVeiculo: this.cotacao.tipoVeiculo || undefined,
+        tipoServico: this.cotacao.tipoServico || undefined,
         descricaoCarga: descricaoCarga || undefined,
         valorTotal: this.totalGeral > 0 ? this.totalGeral : undefined,
         custoRecolha: this.cotacao.custoRecolha || undefined,
+        discountAmount: this.cotacao.discountAmount ?? undefined,
         dataCotacao: this.cotacao.data || new Date().toISOString().split('T')[0],
         dataValidade: this.cotacao.validade || undefined,
         status: this.STATUS_PENDENTE_BACKEND,
@@ -304,6 +320,7 @@ export class CotacoesCadastroComponent implements OnInit {
         this.ultimaCotacaoRef = res.referencia || '';
 
         // Abrir popup de confirmação com preview da cotação.
+        this.recalcularCamposFinanceiros();
         this.showPreview = true;
       };
 
@@ -368,9 +385,11 @@ export class CotacoesCadastroComponent implements OnInit {
         origem: this.cotacao.origem,
         destino: this.cotacao.destino,
         tipoVeiculo: this.cotacao.tipoVeiculo || undefined,
+        tipoServico: this.cotacao.tipoServico || undefined,
         descricaoCarga: descricaoCarga || undefined,
         valorTotal: this.totalGeral > 0 ? this.totalGeral : undefined,
         custoRecolha: this.cotacao.custoRecolha || undefined,
+        discountAmount: this.cotacao.discountAmount ?? undefined,
         dataCotacao: this.cotacao.data || new Date().toISOString().split('T')[0],
         dataValidade: this.cotacao.validade || undefined,
         status: this.STATUS_COTACAO_GERADA_BACKEND,
@@ -384,6 +403,10 @@ export class CotacoesCadastroComponent implements OnInit {
           next: (res: CotacaoResponse) => {
             this.cotacao.referencia = res.referencia || '';
             this.ultimaCotacaoRef = res.referencia || '';
+            this.aplicarCamposFinanceirosDaCotacao(res);
+            if (res.dataValidade) {
+              this.cotacao.validade = this.normalizarISODate(res.dataValidade);
+            }
             resolve();
           },
           error: (error: unknown) => {
@@ -397,17 +420,14 @@ export class CotacoesCadastroComponent implements OnInit {
       await this.guardarPDF(true);
 
       // Popup final para concluir.
-      this.completionMessage = 'Finalizado com sucesso!';
-      this.completionOpen = true;
+      this.mostrarNotificacao('Cotação finalizada com sucesso!', 'success');
+      this.router.navigate(['/billing/cotacoes/enviadas']);
     } catch (e) {
       this.mostrarNotificacao('Erro ao finalizar a cotação', 'error');
     }
   }
 
-  concludeCompletion(): void {
-    this.completionOpen = false;
-    this.router.navigate(['/billing/cotacoes/enviadas']);
-  }
+  // concluindor Completion removed (popup removed); navigation happens in finalizarGeracao().
 
   private async gerarPdfAutoAoCarregarPedido(): Promise<void> {
     // Esperar preview renderizar antes de gerar PDF
@@ -455,6 +475,7 @@ export class CotacoesCadastroComponent implements OnInit {
         descricaoCarga: descricaoCarga || undefined,
         valorTotal: this.totalGeral || undefined,
         custoRecolha: this.cotacao.custoRecolha || undefined,
+        discountAmount: this.cotacao.discountAmount ?? undefined,
         dataCotacao: this.cotacao.data || new Date().toISOString().split('T')[0],
         dataValidade: this.cotacao.validade || undefined,
         status: this.STATUS_PENDENTE_BACKEND,
@@ -701,6 +722,71 @@ export class CotacoesCadastroComponent implements OnInit {
     return m[key] || preferida || 'N/A';
   }
 
+  private aplicarCamposFinanceirosDaCotacao(c: CotacaoResponse): void {
+    this.cotacao.discountAmount = c.discountAmount ?? 0;
+    this.cotacao.vatAmount = c.vatAmount ?? 0;
+    this.cotacao.vatRate = c.vatRate ?? 0;
+    this.cotacao.vatReason = c.vatReason || 'ISENTO';
+  }
+
+  /** Recalcula IVA/Desconto no preview, com base no tipo de serviço e desconto inserido. */
+  recalcularCamposFinanceiros(): void {
+    const desconto = this.cotacao.discountAmount ?? 0;
+    const base = this.totalGeral ?? 0;
+    const baseAposDesconto = Math.max(0, base - desconto);
+
+    const temIva =
+      (this.cotacao.tipoServico || '').toUpperCase() === 'COMPRA_TRANSPORTE';
+
+    if (temIva) {
+      this.cotacao.vatRate = 16;
+      this.cotacao.vatReason = 'IVA 16%';
+      this.cotacao.vatAmount = baseAposDesconto * 0.16;
+    } else {
+      this.cotacao.vatRate = 0;
+      this.cotacao.vatReason = 'ISENTO';
+      this.cotacao.vatAmount = 0;
+    }
+  }
+
+  private get descontoPreview(): number {
+    return this.cotacao.discountAmount ?? 0;
+  }
+
+  private get temIvaPreview(): boolean {
+    return (this.cotacao.tipoServico || '').toUpperCase() === 'COMPRA_TRANSPORTE';
+  }
+
+  get ivaAtivoPreview(): boolean {
+    return this.temIvaPreview;
+  }
+
+  get vatRatePreview(): number {
+    return this.temIvaPreview ? 16 : 0;
+  }
+
+  get vatAmountPreview(): number {
+    const baseAposDesconto = Math.max(0, (this.totalGeral ?? 0) - this.descontoPreview);
+    return this.temIvaPreview ? baseAposDesconto * 0.16 : 0;
+  }
+
+  get vatReasonPreview(): string {
+    return this.temIvaPreview ? 'IVA 16%' : 'ISENTO';
+  }
+
+  get baseAposDescontoPreview(): number {
+    return Math.max(0, (this.totalGeral ?? 0) - this.descontoPreview);
+  }
+
+  get totalFinalPreview(): number {
+    return this.baseAposDescontoPreview + this.vatAmountPreview;
+  }
+
+  setIvaAtivo(ativo: boolean): void {
+    this.cotacao.tipoServico = ativo ? 'COMPRA_TRANSPORTE' : 'TRANSPORTE';
+    this.recalcularCamposFinanceiros();
+  }
+
   /**
    * Nome do ficheiro/identificador do PDF no formato:
    * ct00_carlosmaria_2026
@@ -774,7 +860,7 @@ export class CotacoesCadastroComponent implements OnInit {
         format: 'a4', 
         orientation: 'portrait' as const
       },
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      pagebreak: { mode: ['css', 'legacy'] }
     };
 
     try {
