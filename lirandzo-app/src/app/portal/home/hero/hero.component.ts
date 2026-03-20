@@ -39,7 +39,9 @@ export class HeroComponent implements OnInit, AfterViewInit, OnDestroy {
     this.updateDateTime();
     const build = () => this.buildSlides();
     this.transloco.load(this.transloco.getActiveLang() || 'pt').subscribe(() => build());
-    this.transloco.langChanges$.subscribe(() => build());
+    this.transloco.langChanges$.subscribe(lang => {
+      this.transloco.load(lang).subscribe(() => build());
+    });
   }
 
   private buildSlides(): void {

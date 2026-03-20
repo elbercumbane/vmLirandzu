@@ -2,12 +2,13 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TranslocoModule } from '@ngneat/transloco';
 import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, TranslocoModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -19,14 +20,14 @@ export class LoginComponent {
   password = '';
   showPassword = false;
   loading = false;
-  error = '';
+  errorKey = '';
 
   onSubmit(): void {
-    this.error = '';
+    this.errorKey = '';
     const u = this.username.trim();
     const p = this.password;
     if (!u || !p) {
-      this.error = 'Introduza o utilizador e a senha.';
+      this.errorKey = 'auth.login.errors.required';
       return;
     }
     this.loading = true;
@@ -39,11 +40,11 @@ export class LoginComponent {
         this.loading = false;
         const status = err?.status ?? 0;
         if (status === 401) {
-          this.error = 'Utilizador ou senha incorrectos.';
+          this.errorKey = 'auth.login.errors.invalidCredentials';
         } else if (status === 0 || status === 404 || status === 502 || status === 504) {
-          this.error = 'Backend não acessível. Verifique: 1) PostgreSQL em execução, 2) Base lirandzo_db criada, 3) Backend a correr (mvnw.cmd spring-boot:run na pasta lirandzo-backend).';
+          this.errorKey = 'auth.login.errors.backendUnavailable';
         } else {
-          this.error = 'Erro de ligação. Verifique se o backend está em execução (porta 8080) e se a base de dados está acessível.';
+          this.errorKey = 'auth.login.errors.connection';
         }
       }
     });

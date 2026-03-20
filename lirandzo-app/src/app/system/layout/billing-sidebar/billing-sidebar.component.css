@@ -53,14 +53,14 @@
   width: 36px;
   height: 36px;
   border-radius: 0.55rem;
-  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
   font-size: 0.8rem;
-  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
   flex-shrink: 0;
 }
 
@@ -252,7 +252,7 @@
   width: 36px;
   height: 36px;
   border-radius: 0.5rem;
-  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
   color: #fff;
   font-weight: 700;
   font-size: 0.75rem;

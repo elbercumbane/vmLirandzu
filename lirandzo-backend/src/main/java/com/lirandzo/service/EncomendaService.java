@@ -23,6 +23,9 @@ public class EncomendaService {
     @Autowired
     private ClienteRepository clienteRepository;
 
+    @Autowired
+    private PagamentoService pagamentoService;
+
     public List<Encomenda> findAll(StatusPagamento status, LocalDate dataInicio, LocalDate dataFim) {
         if (status != null) {
             return encomendaRepository.findByStatus(status);
@@ -45,9 +48,20 @@ public class EncomendaService {
     }
 
     public Encomenda save(Encomenda encomenda) {
+        boolean novo = encomenda.getNumeroEncomenda() == null;
         Encomenda saved = encomendaRepository.save(encomenda);
+        if (novo && (saved.getInvoiceNumber() == null || saved.getInvoiceNumber().isBlank())) {
+            LocalDate dataRef = saved.getDataEncomenda() != null ? saved.getDataEncomenda() : LocalDate.now();
+            saved.setInvoiceNumber(gerarNumeroFactura(dataRef.getYear(), saved.getNumeroEncomenda()));
+            saved.setInvoiceDate(dataRef);
+            saved = encomendaRepository.save(saved);
+        }
         atualizarEstatisticasCliente(saved.getCliente().getId());
         return saved;
+    }
+
+    private static String gerarNumeroFactura(int ano, long numeroEncomenda) {
+        return String.format("FAC-%d-%06d", ano, numeroEncomenda);
     }
 
     public Optional<Encomenda> update(Long id, Encomenda encomendaAtualizada) {
@@ -92,14 +106,9 @@ public class EncomendaService {
                     Pagamento pagamento = new Pagamento();
                     pagamento.setEncomenda(encomenda);
                     pagamento.setValor(valor);
-                    
-                    encomenda.getPagamentos().add(pagamento);
-                    encomenda.setValorPago(encomenda.getValorPago() + valor);
-                    
-                    Encomenda saved = encomendaRepository.save(encomenda);
-                    atualizarEstatisticasCliente(saved.getCliente().getId());
-                    
-                    return saved;
+                    pagamento.setVerificationStatus(Pagamento.VerificationStatus.CONFIRMED);
+                    pagamentoService.save(pagamento);
+                    return encomendaRepository.findById(id).orElseThrow();
                 });
     }
 

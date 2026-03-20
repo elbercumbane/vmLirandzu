@@ -1,5 +1,6 @@
 package com.lirandzo.controller;
 
+import com.lirandzo.dto.EncomendaDetalheDTO;
 import com.lirandzo.entity.Encomenda;
 import com.lirandzo.entity.Encomenda.StatusPagamento;
 import com.lirandzo.service.EncomendaService;
@@ -30,8 +31,9 @@ public class EncomendaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Encomenda> getEncomendaById(@PathVariable Long id) {
+    public ResponseEntity<EncomendaDetalheDTO> getEncomendaById(@PathVariable Long id) {
         return encomendaService.findById(id)
+                .map(EncomendaDetalheDTO::from)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

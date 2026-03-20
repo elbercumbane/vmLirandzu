@@ -2,14 +2,14 @@
   <!-- Hero -->
   <section class="noticias-hero">
     <div class="noticias-hero-bg">
-      <img src="/images/hero-warehouse-3.jpg" alt="Logística Lirandzo" class="noticias-hero-img" loading="eager">
+      <img src="/images/hero-warehouse-3.jpg" [alt]="'noticiasPage.altHero' | transloco" class="noticias-hero-img" loading="eager">
       <div class="noticias-hero-overlay"></div>
     </div>
     <div class="noticias-hero-content">
-      <div class="noticias-hero-badge">Blog & Avisos</div>
-      <h1 class="noticias-hero-title">Notícias e Avisos</h1>
+      <div class="noticias-hero-badge">{{ 'noticiasPage.badge' | transloco }}</div>
+      <h1 class="noticias-hero-title">{{ 'noticiasPage.title' | transloco }}</h1>
       <p class="noticias-hero-desc">
-        Actualizações sobre a nossa operação, avisos de tempo, novas rotas e tudo o que precisa saber sobre a Lirandzo.
+        {{ 'noticiasPage.desc' | transloco }}
       </p>
     </div>
   </section>
@@ -54,24 +54,24 @@
       <!-- Sidebar -->
       <aside class="noticias-sidebar">
         <div class="sidebar-card">
-          <h3 class="sidebar-title">Sobre este espaço</h3>
+          <h3 class="sidebar-title">{{ 'noticiasPage.sidebarAboutTitle' | transloco }}</h3>
           <p class="sidebar-text">
-            Aqui partilhamos avisos importantes (como condições meteorológicas), novidades da operação e actualizações que afectam as suas entregas.
+            {{ 'noticiasPage.sidebarAboutText' | transloco }}
           </p>
           <div class="sidebar-hint">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-            <span>Avisos de tempo são actualizados consoante as condições.</span>
+            <span>{{ 'noticiasPage.sidebarHint' | transloco }}</span>
           </div>
         </div>
         <div class="sidebar-card">
-          <h3 class="sidebar-title">Categorias</h3>
+          <h3 class="sidebar-title">{{ 'noticiasPage.categoriesTitle' | transloco }}</h3>
           <ul class="sidebar-tags">
-            <li>Aviso</li>
-            <li>Operações</li>
-            <li>Tecnologia</li>
-            <li>Rotas</li>
-            <li>Infraestrutura</li>
-            <li>Qualidade</li>
+            <li>{{ 'noticiasPage.catAviso' | transloco }}</li>
+            <li>{{ 'noticiasPage.catOperacoes' | transloco }}</li>
+            <li>{{ 'noticiasPage.catTecnologia' | transloco }}</li>
+            <li>{{ 'noticiasPage.catRotas' | transloco }}</li>
+            <li>{{ 'noticiasPage.catInfra' | transloco }}</li>
+            <li>{{ 'noticiasPage.catQualidade' | transloco }}</li>
           </ul>
         </div>
       </aside>
@@ -81,11 +81,11 @@
   <!-- CTA -->
   <section class="noticias-cta">
     <div class="noticias-cta-wrapper">
-      <h2 class="noticias-cta-title">Precisa de uma cotação?</h2>
-      <p class="noticias-cta-text">Solicite uma cotação e a nossa equipa responderá em até 24 horas.</p>
+      <h2 class="noticias-cta-title">{{ 'noticiasPage.ctaTitle' | transloco }}</h2>
+      <p class="noticias-cta-text">{{ 'noticiasPage.ctaText' | transloco }}</p>
       <div class="noticias-cta-actions">
-        <a routerLink="/orcamento" class="noticias-cta-btn noticias-cta-btn--primary">Solicitar Cotação</a>
-        <a routerLink="/contato" class="noticias-cta-btn noticias-cta-btn--outline">Contactar-nos</a>
+        <a routerLink="/orcamento" class="noticias-cta-btn noticias-cta-btn--primary">{{ 'noticiasPage.ctaQuote' | transloco }}</a>
+        <a routerLink="/contato" class="noticias-cta-btn noticias-cta-btn--outline">{{ 'noticiasPage.ctaContact' | transloco }}</a>
       </div>
     </div>
   </section>

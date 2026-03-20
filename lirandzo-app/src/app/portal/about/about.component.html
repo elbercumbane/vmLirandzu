@@ -7,11 +7,11 @@
     <div class="hero-content">
       <div class="hero-badge">
         <span class="pulse-dot"></span>
-        Lirandzo Transportes
+        {{ 'about.hero.badge' | transloco }}
       </div>
-      <h1 class="hero-title">Sobre nós<br><span class="gradient-text">A nossa história</span></h1>
+      <h1 class="hero-title">{{ 'about.hero.titleLine1' | transloco }}<br><span class="gradient-text">{{ 'about.hero.titleGradient' | transloco }}</span></h1>
       <p class="hero-description">
-        Mais de uma década a conectar negócios e pessoas através de soluções logísticas no corredor Joanesburgo–Maputo.
+        {{ 'about.hero.description' | transloco }}
       </p>
       <div class="hero-stats">
         <div class="stat-item" *ngFor="let stat of stats">
@@ -27,12 +27,10 @@
     <div class="container">
       <div class="section-grid">
         <div class="section-content">
-          <span class="section-eyebrow">Quem Somos</span>
-          <h2 class="section-title">Logística moderna,<br><span class="highlight">movida por pessoas reais</span></h2>
+          <span class="section-eyebrow">{{ 'about.who.eyebrow' | transloco }}</span>
+          <h2 class="section-title">{{ 'about.who.title1' | transloco }}<br><span class="highlight">{{ 'about.who.titleHighlight' | transloco }}</span></h2>
           <p class="section-text">
-            A Lirandzo é parceira estratégica na cadeia de suprimentos dos clientes, unindo tecnologia,
-            frota própria rastreada e equipa especializada. Operamos no corredor Joanesburgo–Maputo
-            e em todo o território nacional, com entregas seguras e 100% rastreáveis.
+            {{ 'about.who.text' | transloco }}
           </p>
           <div class="features-row">
             <div class="feature-badge" *ngFor="let f of introFeatures">
@@ -44,11 +42,11 @@
         <div class="section-visual">
           <div class="image-stack">
             <div class="image-card primary">
-              <img src="/images/hero-truck-1.jpg" alt="Frota Lirandzo" loading="lazy">
-              <div class="floating-badge"><strong>+50</strong><span>Veículos</span></div>
+              <img src="/images/hero-truck-1.jpg" [alt]="'about.alt.truckFleet' | transloco" loading="lazy">
+              <div class="floating-badge"><strong>{{ 'about.floating.value' | transloco }}</strong><span>{{ 'about.floating.label' | transloco }}</span></div>
             </div>
             <div class="image-card secondary">
-              <img src="/images/about-warehouse.jpg" alt="Armazém Lirandzo" loading="lazy">
+              <img src="/images/about-warehouse.jpg" [alt]="'about.alt.warehouse' | transloco" loading="lazy">
             </div>
           </div>
         </div>
@@ -60,18 +58,16 @@
   <section class="content-section alt-bg reveal">
     <div class="container">
       <header class="section-header">
-        <span class="section-eyebrow">Nossa História</span>
-        <h2 class="section-title">De um camião a uma operação integrada</h2>
+        <span class="section-eyebrow">{{ 'about.history.eyebrow' | transloco }}</span>
+        <h2 class="section-title">{{ 'about.history.title' | transloco }}</h2>
         <p class="section-text">
-          A Lirandzo nasceu da visão de oferecer transporte que combina proximidade com o cliente,
-          rigor operacional e tecnologia. Evoluímos de uma frota reduzida para uma operação com
-          cobertura nacional e rotas internacionais no corredor África do Sul–Moçambique.
+          {{ 'about.history.text' | transloco }}
         </p>
       </header>
       <div class="history-grid">
-        <img src="/images/hero-truck-1.jpg" alt="Camião Lirandzo" loading="lazy">
-        <img src="/images/about-warehouse.jpg" alt="Armazém Lirandzo" loading="lazy">
-        <img src="/images/hero-warehouse-3.jpg" alt="Terminal de carga" loading="lazy">
+        <img src="/images/hero-truck-1.jpg" [alt]="'about.alt.truckRoad' | transloco" loading="lazy">
+        <img src="/images/about-warehouse.jpg" [alt]="'about.alt.warehouse' | transloco" loading="lazy">
+        <img src="/images/hero-warehouse-3.jpg" [alt]="'about.alt.terminal' | transloco" loading="lazy">
       </div>
     </div>
   </section>
@@ -81,20 +77,19 @@
     <div class="container">
       <div class="section-grid">
         <div class="section-content">
-          <span class="section-eyebrow">Frota &amp; Infraestrutura</span>
-          <h2 class="section-title">Preparados para qualquer escala</h2>
+          <span class="section-eyebrow">{{ 'about.fleet.eyebrow' | transloco }}</span>
+          <h2 class="section-title">{{ 'about.fleet.title' | transloco }}</h2>
           <p class="section-text">
-            Frota própria rastreada GPS, manutenção preventiva e condutores formados.
-            Armazéns equipados com segurança 24h.
+            {{ 'about.fleet.text' | transloco }}
           </p>
-          <a routerLink="/orcamento" class="btn-primary">Solicitar orçamento</a>
+          <a routerLink="/orcamento" class="btn-primary">{{ 'about.fleet.cta' | transloco }}</a>
         </div>
         <div class="section-visual">
           <div class="fleet-showcase">
-            <img src="/frota-camioes.jpg" alt="Frota Lirandzo" loading="lazy">
+            <img src="/frota-camioes.jpg" [alt]="'about.alt.truckFleet' | transloco" loading="lazy">
             <div class="fleet-stats">
-              <div class="fleet-stat"><span class="value">50+</span><span class="label">Veículos</span></div>
-              <div class="fleet-stat"><span class="value">100%</span><span class="label">Rastreados</span></div>
+              <div class="fleet-stat"><span class="value">50+</span><span class="label">{{ 'about.fleet.fs1' | transloco }}</span></div>
+              <div class="fleet-stat"><span class="value">100%</span><span class="label">{{ 'about.fleet.fs2' | transloco }}</span></div>
             </div>
           </div>
         </div>
@@ -106,8 +101,8 @@
   <section class="content-section alt-bg team-section reveal">
     <div class="container">
       <header class="section-header center">
-        <span class="section-eyebrow">A Nossa Equipa</span>
-        <h2 class="section-title">Pessoas no centro de cada entrega</h2>
+        <span class="section-eyebrow">{{ 'about.team.eyebrow' | transloco }}</span>
+        <h2 class="section-title">{{ 'about.team.title' | transloco }}</h2>
       </header>
       <div class="card-grid">
         <article class="info-card" *ngFor="let member of team">
@@ -126,9 +121,9 @@
   <section class="content-section reveal">
     <div class="container">
       <header class="section-header center">
-        <span class="section-eyebrow">Conformidade</span>
-        <h2 class="section-title">Licenças e certificações</h2>
-        <p class="section-text">Comprometidos com os mais altos padrões de qualidade e conformidade regulamentar.</p>
+        <span class="section-eyebrow">{{ 'about.compliance.eyebrow' | transloco }}</span>
+        <h2 class="section-title">{{ 'about.compliance.title' | transloco }}</h2>
+        <p class="section-text">{{ 'about.compliance.text' | transloco }}</p>
       </header>
       <div class="card-grid certs">
         <article class="info-card cert" *ngFor="let cert of certifications">
@@ -143,10 +138,10 @@
   <!-- CTA -->
   <section class="cta-section reveal">
     <div class="container">
-      <h2 class="cta-title">Pronto para otimizar a sua logística?</h2>
+      <h2 class="cta-title">{{ 'about.cta.title' | transloco }}</h2>
       <div class="cta-buttons">
-        <a routerLink="/orcamento" class="btn-primary large">Solicitar orçamento</a>
-        <a routerLink="/contato" class="btn-outline large">Contactar equipa</a>
+        <a routerLink="/orcamento" class="btn-primary large">{{ 'about.cta.quote' | transloco }}</a>
+        <a routerLink="/contato" class="btn-outline large">{{ 'about.cta.contact' | transloco }}</a>
       </div>
     </div>
   </section>

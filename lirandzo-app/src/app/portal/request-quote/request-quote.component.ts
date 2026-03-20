@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { TranslocoModule, TranslocoService } from '@ngneat/transloco';
 import { CotacaoPortalRequest, CotacaoService } from '../../services/cotacao.service';
 
 type FormaEnvio = CotacaoPortalRequest['formaEnvioPreferida'];
@@ -8,14 +9,17 @@ type FormaEnvio = CotacaoPortalRequest['formaEnvioPreferida'];
 @Component({
   selector: 'app-request-quote',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslocoModule],
   templateUrl: './request-quote.component.html',
   styleUrl: './request-quote.component.css'
 })
 export class RequestQuoteComponent {
+  private cotacaoService = inject(CotacaoService);
+  private transloco = inject(TranslocoService);
+
   submitted = false;
   loading = false;
-  error = '';
+  errorKey = '';
   confirmacaoOpen = false;
   expandedSections: Record<'dados' | 'detalhes' | 'mensagem', boolean> = {
     dados: true,
@@ -32,8 +36,6 @@ export class RequestQuoteComponent {
     deliveryMethod: '' as '' | FormaEnvio,
     tipoServico: 'TRANSPORTE' as 'TRANSPORTE' | 'COMPRA_TRANSPORTE'
   };
-
-  constructor(private cotacaoService: CotacaoService) {}
 
   /** Organiza o texto do campo mensagem em lista numerada (1. 2. 3.) para facilitar a análise. */
   formatMessageToList(): void {
@@ -88,15 +90,16 @@ export class RequestQuoteComponent {
 
   /** Retorna lista de campos obrigatórios em falta. */
   getMissingFields(): string[] {
+    const t = (k: string) => this.transloco.translate(k);
     const missing: string[] = [];
-    if (!this.form.name?.trim()) missing.push('Nome');
-    if (!this.form.email?.trim()) missing.push('E-mail');
+    if (!this.form.name?.trim()) missing.push(t('quotePage.missingName'));
+    if (!this.form.email?.trim()) missing.push(t('quotePage.missingEmail'));
     const phone1 = this.form.phone1?.trim() || '';
     const needsPhone = this.form.deliveryMethod === 'whatsapp' || this.form.deliveryMethod === 'chamada';
-    if (needsPhone && !phone1) missing.push('Telefone');
-    if (!this.form.origin?.trim()) missing.push('Origem');
-    if (!this.form.destination?.trim()) missing.push('Destino');
-    if (!this.form.deliveryMethod) missing.push('Preferência de contacto');
+    if (needsPhone && !phone1) missing.push(t('quotePage.missingPhone'));
+    if (!this.form.origin?.trim()) missing.push(t('quotePage.missingOrigin'));
+    if (!this.form.destination?.trim()) missing.push(t('quotePage.missingDest'));
+    if (!this.form.deliveryMethod) missing.push(t('quotePage.missingContactPref'));
     return missing;
   }
 
@@ -108,7 +111,7 @@ export class RequestQuoteComponent {
   /** Abre o popup de confirmação (quando o formulário está válido). */
   openConfirmacao(): void {
     if (!this.isFormValid()) return;
-    this.error = '';
+    this.errorKey = '';
     this.confirmacaoOpen = true;
   }
 
@@ -139,17 +142,23 @@ export class RequestQuoteComponent {
       },
       error: () => {
         this.loading = false;
-        this.error = 'Não foi possível enviar o pedido de cotação. Tente novamente mais tarde.';
+        this.errorKey = 'quotePage.errorSend';
       }
     });
   }
 
   /** Labels para exibir no resumo. */
   getDeliveryLabel(): string {
-    const m: Record<string, string> = { whatsapp: 'WhatsApp', email: 'E-mail', chamada: 'Chamada telefónica' };
-    return m[this.form.deliveryMethod] || this.form.deliveryMethod;
+    const m = this.form.deliveryMethod;
+    if (m === 'whatsapp') return this.transloco.translate('quotePage.labelWhatsapp');
+    if (m === 'email') return this.transloco.translate('quotePage.labelEmail');
+    if (m === 'chamada') return this.transloco.translate('quotePage.labelCall');
+    return m;
   }
+
   getTipoServicoLabel(): string {
-    return this.form.tipoServico === 'COMPRA_TRANSPORTE' ? 'Compra + transporte' : 'Apenas transporte';
+    return this.form.tipoServico === 'COMPRA_TRANSPORTE'
+      ? this.transloco.translate('quotePage.labelBuyTransport')
+      : this.transloco.translate('quotePage.labelTransportOnly');
   }
 }

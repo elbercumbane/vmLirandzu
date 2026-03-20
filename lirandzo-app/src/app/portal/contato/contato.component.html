@@ -2,10 +2,10 @@
   <section class="contato-banner">
     <div class="contato-banner-overlay"></div>
     <div class="contato-banner-content">
-      <p class="contato-banner-eyebrow">VM Lirandzo Transportes</p>
-      <h1 class="contato-banner-title">Contato</h1>
+      <p class="contato-banner-eyebrow">{{ 'contactPage.eyebrow' | transloco }}</p>
+      <h1 class="contato-banner-title">{{ 'contactPage.title' | transloco }}</h1>
       <p class="contato-banner-desc">
-        Entre em contacto connosco. A nossa equipa está disponível para esclarecer dúvidas e ajudar com os seus envios.
+        {{ 'contactPage.desc' | transloco }}
       </p>
     </div>
   </section>
@@ -14,17 +14,17 @@
     <div class="contato-container">
       <div class="contato-grid">
         <div class="contato-info">
-          <h3>Informações de contacto</h3>
+          <h3>{{ 'contactPage.infoTitle' | transloco }}</h3>
           <div class="contato-info-item">
-            <span class="contato-info-label">E-mail</span>
+            <span class="contato-info-label">{{ 'contactPage.labelEmail' | transloco }}</span>
             <a href="mailto:contato&#64;lirandzo.com">contato&#64;lirandzo.com</a>
           </div>
           <div class="contato-info-item">
-            <span class="contato-info-label">Telefone</span>
+            <span class="contato-info-label">{{ 'contactPage.labelPhone' | transloco }}</span>
             <a href="tel:+258841234567">+258 84 123 4567</a>
           </div>
           <div class="contato-info-item">
-            <span class="contato-info-label">WhatsApp</span>
+            <span class="contato-info-label">{{ 'contactPage.labelWhatsapp' | transloco }}</span>
             <a href="https://wa.me/258841234567" target="_blank" rel="noopener noreferrer">+258 84 123 4567</a>
           </div>
         </div>
@@ -32,33 +32,33 @@
           @if (!submitted) {
             <form class="contato-form" (ngSubmit)="onSubmit()" #f="ngForm">
               <div class="form-row">
-                <label for="nome">Nome <span class="required">*</span></label>
-                <input id="nome" type="text" [(ngModel)]="form.nome" name="nome" placeholder="O seu nome" required />
+                <label for="nome">{{ 'contactPage.form.name' | transloco }} <span class="required">*</span></label>
+                <input id="nome" type="text" [(ngModel)]="form.nome" name="nome" [placeholder]="'contactPage.form.phName' | transloco" required />
               </div>
               <div class="form-row">
-                <label for="email">E-mail <span class="required">*</span></label>
-                <input id="email" type="email" [(ngModel)]="form.email" name="email" placeholder="exemplo&#64;email.com" required />
+                <label for="email">{{ 'contactPage.form.email' | transloco }} <span class="required">*</span></label>
+                <input id="email" type="email" [(ngModel)]="form.email" name="email" [placeholder]="'contactPage.form.phEmail' | transloco" required />
               </div>
               <div class="form-row">
-                <label for="telefone">Telefone</label>
-                <input id="telefone" type="tel" [(ngModel)]="form.telefone" name="telefone" placeholder="Ex: 84 123 4567" />
+                <label for="telefone">{{ 'contactPage.form.phone' | transloco }}</label>
+                <input id="telefone" type="tel" [(ngModel)]="form.telefone" name="telefone" [placeholder]="'contactPage.form.phPhone' | transloco" />
               </div>
               <div class="form-row">
-                <label for="assunto">Assunto <span class="required">*</span></label>
-                <input id="assunto" type="text" [(ngModel)]="form.assunto" name="assunto" placeholder="Ex: Solicitar cotação" required />
+                <label for="assunto">{{ 'contactPage.form.subject' | transloco }} <span class="required">*</span></label>
+                <input id="assunto" type="text" [(ngModel)]="form.assunto" name="assunto" [placeholder]="'contactPage.form.phSubject' | transloco" required />
               </div>
               <div class="form-row full">
-                <label for="mensagem">Mensagem <span class="required">*</span></label>
-                <textarea id="mensagem" [(ngModel)]="form.mensagem" name="mensagem" rows="5" placeholder="Escreva a sua mensagem..." required></textarea>
+                <label for="mensagem">{{ 'contactPage.form.message' | transloco }} <span class="required">*</span></label>
+                <textarea id="mensagem" [(ngModel)]="form.mensagem" name="mensagem" rows="5" [placeholder]="'contactPage.form.phMessage' | transloco" required></textarea>
               </div>
-              <button type="submit" class="contato-submit">Enviar mensagem</button>
+              <button type="submit" class="contato-submit">{{ 'contactPage.form.submit' | transloco }}</button>
             </form>
           } @else {
             <div class="contato-success">
               <span class="success-icon">✓</span>
-              <h2>Mensagem enviada</h2>
-              <p>Obrigado pelo contacto. A nossa equipa responderá em breve.</p>
-              <a routerLink="/" class="success-link">Voltar ao início</a>
+              <h2>{{ 'contactPage.form.successTitle' | transloco }}</h2>
+              <p>{{ 'contactPage.form.successText' | transloco }}</p>
+              <a routerLink="/" class="success-link">{{ 'contactPage.form.backHome' | transloco }}</a>
             </div>
           }
         </div>

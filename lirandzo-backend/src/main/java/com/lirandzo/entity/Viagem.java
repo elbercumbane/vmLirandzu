@@ -1,5 +1,6 @@
 package com.lirandzo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -24,10 +25,12 @@ public class Viagem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "driver_id")
+    @JsonIgnoreProperties({"viagens"})
     private Motorista motorista;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id")
+    @JsonIgnoreProperties({"viagens"})
     private Viatura viatura;
 
     @NotBlank(message = "Origin is required")

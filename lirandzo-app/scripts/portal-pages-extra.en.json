@@ -1,0 +1,460 @@
+{
+  "about": {
+    "hero": {
+      "badge": "Lirandzo Transport",
+      "titleLine1": "About us",
+      "titleGradient": "Our story",
+      "description": "Over a decade connecting businesses and people through logistics solutions on the Johannesburg–Maputo corridor."
+    },
+    "stats": {
+      "s1": "years of experience",
+      "s2": "GPS tracking",
+      "s3": "on-time deliveries",
+      "s4": "vehicles"
+    },
+    "who": {
+      "eyebrow": "Who we are",
+      "title1": "Modern logistics,",
+      "titleHighlight": "powered by real people",
+      "text": "Lirandzo is a strategic partner in our customers' supply chain, combining technology, a tracked own fleet and a specialised team. We operate on the Johannesburg–Maputo corridor and nationwide, with secure and 100% trackable deliveries.",
+      "f1": "National coverage",
+      "f2": "24/7 GPS tracking"
+    },
+    "floating": {
+      "value": "+50",
+      "label": "Vehicles"
+    },
+    "history": {
+      "eyebrow": "Our history",
+      "title": "From one truck to an integrated operation",
+      "text": "Lirandzo was born from the vision of offering transport that combines customer proximity, operational rigour and technology. We evolved from a small fleet to an operation with national coverage and international routes on the South Africa–Mozambique corridor."
+    },
+    "fleet": {
+      "eyebrow": "Fleet & infrastructure",
+      "title": "Ready for any scale",
+      "text": "Own GPS-tracked fleet, preventive maintenance and trained drivers. Warehouses with 24h security.",
+      "cta": "Request a quote",
+      "fs1": "Vehicles",
+      "fs2": "Tracked"
+    },
+    "team": {
+      "eyebrow": "Our team",
+      "title": "People at the heart of every delivery",
+      "m1": {
+        "name": "Operations & drivers",
+        "role": "Field team",
+        "desc": "Experienced drivers and logistics technicians who ensure every delivery."
+      },
+      "m2": {
+        "name": "Customer support",
+        "role": "24/7 service",
+        "desc": "A team dedicated to clear information and immediate issue resolution."
+      },
+      "m3": {
+        "name": "Management & planning",
+        "role": "Strategy",
+        "desc": "Professionals who optimise routes and ensure operational efficiency."
+      }
+    },
+    "compliance": {
+      "eyebrow": "Compliance",
+      "title": "Licences and certifications",
+      "text": "Committed to the highest standards of quality and regulatory compliance."
+    },
+    "certs": {
+      "c1": {
+        "title": "INATTER licensing",
+        "desc": "Certified national and international road transport."
+      },
+      "c2": {
+        "title": "Safety and best practices",
+        "desc": "Rigorous safety protocols and trained drivers."
+      },
+      "c3": {
+        "title": "Audited partners",
+        "desc": "Verified and audited supplier chain."
+      }
+    },
+    "cta": {
+      "title": "Ready to optimise your logistics?",
+      "quote": "Request a quote",
+      "contact": "Contact the team"
+    },
+    "alt": {
+      "truckFleet": "Lirandzo fleet",
+      "warehouse": "Lirandzo warehouse",
+      "truckRoad": "Lirandzo truck",
+      "terminal": "Cargo terminal"
+    }
+  },
+  "contactPage": {
+    "eyebrow": "VM Lirandzo Transport",
+    "title": "Contact",
+    "desc": "Get in touch. Our team is available to answer questions and help with your shipments.",
+    "infoTitle": "Contact information",
+    "labelEmail": "Email",
+    "labelPhone": "Phone",
+    "labelWhatsapp": "WhatsApp",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "subject": "Subject",
+      "message": "Message",
+      "phName": "Your name",
+      "phEmail": "example@email.com",
+      "phPhone": "E.g. 84 123 4567",
+      "phSubject": "E.g. Request a quote",
+      "phMessage": "Write your message...",
+      "submit": "Send message",
+      "successTitle": "Message sent",
+      "successText": "Thank you for contacting us. Our team will reply shortly.",
+      "backHome": "Back to home"
+    }
+  },
+  "noticiasPage": {
+    "badge": "Blog & notices",
+    "title": "News & notices",
+    "desc": "Updates on our operations, weather notices, new routes and everything you need to know about Lirandzo.",
+    "altHero": "Lirandzo logistics",
+    "sidebarAboutTitle": "About this section",
+    "sidebarAboutText": "We share important notices (such as weather conditions), operational news and updates that affect your deliveries.",
+    "sidebarHint": "Weather notices are updated according to conditions.",
+    "categoriesTitle": "Categories",
+    "catAviso": "Notice",
+    "catOperacoes": "Operations",
+    "catTecnologia": "Technology",
+    "catRotas": "Routes",
+    "catInfra": "Infrastructure",
+    "catQualidade": "Quality",
+    "ctaTitle": "Need a quote?",
+    "ctaText": "Request a quote and our team will respond within 24 hours.",
+    "ctaQuote": "Request quote",
+    "ctaContact": "Contact us"
+  },
+  "avaliacoesPage": {
+    "eyebrow": "Rate our service",
+    "title": "Rate us",
+    "desc": "Your opinion matters. Share praise, suggestions or complaints — we keep improving.",
+    "feedbackType": "Feedback type",
+    "sugestao": "Suggestion",
+    "sugestaoDesc": "Ideas to improve",
+    "reclamacao": "Complaint",
+    "reclamacaoDesc": "Issues to resolve",
+    "elogio": "Praise",
+    "elogioDesc": "What went well",
+    "ratingLabel": "Overall rating (1–5 stars)",
+    "starAria": "star(s)",
+    "nome": "Name",
+    "email": "Email",
+    "telefone": "Phone",
+    "mensagem": "Message",
+    "phNome": "Your name",
+    "phEmail": "example@email.com",
+    "phTel": "E.g. 912 345 678",
+    "phMsg": "Describe your feedback, complaint or suggestion...",
+    "submit": "Submit",
+    "successTitle": "Thank you for your feedback",
+    "successText": "Your message was received. Our team will contact you if needed.",
+    "backHome": "Back to home"
+  },
+  "frotaAccao": {
+    "badge": "Johannesburg–Maputo corridor",
+    "title": "Our fleet in action",
+    "desc": "Lirandzo trucks on the roads of Mozambique and South Africa. Specialists in cargo transport from Johannesburg (and region) to Mozambique. Road transport, procurement and integrated logistics with one partner.",
+    "alt": "Lirandzo fleet"
+  },
+  "servicesPage": {
+    "hero": {
+      "badge": "Lirandzo Transport",
+      "title1": "Logistics Solutions",
+      "title2": "Integrated",
+      "subtitle": "Excellence in transport",
+      "description": "Over 10 years connecting Johannesburg and Maputo with road transport, logistics and customs clearance."
+    },
+    "showcase": {
+      "alt": "Lirandzo trucks on the road",
+      "kmValue": "545km",
+      "kmLabel": "Main corridor",
+      "countriesValue": "2 countries",
+      "countriesLabel": "ZA ↔ MZ",
+      "clientsValue": "500+",
+      "clientsLabel": "Customers served"
+    },
+    "section": {
+      "eyebrow": "OUR SERVICES",
+      "title": "Complete logistics solutions",
+      "subtitle": "From transport to customs clearance — one partner"
+    },
+    "statusAvailable": "AVAILABLE",
+    "corridor": {
+      "alt": "Johannesburg Maputo road",
+      "jnb": "JNB",
+      "jnbCity": "Johannesburg",
+      "midLabel": "Ressano Garcia",
+      "midCity": "ZA–MZ border",
+      "mpm": "MPM",
+      "mpmCity": "Maputo",
+      "distLabel": "Distance",
+      "distValue": "545 KM",
+      "timeLabel": "Average time",
+      "timeValue": "18–24 HOURS",
+      "freqLabel": "Frequency",
+      "freqValue": "DAILY"
+    },
+    "portfolio": {
+      "title": "See our portfolio",
+      "desc": "Explore case studies, completed projects and success stories with customers in Mozambique and South Africa.",
+      "btn": "View full portfolio"
+    },
+    "cta": {
+      "title": "Ready to optimise your logistics?",
+      "subtitle": "Talk to us and discover how we can help your business grow with reliable, efficient transport.",
+      "quote": "Request a quote",
+      "contact": "Contact the team",
+      "labelResponse": "Response",
+      "valueResponse": "< 2h",
+      "labelSupport": "Support",
+      "valueSupport": "24/7"
+    },
+    "metrics": {
+      "m1": { "value": "+10", "label": "Years of experience", "trend": "Since 2014", "fill": 100 },
+      "m2": { "value": "50+", "label": "Fleet vehicles", "trend": "Tracked 24/7", "fill": 85 },
+      "m3": { "value": "99%", "label": "On-time deliveries", "trend": "Reliability", "fill": 99 },
+      "m4": { "value": "24/7", "label": "Monitoring", "trend": "Real-time GPS", "fill": 100 }
+    },
+    "marquee": {
+      "t1": "GPS tracking",
+      "t2": "Fleet management",
+      "t3": "Integrated logistics",
+      "t4": "Customs clearance",
+      "t5": "Warehousing",
+      "t6": "Road transport",
+      "t7": "Procurement",
+      "t8": "Cross-border"
+    },
+    "services": {
+      "truck": {
+        "badge": "Own fleet",
+        "title": "Road transport",
+        "description": "Own fleet tracked 24/7 on the Johannesburg–Maputo corridors and national routes.",
+        "f1": "Full and partial loads",
+        "f2": "Real-time tracking",
+        "f3": "Certified drivers"
+      },
+      "procurement": {
+        "badge": "ZA → MZ",
+        "title": "Procurement & sourcing",
+        "description": "Purchase of goods in South Africa with direct delivery in Mozambique.",
+        "f1": "Supplier negotiation",
+        "f2": "Cargo consolidation",
+        "f3": "Documentation included"
+      },
+      "tracking": {
+        "badge": "GPS 24/7",
+        "title": "GPS tracking",
+        "description": "Track your cargo in real time via web panel or mobile app.",
+        "f1": "Accurate location",
+        "f2": "Automatic notifications",
+        "f3": "Trip history"
+      },
+      "logistics": {
+        "badge": "End-to-end",
+        "title": "Integrated logistics",
+        "description": "Warehousing, picking, dispatch and door-to-door delivery in ZA and MZ.",
+        "f1": "Strategic warehouses",
+        "f2": "Cross-docking",
+        "f3": "Last-mile distribution"
+      },
+      "warehouse": {
+        "badge": "Maputo",
+        "title": "Warehousing & stock",
+        "description": "Secure space for consolidation, temporary storage or distribution.",
+        "f1": "Covered warehouses",
+        "f2": "Digital control",
+        "f3": "24h security"
+      },
+      "customs": {
+        "badge": "< 2h",
+        "title": "Customs clearance",
+        "description": "Documentation and customs formalities for imports and exports.",
+        "f1": "Fast clearance",
+        "f2": "Tax advisory",
+        "f3": "4 borders"
+      }
+    }
+  },
+  "faqPage": {
+    "heroImgAlt": "Logistics and transport",
+    "badge": "Customer support",
+    "heroTitle": "Frequently asked questions",
+    "heroDesc": "Quick answers about our services, deadlines, tracking and more. We're here to help.",
+    "sidebarTitle": "Need help?",
+    "sidebarText": "Our team is available 24/7 to answer your questions.",
+    "sidebarOverlay": "Excellence in logistics",
+    "searchPlaceholder": "Search questions...",
+    "noResults": "No questions found for \"{{query}}\".",
+    "ctaTitle": "Didn't find what you were looking for?",
+    "ctaText": "Our specialists are ready to help with any further questions.",
+    "ctaQuote": "Request quote",
+    "ctaContact": "Contact us",
+    "q1": {
+      "question": "What types of cargo does Lirandzo transport?",
+      "answer": "We transport general, partial, containerised and special volume cargo. Our fleet is adapted to different goods, from industrial products to consumer goods."
+    },
+    "q2": {
+      "question": "How can I track my shipment?",
+      "answer": "Online: go to the \"Track Order\" page and enter the tracking code provided at dispatch. The system shows location in real time."
+    },
+    "q3": {
+      "question": "What is the delivery time?",
+      "answer": "It depends on origin, destination and service type. National deliveries take 1–5 business days. International routes may take 5–15 business days."
+    },
+    "q4": {
+      "question": "How do I request a quote?",
+      "answer": "Request a quote on our \"Request Quote\" page by filling in the cargo details. Our team responds within 24 business hours."
+    },
+    "q5": {
+      "question": "Does Lirandzo do international transport?",
+      "answer": "Yes. We operate strategic international routes, including corridors between Mozambique and South Africa, with customs documentation handled by our team."
+    },
+    "q6": {
+      "question": "Is cargo insured during transport?",
+      "answer": "Yes, all cargo transported by Lirandzo is covered by transport insurance. In case of incident, claims are supported by our team."
+    },
+    "q7": {
+      "question": "How can I become a Lirandzo partner?",
+      "answer": "We are open to new partnerships. Contact us via the contact form or email contato@lirandzo.com with your proposal."
+    },
+    "q8": {
+      "question": "Does Lirandzo offer warehousing?",
+      "answer": "Yes. We have strategic warehouses acting as logistics hubs for consolidation, temporary storage and distribution."
+    },
+    "q9": {
+      "question": "How does payment work?",
+      "answer": "We accept bank transfer, mobile payment and monthly invoicing agreements for regular customers. Payment details are sent with order confirmation."
+    },
+    "q10": {
+      "question": "Can I schedule a cargo pickup?",
+      "answer": "Yes. We offer on-site pickup. Indicate address and preferred time when requesting a quote or contact our operations team."
+    }
+  },
+  "orderTracking": {
+    "today": "Today",
+    "dash": "—",
+    "heroTitle": "Where is your cargo?",
+    "heroDesc": "Check your delivery status in real time. Enter the invoice number and follow each step from warehouse to your door.",
+    "placeholder": "Invoice number (e.g. 001)",
+    "track": "Track",
+    "hint": "E.g. 001, 002 or 003",
+    "resultAria": "Tracking result",
+    "deliveryStatus": "Delivery status",
+    "invoiceNo": "Invoice no.:",
+    "packageNo": "Order / package no.:",
+    "route": "Route:",
+    "timeline": "Delivery steps",
+    "idleStatus": "Enter or choose a code to see tracking details.",
+    "unknownStatus": "Simulated tracking in progress.",
+    "examples": {
+      "001": {
+        "status": "Left South Africa and is on the way to Maputo.",
+        "route": "Payment in Maputo → Johannesburg → Delivery in Maputo",
+        "steps": [
+          { "label": "Payment confirmed", "location": "Maputo, Mozambique" },
+          { "label": "Product received at warehouse", "location": "Maputo, Mozambique" },
+          { "label": "In transit to South Africa", "location": "Ressano Garcia border post" },
+          { "label": "Purchase consolidated at store", "location": "Johannesburg, South Africa" },
+          { "label": "In transit to Maputo", "location": "Johannesburg, South Africa" },
+          { "label": "Out for delivery to customer", "location": "Maputo, Mozambique" }
+        ]
+      },
+      "002": {
+        "status": "Cargo consolidating in South Africa.",
+        "route": "Maputo → Johannesburg → Matola",
+        "steps": [
+          { "label": "Payment confirmed", "location": "Maputo, Mozambique" },
+          { "label": "Cargo in preparation", "location": "Maputo, Mozambique" },
+          { "label": "In transit to South Africa", "location": "N4 road, Mozambique" },
+          { "label": "Purchase at partner store", "location": "Pretoria, South Africa" },
+          { "label": "Consolidating for return", "location": "Pretoria, South Africa" }
+        ]
+      },
+      "003": {
+        "status": "Delivered to customer in person.",
+        "route": "Payment in Maputo → Final delivery to customer",
+        "steps": [
+          { "label": "Payment confirmed", "location": "Maputo, Mozambique" },
+          { "label": "Product purchased in South Africa", "location": "Sandton, Johannesburg" },
+          { "label": "In transit to Maputo", "location": "N4 highway" },
+          { "label": "Arrived at distribution centre", "location": "Maputo, Mozambique" },
+          { "label": "Out for delivery", "location": "Maputo, Mozambique" },
+          { "label": "Delivered to customer", "location": "Customer, Maputo" }
+        ]
+      }
+    },
+    "unknownSteps": [
+      { "label": "Code received in system", "location": "Maputo, Mozambique" },
+      { "label": "Awaiting carrier update", "location": "—" }
+    ]
+  },
+  "quotePage": {
+    "title": "Request quote",
+    "subtitle": "Fill in the details and our team will respond within 24 hours.",
+    "sectionPersonal": "Personal details",
+    "sectionQuote": "Quote details",
+    "sectionNeed": "What do you need?",
+    "name": "Full name",
+    "phFullName": "Your full name",
+    "email": "Email",
+    "phEmail": "example@email.com",
+    "contacts": "Contacts",
+    "phonePh": "Phone — e.g. 912 345 678",
+    "origin": "Origin",
+    "destination": "Destination",
+    "originPh": "E.g. Maputo, Mozambique",
+    "destPh": "E.g. Johannesburg, South Africa",
+    "serviceType": "Service type",
+    "serviceTransport": "Transport only",
+    "serviceBuyTransport": "Purchase + transport",
+    "quoteDelivery": "Where to receive the quote?",
+    "selectOption": "Select",
+    "whatsapp": "WhatsApp",
+    "emailOpt": "Email",
+    "call": "Phone call",
+    "messageLabel": "Describe details (origin, destination, deadlines, quantities in kg or tonnes, cargo, etc.)",
+    "messageHint": "Enter quantities manually (e.g. 100 kg, 2 tonnes). Use Enter for a new line. On blur, text is organised as a numbered list.",
+    "messagePh": "Describe what you need...",
+    "missingPrefix": "Required fields missing:",
+    "missingName": "Name",
+    "missingEmail": "Email",
+    "missingPhone": "Phone",
+    "missingOrigin": "Origin",
+    "missingDest": "Destination",
+    "missingContactPref": "Contact preference",
+    "sending": "Sending...",
+    "submit": "Send request",
+    "errorSend": "Could not send the quote request. Please try again later.",
+    "confirmTitle": "Confirm details",
+    "confirmSubtitle": "Check the information before sending.",
+    "lblName": "Name",
+    "lblEmail": "Email",
+    "lblPhone": "Phone",
+    "lblOrigin": "Origin",
+    "lblDest": "Destination",
+    "lblService": "Service type",
+    "lblWhereQuote": "Where to receive the quote",
+    "lblMessage": "Message",
+    "edit": "Edit",
+    "send": "Send",
+    "closeAria": "Close",
+    "successTitle": "Request sent successfully",
+    "successText": "Your quote request was registered. Our team will contact you within 24 hours with a proposal.",
+    "successHint": "You can close this window or return to the main site.",
+    "closeBtn": "Close",
+    "labelTransportOnly": "Transport only",
+    "labelBuyTransport": "Purchase + transport",
+    "labelWhatsapp": "WhatsApp",
+    "labelEmail": "Email",
+    "labelCall": "Phone call"
+  }
+}

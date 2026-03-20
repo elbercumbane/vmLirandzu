@@ -22,7 +22,7 @@ export class BillingDashboardComponent {
 
   // Trips by vehicle
   tripsByVehicle = [
-    { viatura: 'Volvo FH16', viagens: 12, cor: '#F97316' },
+    { viatura: 'Volvo FH16', viagens: 12, cor: '#DC2626' },
     { viatura: 'Scania R450', viagens: 9, cor: '#3B82F6' },
     { viatura: 'Iveco Stralis', viagens: 8, cor: '#22C55E' },
     { viatura: 'Isuzu NPR', viagens: 6, cor: '#EAB308' },

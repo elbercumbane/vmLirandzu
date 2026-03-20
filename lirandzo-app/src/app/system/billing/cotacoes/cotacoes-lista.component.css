@@ -44,8 +44,8 @@
 
 .action-btn-conclua {
   background: var(--warning-soft, rgba(245, 158, 11, 0.15)) !important;
-  border-color: var(--warning, #f59e0b) !important;
-  color: var(--warning, #f59e0b) !important;
+  border-color: var(--warning, #dc2626) !important;
+  color: var(--warning, #dc2626) !important;
   font-weight: 800;
   text-decoration: none !important;
 }

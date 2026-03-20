@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
 import { CotacaoService, CotacaoResponse } from '../../../services/cotacao.service';
+import { EncomendaService, EmitirFacturaResponse } from '../../../services/encomenda.service';
 import { NotificationPopupComponent } from '../../../shared/components/notification-popup/notification-popup.component';
 
 interface CotacaoEnviadaDisplay {
@@ -48,8 +49,11 @@ export class CotacoesEnviadasComponent implements OnInit {
   private readonly STATUS_RESPONDIDO_BACKEND = 'RESPONDED';
   private readonly STATUS_CANCELLED_BACKEND = 'CANCELLED';
 
+  emitindoCotacaoId: number | null = null;
+
   constructor(
     private cotacaoService: CotacaoService,
+    private encomendaService: EncomendaService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -83,6 +87,8 @@ export class CotacoesEnviadasComponent implements OnInit {
             statusUpper === 'COTACAO GERADA' ||
             statusUpper === 'RESPONDED' ||
             statusUpper === 'RESPONDIDO' ||
+            statusUpper === 'INVOICED' ||
+            statusUpper === 'FACTURADA' ||
             statusUpper === 'CANCELLED' ||
             statusUpper === 'CANCELADA'
           );
@@ -159,6 +165,8 @@ export class CotacoesEnviadasComponent implements OnInit {
       'QUOTATION_GENERATED': 'COTAÇÃO GERADA',
       'COTACAO_GERADA': 'COTAÇÃO GERADA',
       'COTACAO GERADA': 'COTAÇÃO GERADA',
+      'INVOICED': 'FACTURADA',
+      'FACTURADA': 'FACTURADA',
       'CANCELLED': 'CANCELADA',
       'CANCELADA': 'CANCELADA'
     };
@@ -257,9 +265,41 @@ export class CotacoesEnviadasComponent implements OnInit {
     switch (estado) {
       case 'COTAÇÃO GERADA': return 'badge badge-success';
       case 'RESPONDIDO': return 'badge badge-info';
+      case 'FACTURADA': return 'badge badge-success';
       case 'CANCELADA': return 'badge badge-danger';
       default: return 'badge badge-success';
     }
+  }
+
+  podeEmitirFactura(estado: string): boolean {
+    return estado === 'RESPONDIDO' || estado === 'COTAÇÃO GERADA';
+  }
+
+  emitirFactura(c: CotacaoEnviadaDisplay): void {
+    this.emitindoCotacaoId = c.id;
+    this.encomendaService.emitirFacturaDeCotacao(c.id).subscribe({
+      next: (enc: EmitirFacturaResponse) => {
+        this.emitindoCotacaoId = null;
+        const idEnc = enc?.numeroEncomenda;
+        if (idEnc == null || Number.isNaN(Number(idEnc))) {
+          this.mostrarNotificacao('Factura emitida. Abra a lista de encomendas para ver os detalhes.', 'success');
+          this.carregarCotacoes();
+          this.router.navigate(['/billing/encomendas']);
+          return;
+        }
+        const ref = enc.invoiceNumber || `FAC-${idEnc}`;
+        this.mostrarNotificacao(`Factura ${ref} emitida. A cotação foi marcada como facturada.`, 'success');
+        this.carregarCotacoes();
+        this.router.navigate(['/billing/encomendas', idEnc]);
+      },
+      error: (err: unknown) => {
+        this.emitindoCotacaoId = null;
+        const body = err && typeof err === 'object' && 'error' in err ? (err as { error?: { error?: string } }).error : undefined;
+        const msg = body?.error || 'Não foi possível emitir a factura.';
+        console.error(err);
+        this.mostrarNotificacao(msg, 'error');
+      }
+    });
   }
 
   baixarOuVerPdf(c: CotacaoEnviadaDisplay): void {

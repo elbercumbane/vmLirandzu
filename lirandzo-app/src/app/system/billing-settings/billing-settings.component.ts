@@ -224,7 +224,7 @@ export class BillingSettingsComponent {
   }
 
   getManagerColor(name: string): string {
-    const colors = ['#F97316', '#1E6FBF', '#22C55E', '#EAB308', '#8B5CF6', '#EF4444'];
+    const colors = ['#DC2626', '#1E6FBF', '#22C55E', '#EAB308', '#8B5CF6', '#B91C1C'];
     const index = name.charCodeAt(0) % colors.length;
     return colors[index];
   }

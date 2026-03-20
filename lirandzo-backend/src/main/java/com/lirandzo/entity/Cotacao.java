@@ -28,6 +28,7 @@ public class Cotacao {
     @NotNull(message = "Customer is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
+    @JsonIgnoreProperties({"encomendas"})
     private Cliente cliente;
 
     @NotBlank(message = "Origin is required")
@@ -152,6 +153,6 @@ public class Cotacao {
     }
 
     public enum StatusCotacao {
-        PENDING, RESPONDED, QUOTATION_GENERATED, EXPIRED, CANCELLED
+        PENDING, RESPONDED, QUOTATION_GENERATED, EXPIRED, CANCELLED, INVOICED
     }
 }

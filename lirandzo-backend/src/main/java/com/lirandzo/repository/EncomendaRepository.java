@@ -9,9 +9,12 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EncomendaRepository extends JpaRepository<Encomenda, Long> {
+
+    Optional<Encomenda> findByCotacao_Id(Long cotacaoId);
     
     @EntityGraph(attributePaths = {"cliente"})
     @Query("SELECT e FROM Encomenda e")

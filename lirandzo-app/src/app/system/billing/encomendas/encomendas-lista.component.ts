@@ -8,6 +8,7 @@ import { EncomendaService, EncomendaResponse } from '../../../services/encomenda
 interface EncomendaDisplay {
   id: number;
   numero: string;
+  factura: string;
   cliente: string;
   telefone: string;
   produto: string;
@@ -63,13 +64,11 @@ export class EncomendasListaComponent implements OnInit {
     // Mapear status da API para formato de exibição
     let statusDisplay = 'NÃO PAGO';
     const statusUpper = (encomenda.status || '').toUpperCase();
-    if (statusUpper === 'PAGO') {
+    if (statusUpper === 'PAID' || statusUpper === 'PAGO') {
       statusDisplay = 'PAGO';
-    } else if (statusUpper === 'PARCIAL') {
+    } else if (statusUpper === 'PARTIAL' || statusUpper === 'PARCIAL') {
       statusDisplay = 'PARCIAL';
-    } else if (statusUpper === 'NAO_PAGO' || statusUpper === 'NÃO_PAGO') {
-      statusDisplay = 'NÃO PAGO';
-    } else {
+    } else if (statusUpper === 'UNPAID' || statusUpper === 'NAO_PAGO' || statusUpper === 'NÃO_PAGO') {
       statusDisplay = 'NÃO PAGO';
     }
 
@@ -84,10 +83,12 @@ export class EncomendasListaComponent implements OnInit {
 
     // Formatar número de encomenda (com padding de zeros)
     const numeroFormatado = `VML-${String(encomenda.numeroEncomenda).padStart(4, '0')}`;
+    const factura = encomenda.invoiceNumber?.trim() || '—';
 
     return {
       id: encomenda.numeroEncomenda,
       numero: numeroFormatado,
+      factura,
       cliente: encomenda.cliente?.nome || 'Cliente não especificado',
       telefone: encomenda.cliente?.telefone || '',
       produto: encomenda.produto || '',
@@ -108,9 +109,10 @@ export class EncomendasListaComponent implements OnInit {
     }
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
-      list = list.filter(e => 
-        e.numero.toLowerCase().includes(term) || 
-        e.cliente.toLowerCase().includes(term) || 
+      list = list.filter(e =>
+        e.numero.toLowerCase().includes(term) ||
+        e.factura.toLowerCase().includes(term) ||
+        e.cliente.toLowerCase().includes(term) ||
         e.produto.toLowerCase().includes(term) ||
         e.origem.toLowerCase().includes(term) ||
         e.destino.toLowerCase().includes(term)

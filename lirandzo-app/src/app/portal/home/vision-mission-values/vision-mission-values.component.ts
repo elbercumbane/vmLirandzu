@@ -44,18 +44,18 @@ export class VisionMissionValuesComponent implements OnInit, AfterViewInit {
         title: t('vmv.mission.title'),
         text: t('vmv.mission.text'),
         icon: 'target',
-        circleColor: '#13243A',
+        circleColor: '#2b2d42',
         titleColor: '#f8fafc',
-        textColor: '#cbd5e1'
+        textColor: '#f8fafc'
       },
       {
         type: 'visao',
         title: t('vmv.vision.title'),
         text: t('vmv.vision.text'),
         icon: 'eye',
-        circleColor: '#1a4a72',
+        circleColor: 'var(--brand-red)',
         titleColor: '#f8fafc',
-        textColor: '#cbd5e1'
+        textColor: '#ffffff'
       },
       {
         type: 'valores',

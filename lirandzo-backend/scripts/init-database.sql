@@ -176,9 +176,15 @@ CREATE TABLE IF NOT EXISTS orders (
     status VARCHAR(20) NOT NULL DEFAULT 'UNPAID',
     order_date DATE,
     trip_id BIGINT REFERENCES trips(id) ON DELETE SET NULL,
+    invoice_number VARCHAR(50),
+    invoice_date DATE,
+    quotation_id BIGINT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_orders_invoice_number ON orders(invoice_number) WHERE invoice_number IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_orders_quotation_id ON orders(quotation_id);
 
 -- Payments table
 CREATE TABLE IF NOT EXISTS payments (
@@ -188,8 +194,12 @@ CREATE TABLE IF NOT EXISTS payments (
     payment_date DATE,
     reference VARCHAR(100),
     notes VARCHAR(500),
+    payment_method VARCHAR(50),
+    verification_status VARCHAR(30) NOT NULL DEFAULT 'CONFIRMED',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX IF NOT EXISTS idx_payments_verification_status ON payments(verification_status);
 
 -- ============================================================================
 -- INDEXES FOR PERFORMANCE
@@ -273,6 +283,9 @@ CREATE INDEX IF NOT EXISTS idx_quotations_customer ON quotations(customer_id);
 CREATE INDEX IF NOT EXISTS idx_quotations_status ON quotations(status);
 CREATE INDEX IF NOT EXISTS idx_quotations_quotation_date ON quotations(quotation_date);
 CREATE INDEX IF NOT EXISTS idx_quotations_reference ON quotations(reference);
+
+ALTER TABLE orders DROP CONSTRAINT IF EXISTS fk_orders_quotation;
+ALTER TABLE orders ADD CONSTRAINT fk_orders_quotation FOREIGN KEY (quotation_id) REFERENCES quotations(id) ON DELETE SET NULL;
 
 -- ============================================================================
 -- DELIVERY NOTES MANAGEMENT

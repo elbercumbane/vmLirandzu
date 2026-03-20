@@ -28,6 +28,7 @@ public class Encomenda {
     @NotNull(message = "Customer is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
+    @JsonIgnoreProperties({"encomendas"})
     private Cliente cliente;
 
     @NotBlank(message = "Produto é obrigatório")
@@ -73,6 +74,17 @@ public class Encomenda {
     @JoinColumn(name = "trip_id")
     @JsonIgnoreProperties({"encomendas"})
     private Viagem viagem;
+
+    @Column(name = "invoice_number", length = 50)
+    private String invoiceNumber;
+
+    @Column(name = "invoice_date")
+    private LocalDate invoiceDate;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "quotation_id")
+    @JsonIgnoreProperties({"cliente", "revisaoDe"})
+    private Cotacao cotacao;
 
     @PrePersist
     protected void onCreate() {

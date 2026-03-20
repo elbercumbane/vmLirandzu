@@ -1,6 +1,7 @@
-import { Component, AfterViewInit, ElementRef, inject } from '@angular/core';
+import { Component, AfterViewInit, ElementRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslocoModule, TranslocoService } from '@ngneat/transloco';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -9,37 +10,50 @@ gsap.registerPlugin(ScrollTrigger);
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslocoModule],
   templateUrl: './about.component.html',
   styleUrl: './about.component.css'
 })
-export class AboutComponent implements AfterViewInit {
-
+export class AboutComponent implements OnInit, AfterViewInit {
   private el = inject(ElementRef);
+  private transloco = inject(TranslocoService);
 
-  stats = [
-    { value: '+10', label: 'anos de experiência', suffix: '' },
-    { value: '24/7', label: 'rastreamento GPS', suffix: '' },
-    { value: '99', label: 'entregas no prazo', suffix: '%' },
-    { value: '+50', label: 'veículos', suffix: '' }
-  ];
+  stats: { value: string; label: string; suffix: string }[] = [];
+  introFeatures: { icon: string; label: string }[] = [];
+  team: { name: string; role: string; description: string; image: string }[] = [];
+  certifications: { icon: string; title: string; desc: string }[] = [];
 
-  introFeatures = [
-    { icon: '🌐', label: 'Cobertura Nacional' },
-    { icon: '📡', label: 'Rastreamento GPS 24/7' }
-  ];
+  ngOnInit(): void {
+    const build = () => this.buildContent();
+    this.transloco.load(this.transloco.getActiveLang() || 'pt').subscribe(() => build());
+    this.transloco.langChanges$.subscribe(lang => {
+      this.transloco.load(lang).subscribe(() => build());
+    });
+  }
 
-  team = [
-    { name: 'Operações & Motoristas', role: 'Equipa de campo', description: 'Condutores experientes e técnicos de logística que garantem cada entrega.', image: '/motorista-camiao.jpg' },
-    { name: 'Suporte ao Cliente', role: 'Atendimento 24/7', description: 'Equipa dedicada a informação clara e resolução imediata de questões.', image: '/motorista-cabine.jpg' },
-    { name: 'Gestão & Planeamento', role: 'Estratégia', description: 'Profissionais que otimizam rotas e garantem eficiência operacional.', image: '/equipa-maos-juntas.jpg' }
-  ];
-
-  certifications = [
-    { icon: '📋', title: 'Licenciamento INATTER', desc: 'Transporte rodoviário nacional e internacional certificado.' },
-    { icon: '🛡', title: 'Segurança e boas práticas', desc: 'Protocolos rigorosos de segurança e condutores formados.' },
-    { icon: '✅', title: 'Parceiros auditados', desc: 'Cadeia de fornecedores verificada e auditada.' }
-  ];
+  private buildContent(): void {
+    const t = (k: string) => this.transloco.translate(k);
+    this.stats = [
+      { value: '+10', label: t('about.stats.s1'), suffix: '' },
+      { value: '24/7', label: t('about.stats.s2'), suffix: '' },
+      { value: '99', label: t('about.stats.s3'), suffix: '%' },
+      { value: '+50', label: t('about.stats.s4'), suffix: '' }
+    ];
+    this.introFeatures = [
+      { icon: '🌐', label: t('about.who.f1') },
+      { icon: '📡', label: t('about.who.f2') }
+    ];
+    this.team = [
+      { name: t('about.team.m1.name'), role: t('about.team.m1.role'), description: t('about.team.m1.desc'), image: '/motorista-camiao.jpg' },
+      { name: t('about.team.m2.name'), role: t('about.team.m2.role'), description: t('about.team.m2.desc'), image: '/motorista-cabine.jpg' },
+      { name: t('about.team.m3.name'), role: t('about.team.m3.role'), description: t('about.team.m3.desc'), image: '/equipa-maos-juntas.jpg' }
+    ];
+    this.certifications = [
+      { icon: '📋', title: t('about.certs.c1.title'), desc: t('about.certs.c1.desc') },
+      { icon: '🛡', title: t('about.certs.c2.title'), desc: t('about.certs.c2.desc') },
+      { icon: '✅', title: t('about.certs.c3.title'), desc: t('about.certs.c3.desc') }
+    ];
+  }
 
   ngAfterViewInit(): void {
     const host = this.el.nativeElement as HTMLElement;

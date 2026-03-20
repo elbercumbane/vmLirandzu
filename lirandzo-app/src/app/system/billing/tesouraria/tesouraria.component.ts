@@ -1,62 +1,176 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
+import { PagamentoService, PagamentoResponse } from '../../../services/pagamento.service';
+import { EncomendaService, EncomendaResponse } from '../../../services/encomenda.service';
+
+interface RecebimentoRow {
+  id: number;
+  data: string;
+  cliente: string;
+  referencia: string;
+  valor: number;
+  metodo: string;
+  encomendaLabel: string;
+  encomendaId: number;
+  factura: string;
+  estado: string;
+  verificationStatus: string;
+}
+
+interface DividaRow {
+  cliente: string;
+  encomendaLabel: string;
+  encomendaId: number;
+  valor: number;
+  dias: number;
+}
 
 @Component({
   selector: 'app-tesouraria',
   standalone: true,
-  imports: [CommonModule, FormsModule, BillingSectionHeaderComponent],
+  imports: [CommonModule, FormsModule, RouterLink, BillingSectionHeaderComponent],
   templateUrl: './tesouraria.component.html',
   styleUrls: ['../shared/billing-page.css', './tesouraria.component.css']
 })
-export class TesourariaComponent {
-  activeTab = 'RECEBIMENTOS';
+export class TesourariaComponent implements OnInit {
+  helpItems = [
+    'Os recebimentos vêm das encomendas: abra cada encomenda e registe o valor com a referência do M-Pesa ou extrato.',
+    'Se ainda não verificou no banco, marque «aguarda extrato»; o valor aparece na aba Conciliação até confirmar.',
+    'Após cruzar com o extrato ou app M-Pesa, confirme o pagamento para actualizar a dívida do cliente.',
+    'As despesas mostradas são exemplos locais até existir módulo de despesas na base de dados.'
+  ];
+
+  activeTab: 'RECEBIMENTOS' | 'CONCILIACAO' | 'DESPESAS' | 'DIVIDAS' = 'RECEBIMENTOS';
   mostrarFormRecebimento = false;
   mostrarFormDespesa = false;
 
-  novoRecebimento = { data: '', cliente: '', referencia: '', valor: null as number | null, metodo: '', encomenda: '', observacao: '' };
+  loading = true;
+  erro: string | null = null;
+
+  novoRecebimento = {
+    data: '',
+    cliente: '',
+    referencia: '',
+    valor: null as number | null,
+    metodo: '',
+    encomenda: '',
+    observacao: ''
+  };
+
   novaDespesa = { data: '', descricao: '', categoria: '', valor: null as number | null, viatura: '', observacao: '' };
 
   metodosPagamento = ['Transferência Bancária', 'M-Pesa', 'e-Mola', 'Depósito', 'Numerário', 'Cheque'];
   categoriasDespesa = ['Combustível', 'Manutenção', 'Pneus', 'Portagem', 'Multa', 'Seguro', 'Lavagem', 'Peças', 'Salários', 'Outros'];
 
-  recebimentos = [
-    { id: 1, data: '20/01/2025', cliente: 'Ana Rodrigues', referencia: 'PAG-001', valor: 45200, metodo: 'Transferência', encomenda: 'VML-2025-0001', observacao: '' },
-    { id: 2, data: '18/01/2025', cliente: 'Carlos Mondlane', referencia: 'PAG-002', valor: 20000, metodo: 'M-Pesa', encomenda: 'VML-2025-0002', observacao: 'Pagamento parcial' },
-    { id: 3, data: '15/01/2025', cliente: 'Pedro Nhantumbo', referencia: 'PAG-003', valor: 41600, metodo: 'Depósito', encomenda: 'VML-2025-0006', observacao: '' },
-    { id: 4, data: '14/01/2025', cliente: 'António Bila', referencia: 'PAG-004', valor: 8750, metodo: 'Numerário', encomenda: 'VML-2025-0008', observacao: '' },
-    { id: 5, data: '12/01/2025', cliente: 'Maria Machava', referencia: 'PAG-005', valor: 10000, metodo: 'M-Pesa', encomenda: 'VML-2025-0005', observacao: 'Pagamento parcial' },
-    { id: 6, data: '10/01/2025', cliente: 'José Tembe', referencia: 'PAG-006', valor: 52000, metodo: 'Transferência', encomenda: 'VML-2025-0004', observacao: '' }
-  ];
+  recebimentos: RecebimentoRow[] = [];
+  pendentesConciliacao: PagamentoResponse[] = [];
+  dividasPendentes: DividaRow[] = [];
+
+  confirmandoId: number | null = null;
 
   despesas = [
-    { id: 1, data: '19/01/2025', descricao: 'Combustível — Volvo FH16 (Maputo-Beira)', categoria: 'Combustível', valor: 12500, viatura: 'MDD-45-78', observacao: '350 litros' },
-    { id: 2, data: '17/01/2025', descricao: 'Pneus dianteiros — Scania R450', categoria: 'Pneus', valor: 45000, viatura: 'MPT-12-34', observacao: '2 pneus Bridgestone' },
-    { id: 3, data: '15/01/2025', descricao: 'Portagem EN1 Maputo-Xai-Xai (ida e volta)', categoria: 'Portagem', valor: 1800, viatura: 'MDD-45-78', observacao: '' },
-    { id: 4, data: '12/01/2025', descricao: 'Multa — excesso de velocidade', categoria: 'Multa', valor: 5000, viatura: 'MNP-56-90', observacao: 'Auto nº 4521' },
-    { id: 5, data: '10/01/2025', descricao: 'Combustível — Isuzu NPR (cidade)', categoria: 'Combustível', valor: 8200, viatura: 'MTT-67-89', observacao: '180 litros' },
-    { id: 6, data: '08/01/2025', descricao: 'Revisão completa — Mercedes Actros', categoria: 'Manutenção', valor: 38000, viatura: 'MBR-89-12', observacao: 'Revisão 250.000km' },
-    { id: 7, data: '05/01/2025', descricao: 'Seguro anual — Iveco Stralis', categoria: 'Seguro', valor: 65000, viatura: 'MNP-56-90', observacao: '' }
+    { id: 1, data: '19/01/2025', descricao: 'Combustível — exemplo local', categoria: 'Combustível', valor: 12500, viatura: 'MDD-45-78', observacao: 'Registo interno' }
   ];
 
-  dividasPendentes = [
-    { cliente: 'Fátima Cossa', encomenda: 'VML-2025-0003', valor: 12800, dias: 18 },
-    { cliente: 'Lurdes Sitoe', encomenda: 'VML-2025-0007', valor: 29400, dias: 11 },
-    { cliente: 'Domingos Cuamba', encomenda: 'VML-2025-0010', valor: 33900, dias: 8 },
-    { cliente: 'Carlos Mondlane', encomenda: 'VML-2025-0002', valor: 18500, dias: 21 },
-    { cliente: 'Maria Machava', encomenda: 'VML-2025-0005', valor: 8300, dias: 14 },
-    { cliente: 'Rosa Mahumane', encomenda: 'VML-2025-0009', valor: 7200, dias: 9 }
-  ];
+  constructor(
+    private pagamentoService: PagamentoService,
+    private encomendaService: EncomendaService
+  ) {}
 
-  get totalRecebido() { return this.recebimentos.reduce((s, r) => s + r.valor, 0); }
-  get totalDespesas() { return this.despesas.reduce((s, d) => s + d.valor, 0); }
-  get saldo() { return this.totalRecebido - this.totalDespesas; }
-  get totalDividas() { return this.dividasPendentes.reduce((s, d) => s + d.valor, 0); }
+  ngOnInit(): void {
+    const hoje = new Date().toISOString().split('T')[0];
+    this.novoRecebimento.data = hoje;
+    this.carregarDados();
+  }
+
+  carregarDados(): void {
+    this.loading = true;
+    this.erro = null;
+
+    forkJoin({
+      pagamentos: this.pagamentoService.listarTodos(),
+      pendentes: this.pagamentoService.listarPendentesConciliacao(),
+      encomendas: this.encomendaService.listarEncomendas()
+    }).subscribe({
+      next: ({ pagamentos, pendentes, encomendas }) => {
+        this.pendentesConciliacao = pendentes;
+        this.recebimentos = pagamentos.map((p) => this.mapearRecebimento(p));
+        this.dividasPendentes = this.mapearDividas(encomendas);
+        this.loading = false;
+      },
+      error: (e) => {
+        console.error(e);
+        this.erro = 'Não foi possível carregar dados da tesouraria.';
+        this.loading = false;
+      }
+    });
+  }
+
+  private mapearRecebimento(p: PagamentoResponse): RecebimentoRow {
+    const enc = p.encomenda;
+    const num = enc?.numeroEncomenda ?? 0;
+    return {
+      id: p.id,
+      data: p.dataPagamento
+        ? new Date(p.dataPagamento).toLocaleDateString('pt-MZ', { day: '2-digit', month: '2-digit', year: 'numeric' })
+        : '—',
+      cliente: enc?.cliente?.nome || '—',
+      referencia: p.referencia || '—',
+      valor: p.valor || 0,
+      metodo: p.metodoPagamento || '—',
+      encomendaLabel: num ? `VML-${String(num).padStart(4, '0')}` : '—',
+      encomendaId: num,
+      factura: enc?.invoiceNumber || '—',
+      estado: p.verificationStatus === 'PENDING_BANK' ? 'Aguarda extrato' : 'Confirmado',
+      verificationStatus: p.verificationStatus
+    };
+  }
+
+  private mapearDividas(encomendas: EncomendaResponse[]): DividaRow[] {
+    const hoje = new Date();
+    return encomendas
+      .filter((e) => (e.valorDivida || 0) > 0)
+      .map((e) => {
+        const d0 = e.dataEncomenda ? new Date(e.dataEncomenda) : hoje;
+        const dias = Math.max(0, Math.floor((hoje.getTime() - d0.getTime()) / 86400000));
+        return {
+          cliente: e.cliente?.nome || '—',
+          encomendaLabel: `VML-${String(e.numeroEncomenda).padStart(4, '0')}`,
+          encomendaId: e.numeroEncomenda,
+          valor: e.valorDivida || 0,
+          dias
+        };
+      })
+      .sort((a, b) => b.dias - a.dias);
+  }
+
+  get totalRecebido(): number {
+    return this.recebimentos.filter((r) => r.verificationStatus === 'CONFIRMED').reduce((s, r) => s + r.valor, 0);
+  }
+
+  get totalPendenteConciliacao(): number {
+    return this.pendentesConciliacao.reduce((s, p) => s + (p.valor || 0), 0);
+  }
+
+  get totalDespesas(): number {
+    return this.despesas.reduce((s, d) => s + d.valor, 0);
+  }
+
+  get saldo(): number {
+    return this.totalRecebido - this.totalDespesas;
+  }
+
+  get totalDividas(): number {
+    return this.dividasPendentes.reduce((s, d) => s + d.valor, 0);
+  }
 
   get despesasPorCategoria() {
     const map = new Map<string, number>();
-    this.despesas.forEach(d => map.set(d.categoria, (map.get(d.categoria) || 0) + d.valor));
+    this.despesas.forEach((d) => map.set(d.categoria, (map.get(d.categoria) || 0) + d.valor));
     return Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
   }
 
@@ -66,8 +180,21 @@ export class TesourariaComponent {
     return 'badge-info';
   }
 
+  confirmarPagamento(p: PagamentoResponse): void {
+    this.confirmandoId = p.id;
+    this.pagamentoService.confirmarConciliacao(p.id).subscribe({
+      next: () => {
+        this.confirmandoId = null;
+        this.carregarDados();
+      },
+      error: () => {
+        this.confirmandoId = null;
+      }
+    });
+  }
+
   registarRecebimento(): void {
-    console.log('Novo recebimento:', this.novoRecebimento);
+    console.log('Formulário de recebimento sem encomenda: use a página da encomenda para lançar pagamentos.');
     this.mostrarFormRecebimento = false;
   }
 
@@ -76,7 +203,8 @@ export class TesourariaComponent {
     this.mostrarFormDespesa = false;
   }
 
-  registarPagamentoDivida(divida: { cliente: string; encomenda: string; valor: number }): void {
-    console.log('Registar pagamento dívida:', divida);
+  formatarEnc(num: number | undefined): string {
+    if (num == null) return '—';
+    return `VML-${String(num).padStart(4, '0')}`;
   }
 }

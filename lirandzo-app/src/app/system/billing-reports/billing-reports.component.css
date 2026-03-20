@@ -25,7 +25,7 @@
   position: relative;
   margin-bottom: 0;
   padding: 1.25rem 1.5rem;
-  background: linear-gradient(135deg, #C45C0A 0%, #F97316 50%, #EA580C 100%);
+  background: linear-gradient(135deg, #991B1B 0%, #DC2626 50%, #B91C1C 100%);
   border-radius: 0.9rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: var(--shadow-card);
@@ -413,7 +413,7 @@
 
 /* Card variants: accent, success, danger, info */
 .reports-kpi-accent .reports-kpi-top-line { background: var(--accent); }
-.reports-kpi-accent .reports-kpi-icon { background: rgba(249, 115, 22, 0.18); color: var(--accent); }
+.reports-kpi-accent .reports-kpi-icon { background: rgba(220, 38, 38, 0.18); color: var(--accent); }
 .reports-kpi-accent .reports-kpi-value { color: var(--text-primary); }
 
 .reports-kpi-success .reports-kpi-top-line { background: var(--success); }
@@ -679,7 +679,7 @@
 .reports-table-trip {
   font-family: 'Courier New', monospace;
   font-size: 0.85rem;
-  color: #FBBF24;
+  color: #F87171;
 }
 
 .reports-action-button {
@@ -767,7 +767,7 @@
 
 .status-planned {
   background: rgba(180, 83, 9, 0.9);
-  color: #fed7aa;
+  color: #fecaca;
 }
 
 /* Export Grid */

@@ -49,6 +49,7 @@
         <button class="filter-chip" [class.active]="filtroEstado === 'COTAÇÃO GERADA'" (click)="filtroEstado = 'COTAÇÃO GERADA'">Pendente de Confirmação</button>
       <button class="filter-chip" [class.active]="filtroEstado === 'RESPONDIDO'" (click)="filtroEstado = 'RESPONDIDO'">Enviadas</button>
         <button class="filter-chip" [class.active]="filtroEstado === 'CANCELADA'" (click)="filtroEstado = 'CANCELADA'">Canceladas</button>
+      <button class="filter-chip" [class.active]="filtroEstado === 'FACTURADA'" (click)="filtroEstado = 'FACTURADA'">Facturadas</button>
     </div>
   </div>
 
@@ -107,8 +108,18 @@
                 <button type="button" class="btn-secondary btn-sm" (click)="baixarOuVerPdf(c)">
                   PDF
                 </button>
+                @if (podeEmitirFactura(c.estado)) {
+                  <button
+                    type="button"
+                    class="btn-primary btn-sm"
+                    [disabled]="emitindoCotacaoId === c.id"
+                    (click)="emitirFactura(c)"
+                  >
+                    {{ emitindoCotacaoId === c.id ? 'A emitir…' : 'Emitir factura' }}
+                  </button>
+                }
                 @if (c.estado === 'COTAÇÃO GERADA') {
-                  <button type="button" class="btn-primary btn-sm" (click)="confirmarEnvio(c)">
+                  <button type="button" class="btn-secondary btn-sm" (click)="confirmarEnvio(c)">
                     Confirmar envio
                   </button>
                   <button type="button" class="btn-danger btn-sm" (click)="cancelarCotacao(c)">
