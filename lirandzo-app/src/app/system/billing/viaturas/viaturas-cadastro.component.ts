@@ -18,12 +18,18 @@ export class ViaturasCadastroComponent {
     matricula: '',
     marca: '',
     modelo: '',
+    ano: null as number | null,
+    cor: '',
     tipo: '',
     capacidade: null as number | null,
-    status: 'ATIVA'
+    capacidadeUnidade: 'KG',
+    combustivel: '',
+    numeroChassis: '',
+    status: 'ACTIVE'
   };
 
-  tiposViatura = ['Camião Pesado', 'Camião Médio', 'Camião Leve', 'Reboque', 'Semi-Reboque'];
+  tiposViatura = ['Camião Pesado', 'Camião Médio', 'Camião Leve', 'Carro ligeiro', 'Carro comercial', 'Reboque', 'Semi-Reboque', 'Outros'];
+  tipoOutros = '';
 
   loading = false;
   showNotification = false;
@@ -36,16 +42,16 @@ export class ViaturasCadastroComponent {
   ) {}
 
   salvar() {
-    if (!this.viatura.matricula || !this.viatura.matricula.trim()) {
-      this.mostrarNotificacao('Por favor, preencha a matrícula da viatura.', 'error');
+    if (!this.viatura.matricula?.trim()) {
+      this.mostrarNotificacao('Por favor, preencha a matrícula.', 'error');
       return;
     }
-    if (!this.viatura.marca || !this.viatura.marca.trim()) {
-      this.mostrarNotificacao('Por favor, preencha a marca da viatura.', 'error');
+    if (!this.viatura.marca?.trim()) {
+      this.mostrarNotificacao('Por favor, preencha a marca.', 'error');
       return;
     }
-    if (!this.viatura.modelo || !this.viatura.modelo.trim()) {
-      this.mostrarNotificacao('Por favor, preencha o modelo da viatura.', 'error');
+    if (!this.viatura.modelo?.trim()) {
+      this.mostrarNotificacao('Por favor, preencha o modelo.', 'error');
       return;
     }
 
@@ -53,18 +59,21 @@ export class ViaturasCadastroComponent {
       matricula: this.viatura.matricula.trim(),
       marca: this.viatura.marca.trim(),
       modelo: this.viatura.modelo.trim(),
-      tipo: this.viatura.tipo?.trim() || undefined,
+      ano: this.viatura.ano || undefined,
+      cor: this.viatura.cor?.trim() || undefined,
+      tipo: this.obterTipoParaGuardar(),
       capacidade: this.viatura.capacidade || undefined,
-      status: this.viatura.status as 'ATIVA' | 'EM_MANUTENCAO' | 'RESERVADA' | 'INATIVA'
+      capacidadeUnidade: this.viatura.capacidadeUnidade || 'KG',
+      combustivel: this.viatura.combustivel?.trim() || undefined,
+      numeroChassis: this.viatura.numeroChassis?.trim() || undefined,
+      status: this.viatura.status
     };
 
     this.loading = true;
     this.viaturaService.criarViatura(viaturaData).subscribe({
       next: (viatura) => {
-        this.mostrarNotificacao('Viatura guardada com sucesso!', 'success');
-        setTimeout(() => {
-          this.router.navigate(['/billing/viaturas', viatura.id]);
-        }, 1500);
+        this.mostrarNotificacao('Viatura registada com sucesso!', 'success');
+        setTimeout(() => this.router.navigate(['/billing/viaturas', viatura.id]), 1500);
       },
       error: (error) => {
         console.error('Erro ao guardar viatura:', error);
@@ -74,12 +83,19 @@ export class ViaturasCadastroComponent {
     });
   }
 
+  obterTipoParaGuardar(): string | undefined {
+    const t = this.viatura.tipo?.trim();
+    if (!t) return undefined;
+    if (t === 'Outros' && this.tipoOutros?.trim()) {
+      return `Outros - ${this.tipoOutros.trim()}`;
+    }
+    return t;
+  }
+
   mostrarNotificacao(message: string, type: 'success' | 'error') {
     this.notificationMessage = message;
     this.notificationType = type;
     this.showNotification = true;
-    setTimeout(() => {
-      this.showNotification = false;
-    }, 7000);
+    setTimeout(() => { this.showNotification = false; }, 7000);
   }
 }

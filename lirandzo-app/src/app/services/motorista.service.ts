@@ -6,9 +6,23 @@ import { environment } from '@environments/environment';
 export interface Motorista {
   id?: number;
   nome: string;
+  dataNascimento?: string;
+  morada?: string;
+  nomePai?: string;
+  nomeMae?: string;
+  nuit?: string;
+  numeroBI?: string;
   telefone?: string;
+  telefone2?: string;
+  nomeParenteEmergencia?: string;
+  parentesco?: string;
+  telefoneParenteEmergencia?: string;
   numeroCarta?: string;
+  categoriaCarta?: string;
+  dataEmissaoCarta?: string;
+  dataValidadeCarta?: string;
   avaliacaoMedia?: number;
+  numeroViagens?: number;
   status?: string;
 }
 

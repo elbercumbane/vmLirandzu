@@ -77,6 +77,9 @@ public class CotacaoService {
         cotacao.setStatus(Cotacao.StatusCotacao.PENDING);
         cotacao.setObservacoes("Pedido vindo do portal");
         cotacao.setFormaEnvioPreferida(dto.formaEnvioPreferida());
+        cotacao.setFontePedido("PORTAL");
+        cotacao.setTipoServico(dto.tipoServico() != null && !dto.tipoServico().isBlank()
+                ? dto.tipoServico().toUpperCase() : "TRANSPORTE");
 
         cotacaoRepository.save(cotacao);
     }
@@ -87,22 +90,28 @@ public class CotacaoService {
                     cotacao.setCliente(cotacaoAtualizada.getCliente());
                     cotacao.setOrigem(cotacaoAtualizada.getOrigem());
                     cotacao.setDestino(cotacaoAtualizada.getDestino());
+                    if (cotacaoAtualizada.getTipoServico() != null) cotacao.setTipoServico(cotacaoAtualizada.getTipoServico());
                     cotacao.setTipoVeiculo(cotacaoAtualizada.getTipoVeiculo());
                     cotacao.setDescricaoCarga(cotacaoAtualizada.getDescricaoCarga());
                     cotacao.setValorTotal(cotacaoAtualizada.getValorTotal());
                     cotacao.setCustoTransporte(cotacaoAtualizada.getCustoTransporte());
                     cotacao.setCustoRecolha(cotacaoAtualizada.getCustoRecolha());
                     cotacao.setCustoBillOfEntry(cotacaoAtualizada.getCustoBillOfEntry());
-                    cotacao.setDataCotacao(cotacaoAtualizada.getDataCotacao());
-                    cotacao.setDataValidade(cotacaoAtualizada.getDataValidade());
+                    // dataCotacao e validade devem ser imutáveis:
+                    //  - vêm do portal (quando fontePedido=PORTAL)
+                    //  - ou correspondem à data "manual" de criação
+                    // Mantemos o valor existente e recalculamos apenas a validade = dataCotacao + 3 dias.
+                    if (cotacao.getDataCotacao() != null) {
+                        cotacao.setDataValidade(cotacao.getDataCotacao().plusDays(3));
+                    }
                     cotacao.setStatus(cotacaoAtualizada.getStatus());
                     cotacao.setObservacoes(cotacaoAtualizada.getObservacoes());
                     cotacao.setCondicoes(cotacaoAtualizada.getCondicoes());
                     cotacao.setOperador(cotacaoAtualizada.getOperador());
                     cotacao.setFormaEnvioPreferida(cotacaoAtualizada.getFormaEnvioPreferida());
                     cotacao.setFormaEnvioRealizada(cotacaoAtualizada.getFormaEnvioRealizada());
-                    if (cotacaoAtualizada.getStatus() == StatusCotacao.RESPONDED ||
-                        cotacaoAtualizada.getStatus() == StatusCotacao.QUOTATION_GENERATED) {
+                    // Regra do sistema: o "tempo resposta" fecha quando o operador confirma o envio (RESPONDED).
+                    if (cotacaoAtualizada.getStatus() == StatusCotacao.RESPONDED) {
                         cotacao.setDataResposta(java.time.LocalDateTime.now());
                     }
                     return cotacaoRepository.save(cotacao);

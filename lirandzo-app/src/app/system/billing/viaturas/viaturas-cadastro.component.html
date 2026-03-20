@@ -6,9 +6,9 @@
   subtitle="Registar nova viatura na frota"
   helpTitle="Como registar uma Viatura"
   [helpItems]="[
-    'Informe a matrícula, marca, modelo, tipo e ano da viatura.',
-    'Defina capacidade, consumo médio e estado actual para planeamento da frota.',
-    'Estes dados serão usados no futuro para manutenção e controlo de custos.'
+    'Preencha a matrícula, marca, modelo, ano e cor.',
+    'Informe tipo, capacidade, combustível e número do chassis.',
+    'Defina o status actual da viatura.'
   ]"
 ></app-billing-section-header>
 
@@ -29,6 +29,14 @@
         <input type="text" class="form-control" placeholder="Ex: FH16, R450" [(ngModel)]="viatura.modelo" name="modelo" required>
       </div>
       <div class="form-group">
+        <label class="form-label">Ano</label>
+        <input type="number" class="form-control" placeholder="Ex: 2020" [(ngModel)]="viatura.ano" name="ano" min="1900" max="2100">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cor</label>
+        <input type="text" class="form-control" placeholder="Ex: Branco, Azul" [(ngModel)]="viatura.cor" name="cor">
+      </div>
+      <div class="form-group">
         <label class="form-label">Tipo</label>
         <select class="form-control" [(ngModel)]="viatura.tipo" name="tipo">
           <option value="">Seleccionar tipo</option>
@@ -37,28 +45,53 @@
           }
         </select>
       </div>
+      @if (viatura.tipo === 'Outros') {
+        <div class="form-group">
+          <label class="form-label">Especificar tipo</label>
+          <input type="text" class="form-control" placeholder="Ex: Minibus, Pick-up..." [(ngModel)]="tipoOutros" name="tipoOutros">
+        </div>
+      }
       <div class="form-group">
-        <label class="form-label">Capacidade (ton)</label>
-        <input type="number" class="form-control" placeholder="Ex: 25" [(ngModel)]="viatura.capacidade" name="capacidade" min="0">
+        <label class="form-label">Capacidade de carga</label>
+        <div class="capacity-input-group">
+          <input type="number" class="form-control" placeholder="Ex: 1500 ou 25" [(ngModel)]="viatura.capacidade" name="capacidade" min="0" step="0.01">
+          <select class="form-control capacity-unit" [(ngModel)]="viatura.capacidadeUnidade" name="capacidadeUnidade">
+            <option value="KG">kg</option>
+            <option value="TON">ton</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Combustível</label>
+        <select class="form-control" [(ngModel)]="viatura.combustivel" name="combustivel">
+          <option value="">Seleccionar</option>
+          <option value="Gasolina">Gasolina</option>
+          <option value="Gasóleo">Gasóleo</option>
+          <option value="Eléctrico">Eléctrico</option>
+        </select>
+      </div>
+      <div class="form-group full-width">
+        <label class="form-label">Número do chassis</label>
+        <input type="text" class="form-control" placeholder="Número de identificação do chassis" [(ngModel)]="viatura.numeroChassis" name="numeroChassis">
       </div>
       <div class="form-group">
         <label class="form-label">Status</label>
         <select class="form-control" [(ngModel)]="viatura.status" name="status">
-          <option value="ATIVA">Ativa</option>
-          <option value="EM_MANUTENCAO">Em Manutenção</option>
-          <option value="RESERVADA">Reservada</option>
-          <option value="INATIVA">Inativa</option>
+          <option value="ACTIVE">Activa</option>
+          <option value="UNDER_MAINTENANCE">Em Manutenção</option>
+          <option value="RESERVED">Reservada</option>
+          <option value="INACTIVE">Inactiva</option>
         </select>
       </div>
     </div>
 
     <div class="form-actions">
       <a routerLink="/billing/viaturas" class="btn-secondary">Cancelar</a>
-      <button type="button" class="btn-primary" (click)="salvar()" [disabled]="loading">
+      <button type="submit" class="btn-primary" [disabled]="loading">
         @if (loading) {
           Guardando...
         } @else {
-          Guardar Viatura
+          Registar
         }
       </button>
     </div>

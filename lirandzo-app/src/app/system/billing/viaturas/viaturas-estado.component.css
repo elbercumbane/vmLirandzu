@@ -1,3 +1,9 @@
+.form-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
 .register-form {
   animation: slideDown 0.2s ease;
 }
@@ -103,4 +109,27 @@
   display: flex;
   gap: 0.35rem;
   align-items: center;
+}
+
+.link-viatura {
+  text-decoration: none;
+  display: block;
+}
+.link-viatura:hover div:first-child {
+  text-decoration: underline;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem;
+  border-radius: 6px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+.btn-icon:hover {
+  background: var(--bg-card-inner);
+  color: var(--primary);
 }

@@ -9,8 +9,10 @@ interface MotoristaDisplay {
   id: number;
   nome: string;
   telefone: string;
+  telefone2?: string;
   carta: string;
-  avaliacao: number;
+  categoria: string;
+  validadeCarta: string;
   status: string;
 }
 
@@ -54,6 +56,8 @@ export class MotoristasListaComponent implements OnInit {
 
   private mapearMotorista(motorista: Motorista): MotoristaDisplay {
     const statusMap: { [key: string]: string } = {
+      'ACTIVE': 'DISPONÍVEL',
+      'INACTIVE': 'INACTIVO',
       'ATIVO': 'DISPONÍVEL',
       'INATIVO': 'INACTIVO'
     };
@@ -64,8 +68,12 @@ export class MotoristasListaComponent implements OnInit {
       id: motorista.id || 0,
       nome: motorista.nome || '',
       telefone: motorista.telefone || 'N/A',
+      telefone2: motorista.telefone2,
       carta: motorista.numeroCarta || 'N/A',
-      avaliacao: motorista.avaliacaoMedia || 0,
+      categoria: motorista.categoriaCarta || '—',
+      validadeCarta: motorista.dataValidadeCarta
+        ? new Date(motorista.dataValidadeCarta).toLocaleDateString('pt-MZ')
+        : '—',
       status: statusDisplay
     };
   }
@@ -77,10 +85,13 @@ export class MotoristasListaComponent implements OnInit {
     }
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
-      list = list.filter(m => 
-        m.nome.toLowerCase().includes(term) || 
-        m.telefone.toLowerCase().includes(term)
-      );
+      list = list.filter(m => {
+        const tel2 = m.telefone2 || '';
+        return m.nome.toLowerCase().includes(term) ||
+          m.telefone.toLowerCase().includes(term) ||
+          tel2.toLowerCase().includes(term) ||
+          m.carta.toLowerCase().includes(term);
+      });
     }
     return list;
   }
@@ -88,11 +99,6 @@ export class MotoristasListaComponent implements OnInit {
   get totalMotoristas() { return this.motoristas.length; }
   get disponiveis() { return this.motoristas.filter(m => m.status === 'DISPONÍVEL').length; }
   get emViagem() { return this.motoristas.filter(m => m.status === 'EM VIAGEM').length; }
-  get avaliacaoMedia() {
-    if (this.motoristas.length === 0) return '0.0';
-    const sum = this.motoristas.reduce((a, m) => a + m.avaliacao, 0);
-    return (sum / this.motoristas.length).toFixed(1);
-  }
 
   setFilter(f: string) { this.activeFilter = f; }
 }

@@ -33,11 +33,26 @@ public class Viatura {
     @Column(name = "license_plate", nullable = false, length = 20, unique = true)
     private String matricula;
 
+    @Column(name = "year")
+    private Integer ano;
+
+    @Column(name = "color", length = 50)
+    private String cor;
+
     @Column(name = "type", length = 50)
     private String tipo;
 
     @Column(name = "capacity", columnDefinition = "DECIMAL(10,2)")
     private Double capacidade;
+
+    @Column(name = "capacity_unit", length = 10)
+    private String capacidadeUnidade;  // "KG" or "TON"
+
+    @Column(name = "fuel_type", length = 50)
+    private String combustivel;
+
+    @Column(name = "chassis_number", length = 50)
+    private String numeroChassis;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

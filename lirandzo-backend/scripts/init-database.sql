@@ -78,8 +78,13 @@ CREATE TABLE IF NOT EXISTS vehicles (
     brand VARCHAR(100) NOT NULL,
     model VARCHAR(100) NOT NULL,
     license_plate VARCHAR(20) NOT NULL UNIQUE,
+    year INTEGER,
+    color VARCHAR(50),
     type VARCHAR(50),
     capacity DECIMAL(10,2),
+    capacity_unit VARCHAR(10),
+    fuel_type VARCHAR(50),
+    chassis_number VARCHAR(50),
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     trip_count INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -90,14 +95,48 @@ CREATE TABLE IF NOT EXISTS vehicles (
 CREATE TABLE IF NOT EXISTS drivers (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(200) NOT NULL,
+    date_of_birth DATE,
+    address VARCHAR(500),
+    father_name VARCHAR(200),
+    mother_name VARCHAR(200),
+    nuit VARCHAR(20),
+    id_document_number VARCHAR(50),
     phone VARCHAR(50),
+    phone_2 VARCHAR(50),
+    emergency_contact_name VARCHAR(200),
+    emergency_contact_relationship VARCHAR(100),
+    emergency_contact_phone VARCHAR(50),
     license_number VARCHAR(50),
+    license_category VARCHAR(10),
+    license_issue_date DATE,
+    license_expiry_date DATE,
     average_rating DECIMAL(3,2) DEFAULT 0.0,
     trip_count INTEGER DEFAULT 0,
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Vehicle occurrences (acidentes, avarias, manutenção)
+CREATE TABLE IF NOT EXISTS vehicle_occurrences (
+    id BIGSERIAL PRIMARY KEY,
+    occurrence_date DATE NOT NULL,
+    vehicle_id BIGINT NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
+    driver_id BIGINT REFERENCES drivers(id) ON DELETE SET NULL,
+    type VARCHAR(20) NOT NULL,
+    description VARCHAR(1000) NOT NULL,
+    severity VARCHAR(20),
+    status VARCHAR(20) NOT NULL DEFAULT 'ABERTO',
+    vehicle_impact VARCHAR(20) NOT NULL DEFAULT 'EM_REPARACAO',
+    estimated_cost DECIMAL(15,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_vehicle_occurrences_vehicle ON vehicle_occurrences(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_vehicle_occurrences_driver ON vehicle_occurrences(driver_id);
+CREATE INDEX IF NOT EXISTS idx_vehicle_occurrences_date ON vehicle_occurrences(occurrence_date);
+CREATE INDEX IF NOT EXISTS idx_vehicle_occurrences_status ON vehicle_occurrences(status);
 
 -- ============================================================================
 -- TRIPS MANAGEMENT
@@ -215,7 +254,13 @@ CREATE TABLE IF NOT EXISTS quotations (
     notes VARCHAR(500),
     terms VARCHAR(500),
     operator VARCHAR(200),
+    preferred_delivery_method VARCHAR(50),
+    actual_delivery_method VARCHAR(50),
     response_date TIMESTAMP,
+    request_source VARCHAR(50) DEFAULT 'MANUAL',
+    tipo_servico VARCHAR(50) DEFAULT 'TRANSPORTE',
+    revisao_de_id BIGINT REFERENCES quotations(id) ON DELETE SET NULL,
+    revisao_numero INTEGER DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

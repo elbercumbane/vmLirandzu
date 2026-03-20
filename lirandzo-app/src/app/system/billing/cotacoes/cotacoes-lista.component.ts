@@ -48,7 +48,13 @@ export class CotacoesListaComponent implements OnInit {
 
     this.cotacaoService.listarCotacoes().subscribe({
       next: (cotacoes: CotacaoResponse[]) => {
-        this.pedidos = cotacoes.map(c => this.mapearCotacao(c));
+        // Mostrar mais recentes primeiro (pedidos antigos ficam por último).
+        const sorted = [...cotacoes].sort((a, b) => {
+          const ta = a.dataCotacao ? new Date(a.dataCotacao).getTime() : 0;
+          const tb = b.dataCotacao ? new Date(b.dataCotacao).getTime() : 0;
+          return tb - ta;
+        });
+        this.pedidos = sorted.map(c => this.mapearCotacao(c));
         this.loading = false;
       },
       error: (error: unknown) => {
@@ -91,10 +97,12 @@ export class CotacoesListaComponent implements OnInit {
         })
       : '';
 
-    let tempoResposta = '';
-    if (c.dataCotacao && c.dataResposta) {
+    let tempoResposta = '—';
+    if (c.dataCotacao) {
       const inicio = new Date(c.dataCotacao);
-      const fim = new Date(c.dataResposta);
+      const statusUpper = c.status?.toUpperCase() || '';
+      const isRespondido = statusUpper === 'RESPONDIDO' || statusUpper === 'RESPONDED';
+      const fim = isRespondido && c.dataResposta ? new Date(c.dataResposta) : new Date();
       const diffMs = fim.getTime() - inicio.getTime();
       if (diffMs > 0) {
         const diffMin = Math.round(diffMs / 60000);

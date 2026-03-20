@@ -36,7 +36,7 @@
       </svg>
     </div>
     <div class="kpi-label">Cotações Geradas</div>
-    <div class="kpi-value" style="color: var(--success)">{{ cotacoes.length }}</div>
+    <div class="kpi-value" style="color: var(--success)">{{ totalGerados }}</div>
     <div class="kpi-sub">enviadas aos clientes</div>
   </div>
 </div>
@@ -47,6 +47,7 @@
     <div class="filter-chips">
       <button class="filter-chip" [class.active]="filtroEstado === 'TODOS'" (click)="filtroEstado = 'TODOS'">Todos</button>
       <button class="filter-chip" [class.active]="filtroEstado === 'COTAÇÃO GERADA'" (click)="filtroEstado = 'COTAÇÃO GERADA'">Cotação Gerada</button>
+      <button class="filter-chip" [class.active]="filtroEstado === 'RESPONDIDO'" (click)="filtroEstado = 'RESPONDIDO'">Enviadas</button>
     </div>
   </div>
 
@@ -73,6 +74,7 @@
             <th>Forma de Envio</th>
             <th>Operador</th>
             <th>Tempo Resposta</th>
+            <th style="width: 110px;">Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -99,16 +101,36 @@
             </td>
             <td>{{ c.operador || '—' }}</td>
             <td>{{ c.tempoResposta || '—' }}</td>
-          </tr>
-          } @empty {
-          <tr>
-            <td colspan="9" class="empty-state">
-              <p>Nenhuma cotação enviada encontrada</p>
+            <td>
+              <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <button type="button" class="btn-secondary btn-sm" (click)="baixarOuVerPdf(c)">
+                  PDF
+                </button>
+                <button type="button" class="btn-primary btn-sm" (click)="confirmarEnvio(c)">
+                  Confirmar envio
+                </button>
+                <button type="button" class="btn-danger btn-sm" (click)="cancelarCotacao(c)">
+                  Cancelar
+                </button>
+              </div>
             </td>
           </tr>
+          } @empty {
+            <tr>
+              <td colspan="10" class="empty-state">
+                <p>Nenhuma cotação enviada encontrada</p>
+              </td>
+            </tr>
           }
         </tbody>
       </table>
     </div>
   }
 </div>
+
+<app-notification-popup
+  *ngIf="showNotification"
+  [message]="notificationMessage"
+  [type]="notificationType"
+  [duration]="7000">
+</app-notification-popup>

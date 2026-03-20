@@ -2,11 +2,11 @@
   [showBack]="true"
   [backLink]="'/billing/cotacoes'"
   [showHelp]="true"
-  title="Gerar Cotação"
+  title="Criar Cotação"
   subtitle="Crie e envie cotações profissionais para os clientes"
   helpTitle="Como gerar uma Cotação"
   [helpItems]="[
-    'Preencha os dados do cliente e da rota (origem, destino e tipo de veículo).',
+    'Preencha os dados do cliente e da rota (origem e destino).',
     'Adicione produtos/serviços e valores para formar o total da cotação.',
     'Defina a validade e o operador responsável para controlo interno.'
   ]"
@@ -29,11 +29,11 @@
     </div>
     <div class="form-group">
       <label class="form-label">Data</label>
-      <input type="date" class="form-control" [(ngModel)]="cotacao.data">
+      <input type="date" class="form-control" [(ngModel)]="cotacao.data" readonly>
     </div>
     <div class="form-group">
       <label class="form-label">Validade</label>
-      <input type="date" class="form-control" [(ngModel)]="cotacao.validade">
+      <input type="date" class="form-control" [(ngModel)]="cotacao.validade" readonly>
     </div>
     <div class="form-group">
       <label class="form-label">Operador Responsável</label>
@@ -48,19 +48,15 @@
   <div class="form-grid">
     <div class="form-group">
       <label class="form-label">Nome / Empresa</label>
-      <input type="text" class="form-control" [(ngModel)]="cotacao.clienteNome" placeholder="Ex: SLR Mining, Lda">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Pessoa de Contacto</label>
-      <input type="text" class="form-control" [(ngModel)]="cotacao.clienteContacto" placeholder="Ex: Sr. Euclides">
+        <input type="text" class="form-control" [(ngModel)]="cotacao.clienteNome" [readonly]="modoPortal" [disabled]="modoPortal" placeholder="Ex: SLR Mining, Lda">
     </div>
     <div class="form-group">
       <label class="form-label">Telefone</label>
-      <input type="text" class="form-control" [(ngModel)]="cotacao.clienteTelefone" placeholder="Ex: 847983277">
+        <input type="text" class="form-control" [(ngModel)]="cotacao.clienteTelefone" [readonly]="modoPortal" [disabled]="modoPortal" placeholder="Ex: 847983277">
     </div>
     <div class="form-group">
       <label class="form-label">Email</label>
-      <input type="email" class="form-control" [(ngModel)]="cotacao.clienteEmail" placeholder="email@empresa.com">
+        <input type="email" class="form-control" [(ngModel)]="cotacao.clienteEmail" [readonly]="modoPortal" [disabled]="modoPortal" placeholder="email&#64;empresa.com">
     </div>
   </div>
 
@@ -68,40 +64,41 @@
   <div class="form-grid">
     <div class="form-group">
       <label class="form-label">Origem</label>
-      <input type="text" class="form-control" [(ngModel)]="cotacao.origem" placeholder="Ex: Maputo">
+        <input type="text" class="form-control" [(ngModel)]="cotacao.origem" [readonly]="modoPortal" [disabled]="modoPortal" placeholder="Ex: Maputo">
     </div>
     <div class="form-group">
       <label class="form-label">Destino</label>
-      <input type="text" class="form-control" [(ngModel)]="cotacao.destino" placeholder="Ex: Cabo Delgado">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Tipo de Veículo</label>
-      <select class="form-control" [(ngModel)]="cotacao.tipoVeiculo">
-        <option value="">Seleccionar...</option>
-        <option *ngFor="let t of tiposVeiculo" [value]="t">{{ t }}</option>
-      </select>
+        <input type="text" class="form-control" [(ngModel)]="cotacao.destino" [readonly]="modoPortal" [disabled]="modoPortal" placeholder="Ex: Cabo Delgado">
     </div>
   </div>
 
   <h3 class="form-section-title">Itens / Serviços</h3>
-  <div class="table-wrapper">
-    <table class="data-table">
+  <div class="table-wrapper cotacao-itens-table">
+    <table class="data-table cotacao-itens-data">
       <thead>
         <tr>
-          <th style="width: 80px">Qtd</th>
-          <th>Descrição</th>
-          <th style="width: 150px">Preço Unit.</th>
-          <th style="width: 150px">Subtotal</th>
-          <th style="width: 50px"></th>
+          <th class="col-qtd">Qtd</th>
+          <th class="col-unidade">Unidade</th>
+          <th class="col-descricao">Descrição</th>
+          <th class="col-preco">Valor (MZN)</th>
+          <th class="col-subtotal">Subtotal</th>
+          <th class="col-actions"></th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let item of itens; let i = index">
-          <td><input type="number" class="form-control" [(ngModel)]="item.quantidade" min="1" style="width: 70px"></td>
-          <td><input type="text" class="form-control" [(ngModel)]="item.descricao" placeholder="Ex: Transporte full load" style="width: 100%"></td>
-          <td><input type="number" class="form-control" [(ngModel)]="item.precoUnitario" placeholder="0.00" style="width: 130px"></td>
-          <td style="font-weight: 600; color: var(--text-primary)">{{ getSubtotalItem(item) | number:'1.2-2' }} MZN</td>
-          <td>
+          <td class="col-qtd"><input type="number" class="form-control input-qtd" [(ngModel)]="item.quantidade" [name]="'itemQtd'+i" [readonly]="modoPortal" [disabled]="modoPortal" min="0" placeholder="1" step="any"></td>
+          <td class="col-unidade">
+            <select class="form-control input-unidade" [(ngModel)]="item.unidade" [name]="'itemUnidade'+i" [disabled]="modoPortal">
+              <option value="">—</option>
+              <option value="kg">kg</option>
+              <option value="toneladas">toneladas</option>
+            </select>
+          </td>
+          <td class="col-descricao"><input type="text" class="form-control" [(ngModel)]="item.descricao" [name]="'itemDesc'+i" placeholder="Ex: farinha de trigo" [disabled]="modoPortal"></td>
+          <td class="col-preco"><input type="number" class="form-control input-preco" [(ngModel)]="item.precoUnitario" [name]="'itemPreco'+i" placeholder="0.00" step="0.01"></td>
+          <td class="col-subtotal">{{ getSubtotalItem(item) | number:'1.2-2' }} MZN</td>
+          <td class="col-actions">
             <button type="button" class="action-btn action-btn-danger" (click)="removerItem(i)" *ngIf="itens.length > 1" title="Remover">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
@@ -118,48 +115,33 @@
   <h3 class="form-section-title">Custos Adicionais</h3>
   <div class="form-grid">
     <div class="form-group">
-      <label class="form-label">Transporte (MZN)</label>
-      <input type="number" class="form-control" [(ngModel)]="cotacao.custoTransporte" placeholder="0.00">
-    </div>
-    <div class="form-group">
       <label class="form-label">Recolha (MZN)</label>
       <input type="number" class="form-control" [(ngModel)]="cotacao.custoRecolha" placeholder="0.00">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Bill of Entry (MZN)</label>
-      <input type="number" class="form-control" [(ngModel)]="cotacao.custoBillOfEntry" placeholder="0.00">
     </div>
   </div>
 
   <!-- Totais -->
   <div class="quote-totals">
     <div class="quote-total-row"><span>Subtotal Itens</span><span>{{ subtotalItens | number:'1.2-2' }} MZN</span></div>
-    <div class="quote-total-row"><span>Transporte</span><span>{{ (cotacao.custoTransporte || 0) | number:'1.2-2' }} MZN</span></div>
     <div class="quote-total-row"><span>Recolha</span><span>{{ (cotacao.custoRecolha || 0) | number:'1.2-2' }} MZN</span></div>
-    <div class="quote-total-row"><span>Bill of Entry</span><span>{{ (cotacao.custoBillOfEntry || 0) | number:'1.2-2' }} MZN</span></div>
     <div class="quote-total-row quote-total-final"><span>TOTAL</span><span>{{ totalGeral | number:'1.2-2' }} MZN</span></div>
   </div>
 
-  <h3 class="form-section-title">Condições e Observações</h3>
-  <div class="form-grid">
-    <div class="form-group full-width">
-      <label class="form-label">Condições</label>
-      <textarea class="form-control" [(ngModel)]="cotacao.condicoes" rows="2"></textarea>
+  @if (!modoPdfOnly) {
+    <div class="form-actions">
+      <a routerLink="/billing/cotacoes" class="btn-secondary">Cancelar</a>
+      <button type="button" class="btn-primary" (click)="gerarCotacao()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        Gerar Cotação
+      </button>
     </div>
-    <div class="form-group full-width">
-      <label class="form-label">Observações</label>
-      <textarea class="form-control" [(ngModel)]="cotacao.observacoes" placeholder="Notas adicionais..." rows="2"></textarea>
+  } @else {
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" (click)="voltarParaEnviadas()">
+        Voltar
+      </button>
     </div>
-  </div>
-
-  <div class="form-actions">
-    <a routerLink="/billing/cotacoes" class="btn-secondary">Cancelar</a>
-    <button type="button" class="btn-secondary" (click)="guardarCotacao()">Guardar Cotação</button>
-    <button type="button" class="btn-primary" (click)="abrirModalEnvio()" [disabled]="!ultimaCotacaoId">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-      Gerar e Enviar Cotação
-    </button>
-  </div>
+  }
 </div>
 
 <app-notification-popup
@@ -171,10 +153,12 @@
 
 <!-- Preview Modal -->
 @if (showPreview) {
-<div class="preview-modal-overlay" (click)="fecharPreview()">
+      <div class="preview-modal-overlay">
   <div class="preview-modal" (click)="$event.stopPropagation()">
     <div class="preview-modal-header">
-      <h3>Preview da Cotação</h3>
+      <h3>
+        {{ modoConfirmacaoGeracao ? 'Confirmar dados da cotação e gerar PDF' : 'Preview da Cotação' }}
+      </h3>
       <button type="button" class="preview-modal-close" (click)="fecharPreview()" aria-label="Fechar">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -184,209 +168,170 @@
     </div>
     <div class="preview-modal-body">
       <div id="cotacao-preview-content" class="cotacao-preview">
-        <!-- Cabeçalho do documento -->
-        <div class="quote-doc-header">
-          <div>
-            <div class="quote-company">VM TRANSPORTES</div>
-            <div class="quote-company-sub">Lirandzo — Transporte de Cargas</div>
-          </div>
-          <div class="quote-doc-title">COTAÇÃO</div>
-        </div>
+        <div class="qpdf-quotation-container">
+          <div class="qpdf-header">
+            <div class="qpdf-company-info">
+              <div class="qpdf-company-name">VM - LIRANDZO TRANSPORTES</div>
+              <div class="qpdf-company-details">
+                Boane, Djuba, Celula "D" Q.1, Casa nº07, Matola<br>
+                <strong>NUIT:</strong> 400872473<br>
+                <strong>Cell:</strong> +258 84 841 0008 / 84 831 0348<br>
+                <strong>Email:</strong> vm.lirandzotransportes&#64;gmail.com
+              </div>
+            </div>
 
-        <!-- Informações Gerais -->
-        <div class="preview-info-grid">
-          <div class="preview-info-item">
-            <span class="preview-label">Referência:</span>
-            <span class="preview-value">{{ cotacao.referencia || 'N/A' }}</span>
+            <div class="qpdf-quotation-badge">
+              <div class="qpdf-quotation-label">Quotation</div>
+              <div class="qpdf-quotation-number">{{ getQuotationDocumentName() }}</div>
+              <div class="qpdf-quotation-date">{{ formatarData(cotacao.data) }}</div>
+            </div>
           </div>
-          <div class="preview-info-item">
-            <span class="preview-label">Data:</span>
-            <span class="preview-value">{{ formatarData(cotacao.data) }}</span>
-          </div>
-          <div class="preview-info-item">
-            <span class="preview-label">Validade:</span>
-            <span class="preview-value">{{ formatarData(cotacao.validade) }}</span>
-          </div>
-          <div class="preview-info-item">
-            <span class="preview-label">Operador:</span>
-            <span class="preview-value">{{ cotacao.operador || 'N/A' }}</span>
-          </div>
-        </div>
 
-        <!-- Dados do Cliente -->
-        <h3 class="preview-section-title">Dados do Cliente</h3>
-        <div class="preview-info-grid">
-          <div class="preview-info-item">
-            <span class="preview-label">Nome / Empresa:</span>
-            <span class="preview-value">{{ cotacao.clienteNome || 'N/A' }}</span>
-          </div>
-          <div class="preview-info-item">
-            <span class="preview-label">Pessoa de Contacto:</span>
-            <span class="preview-value">{{ cotacao.clienteContacto || 'N/A' }}</span>
-          </div>
-          <div class="preview-info-item">
-            <span class="preview-label">Telefone:</span>
-            <span class="preview-value">{{ cotacao.clienteTelefone || 'N/A' }}</span>
-          </div>
-          <div class="preview-info-item">
-            <span class="preview-label">Email:</span>
-            <span class="preview-value">{{ cotacao.clienteEmail || 'N/A' }}</span>
-          </div>
-        </div>
+          <div class="qpdf-client-section">
+            <div class="qpdf-client-info">
+              <div class="qpdf-section-label">Client</div>
+              <div class="qpdf-client-name">{{ cotacao.clienteNome || 'N/A' }}</div>
+              <div class="qpdf-client-details">
+                <div>{{ cotacao.origem || '—' }} → {{ cotacao.destino || '—' }}</div>
+                <div><strong>Phone:</strong> {{ cotacao.clienteTelefone || '—' }}</div>
+                <div><strong>Email:</strong> {{ cotacao.clienteEmail || '—' }}</div>
+              </div>
+            </div>
 
-        <!-- Rota e Veículo -->
-        <h3 class="preview-section-title">Rota e Veículo</h3>
-        <div class="preview-info-grid">
-          <div class="preview-info-item">
-            <span class="preview-label">Origem:</span>
-            <span class="preview-value">{{ cotacao.origem || 'N/A' }}</span>
+            <div class="qpdf-quotation-meta">
+              <div class="qpdf-section-label">Quotation details</div>
+              <div class="qpdf-meta-grid">
+                <div class="qpdf-meta-item">
+                  <div class="qpdf-meta-label">Validity</div>
+                  <div class="qpdf-meta-value">{{ formatarData(cotacao.validade) }}</div>
+                </div>
+                <div class="qpdf-meta-item">
+                  <div class="qpdf-meta-label">Conditions</div>
+                  <div class="qpdf-meta-value">Pronto Pagamento</div>
+                </div>
+                <div class="qpdf-meta-item">
+                  <div class="qpdf-meta-label">Currency</div>
+                  <div class="qpdf-meta-value">MZN (MT)</div>
+                </div>
+                <div class="qpdf-meta-item">
+                  <div class="qpdf-meta-label">Delivery</div>
+                  <div class="qpdf-meta-value">As agreed</div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="preview-info-item">
-            <span class="preview-label">Destino:</span>
-            <span class="preview-value">{{ cotacao.destino || 'N/A' }}</span>
-          </div>
-          <div class="preview-info-item">
-            <span class="preview-label">Tipo de Veículo:</span>
-            <span class="preview-value">{{ cotacao.tipoVeiculo || 'N/A' }}</span>
-          </div>
-        </div>
 
-        <!-- Itens / Serviços -->
-        <h3 class="preview-section-title">Itens / Serviços</h3>
-        <div class="preview-table-wrapper">
-          <table class="preview-table">
-            <thead>
-              <tr>
-                <th style="width: 80px">Qtd</th>
-                <th>Descrição</th>
-                <th style="width: 150px">Preço Unit.</th>
-                <th style="width: 150px">Subtotal</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (item of itens; track $index) {
-                @if (item.descricao || item.precoUnitario) {
+          <div class="qpdf-validity-notice">
+            <span class="qpdf-validity-icon">⏱️</span>
+            <span class="qpdf-validity-text">
+              <strong>Note:</strong> This quotation is valid until the validity date shown above.
+            </span>
+          </div>
+
+          <div class="qpdf-items-section">
+            <div class="qpdf-section-label">Services</div>
+            <table class="qpdf-items-table">
+              <thead>
                 <tr>
-                  <td>{{ item.quantidade }}</td>
-                  <td>{{ item.descricao || 'N/A' }}</td>
-                  <td>{{ (item.precoUnitario || 0) | number:'1.2-2' }} MZN</td>
-                  <td style="font-weight: 600">{{ getSubtotalItem(item) | number:'1.2-2' }} MZN</td>
+                  <th class="qpdf-col-index">#</th>
+                  <th class="qpdf-col-description">Description</th>
+                  <th class="qpdf-col-qty">Qty</th>
+                  <th class="qpdf-col-unit">Unit Price</th>
+                  <th class="qpdf-col-total">Total</th>
                 </tr>
+              </thead>
+              <tbody>
+                @for (item of itens; track $index) {
+                  @if (item.descricao || item.precoUnitario) {
+                    <tr>
+                      <td>{{ $index + 1 }}</td>
+                      <td>
+                        <div class="qpdf-item-description">{{ item.descricao || 'N/A' }}</div>
+                        <div class="qpdf-item-route">
+                          {{ cotacao.origem || '—' }} → {{ cotacao.destino || '—' }}
+                        </div>
+                      </td>
+                      <td>{{ item.quantidade }} {{ item.unidade || '' }}</td>
+                      <td>{{ (item.precoUnitario || 0) | number:'1.2-2' }} MZN</td>
+                      <td style="font-weight: 700; text-align: right">{{ getSubtotalItem(item) | number:'1.2-2' }} MZN</td>
+                    </tr>
+                  }
                 }
-              }
-            </tbody>
-          </table>
-        </div>
+              </tbody>
+            </table>
+          </div>
 
-        <!-- Custos Adicionais -->
-        <h3 class="preview-section-title">Custos Adicionais</h3>
-        <div class="preview-info-grid">
-          <div class="preview-info-item">
-            <span class="preview-label">Transporte:</span>
-            <span class="preview-value">{{ (cotacao.custoTransporte || 0) | number:'1.2-2' }} MZN</span>
+          <div class="qpdf-summary-section">
+            <div class="qpdf-summary-box">
+              <div class="qpdf-summary-row">
+                <span>Subtotal</span>
+                <span>{{ subtotalItens | number:'1.2-2' }} MT</span>
+              </div>
+              <div class="qpdf-summary-row">
+                <span>Recolha</span>
+                <span>{{ (cotacao.custoRecolha || 0) | number:'1.2-2' }} MT</span>
+              </div>
+              <div class="qpdf-summary-row qpdf-summary-total">
+                <span>Total</span>
+                <span>{{ totalGeral | number:'1.2-2' }} MT</span>
+              </div>
+            </div>
           </div>
-          <div class="preview-info-item">
-            <span class="preview-label">Recolha:</span>
-            <span class="preview-value">{{ (cotacao.custoRecolha || 0) | number:'1.2-2' }} MZN</span>
-          </div>
-          <div class="preview-info-item">
-            <span class="preview-label">Bill of Entry:</span>
-            <span class="preview-value">{{ (cotacao.custoBillOfEntry || 0) | number:'1.2-2' }} MZN</span>
-          </div>
-        </div>
 
-        <!-- Totais -->
-        <div class="quote-totals">
-          <div class="quote-total-row"><span>Subtotal Itens</span><span>{{ subtotalItens | number:'1.2-2' }} MZN</span></div>
-          <div class="quote-total-row"><span>Transporte</span><span>{{ (cotacao.custoTransporte || 0) | number:'1.2-2' }} MZN</span></div>
-          <div class="quote-total-row"><span>Recolha</span><span>{{ (cotacao.custoRecolha || 0) | number:'1.2-2' }} MZN</span></div>
-          <div class="quote-total-row"><span>Bill of Entry</span><span>{{ (cotacao.custoBillOfEntry || 0) | number:'1.2-2' }} MZN</span></div>
-          <div class="quote-total-row quote-total-final"><span>TOTAL</span><span>{{ totalGeral | number:'1.2-2' }} MZN</span></div>
-        </div>
+          <div class="qpdf-payment-section">
+            <div class="qpdf-payment-title">Accepted payment methods</div>
+            <div class="qpdf-payment-methods">
+              <span class="qpdf-payment-method">Cheque</span>
+              <span class="qpdf-payment-method">Bank deposit</span>
+              <span class="qpdf-payment-method">Bank transfer</span>
+            </div>
 
-        <!-- Condições e Observações -->
-        <h3 class="preview-section-title">Condições e Observações</h3>
-        <div class="preview-text-content">
-          <div class="preview-text-item">
-            <strong>Condições:</strong>
-            <p>{{ cotacao.condicoes || 'N/A' }}</p>
+            <div class="qpdf-bank-details">
+              <div class="qpdf-bank-item">
+                <div class="qpdf-bank-label">Bank</div>
+                <div class="qpdf-bank-value">BCI</div>
+              </div>
+              <div class="qpdf-bank-item">
+                <div class="qpdf-bank-label">Account</div>
+                <div class="qpdf-bank-value">19219609210001</div>
+              </div>
+              <div class="qpdf-bank-item">
+                <div class="qpdf-bank-label">NIB</div>
+                <div class="qpdf-bank-value">000800009219609210195</div>
+              </div>
+            </div>
           </div>
-          @if (cotacao.observacoes) {
-          <div class="preview-text-item">
-            <strong>Observações:</strong>
-            <p>{{ cotacao.observacoes }}</p>
+
+          <div class="qpdf-footer">
+            Processed by computer • VM-Lirandzo Transportes • Valid for 3 days
           </div>
-          }
         </div>
       </div>
     </div>
     <div class="preview-modal-footer">
-      <button type="button" class="btn-secondary" (click)="fecharPreview()">Cancelar</button>
-      <button type="button" class="btn-primary" (click)="guardarPDF()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-          <polyline points="7 10 12 15 17 10"></polyline>
-          <line x1="12" y1="15" x2="12" y2="3"></line>
-        </svg>
-        Guardar PDF
-      </button>
+      @if (modoPdfOnly) {
+        <button type="button" class="btn-secondary" (click)="fecharPreview()">Voltar</button>
+        <button type="button" class="btn-primary" (click)="guardarPDF(false)">Baixar PDF</button>
+      } @else if (modoConfirmacaoGeracao) {
+        <button type="button" class="btn-secondary" (click)="fecharPreview()">Editar</button>
+        <button type="button" class="btn-primary" (click)="finalizarGeracao()">Finalizar</button>
+      } @else {
+        <button type="button" class="btn-secondary" (click)="fecharPreview()">Cancelar</button>
+        <button type="button" class="btn-primary" (click)="guardarPDF(false)">Guardar PDF</button>
+      }
     </div>
     </div>
   </div>
 }
 
-<!-- Modal de Opções de Envio -->
-@if (showEnvioModal) {
-<div class="preview-modal-overlay" (click)="fecharModalEnvio()">
-  <div class="preview-modal envio-modal" (click)="$event.stopPropagation()">
-    <div class="preview-modal-header">
-      <h3>Como deseja enviar a cotação?</h3>
-      <button type="button" class="preview-modal-close" (click)="fecharModalEnvio()" aria-label="Fechar">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
-    <div class="preview-modal-body">
-      <div class="envio-options-grid">
-        <button type="button" class="envio-option-btn" (click)="enviarViaWhatsApp()">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-          </svg>
-          <span class="envio-option-label">Partilhar via WhatsApp</span>
-          <span class="envio-option-desc">Abrir conversa no WhatsApp com a cotação</span>
-        </button>
-        <button type="button" class="envio-option-btn" (click)="imprimirCotacao()">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 6 2 18 2 18 9"></polyline>
-            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-            <rect x="6" y="14" width="12" height="8"></rect>
-          </svg>
-          <span class="envio-option-label">Imprimir / PDF</span>
-          <span class="envio-option-desc">Imprimir ou guardar como PDF</span>
-        </button>
-        <button type="button" class="envio-option-btn" (click)="guardarComoEnviada()">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-            <polyline points="17 21 17 13 7 13 7 21"></polyline>
-            <polyline points="7 3 7 8 15 8"></polyline>
-          </svg>
-          <span class="envio-option-label">Guardar Cotação</span>
-          <span class="envio-option-desc">Marcar como enviada e guardar na base de dados</span>
-        </button>
-        <button type="button" class="envio-option-btn" (click)="marcarComoChamada()">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-          </svg>
-          <span class="envio-option-label">Marcar como Chamada</span>
-          <span class="envio-option-desc">Registar que a cotação foi enviada via chamada telefónica</span>
-        </button>
+@if (completionOpen) {
+  <div class="completion-overlay" role="dialog" aria-modal="true">
+    <div class="completion-modal" role="document">
+      <h3 class="completion-title">{{ completionMessage }}</h3>
+      <p class="completion-subtitle">Clique em concluir para ir para “Cotações Enviadas”.</p>
+      <div class="completion-actions">
+        <button type="button" class="btn-primary" (click)="concludeCompletion()">Concluir</button>
       </div>
     </div>
-    <div class="preview-modal-footer">
-      <button type="button" class="btn-secondary" (click)="fecharModalEnvio()">Cancelar</button>
-    </div>
   </div>
-</div>
 }

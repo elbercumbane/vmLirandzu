@@ -55,6 +55,8 @@ export class MotoristasDetalheComponent implements OnInit {
 
   formatarStatus(status?: string): string {
     const statusMap: { [key: string]: string } = {
+      'ACTIVE': 'DISPONÍVEL',
+      'INACTIVE': 'INACTIVO',
       'ATIVO': 'DISPONÍVEL',
       'INATIVO': 'INACTIVO'
     };
@@ -63,8 +65,21 @@ export class MotoristasDetalheComponent implements OnInit {
 
   getStatusClass(status?: string): string {
     const statusUpper = (status || '').toUpperCase();
-    if (statusUpper === 'ATIVO') return 'badge-success';
+    if (statusUpper === 'ACTIVE' || statusUpper === 'ATIVO') return 'badge-success';
     return 'badge-neutral';
+  }
+
+  formatarData(data?: string): string {
+    if (!data) return 'N/A';
+    const d = new Date(data);
+    return isNaN(d.getTime()) ? data : d.toLocaleDateString('pt-MZ');
+  }
+
+  formatarFiliacao(m: Motorista): string {
+    if (m.nomePai && m.nomeMae) return m.nomePai + ' / ' + m.nomeMae;
+    if (m.nomePai) return m.nomePai;
+    if (m.nomeMae) return m.nomeMae;
+    return 'N/A';
   }
 
   editar() {

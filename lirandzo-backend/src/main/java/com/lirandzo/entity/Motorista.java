@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +26,50 @@ public class Motorista {
     @Column(name = "name", nullable = false, length = 200)
     private String nome;
 
+    @Column(name = "date_of_birth")
+    private LocalDate dataNascimento;
+
+    @Column(name = "address", length = 500)
+    private String morada;
+
+    @Column(name = "father_name", length = 200)
+    private String nomePai;
+
+    @Column(name = "mother_name", length = 200)
+    private String nomeMae;
+
+    @Column(name = "nuit", length = 20)
+    private String nuit;
+
+    @Column(name = "id_document_number", length = 50)
+    private String numeroBI;
+
     @Column(name = "phone", length = 50)
     private String telefone;
 
+    @Column(name = "phone_2", length = 50)
+    private String telefone2;
+
+    @Column(name = "emergency_contact_name", length = 200)
+    private String nomeParenteEmergencia;
+
+    @Column(name = "emergency_contact_relationship", length = 100)
+    private String parentesco;
+
+    @Column(name = "emergency_contact_phone", length = 50)
+    private String telefoneParenteEmergencia;
+
     @Column(name = "license_number", length = 50)
     private String numeroCarta;
+
+    @Column(name = "license_category", length = 10)
+    private String categoriaCarta;
+
+    @Column(name = "license_issue_date")
+    private LocalDate dataEmissaoCarta;
+
+    @Column(name = "license_expiry_date")
+    private LocalDate dataValidadeCarta;
 
     @Column(name = "average_rating", columnDefinition = "DECIMAL(3,2)")
     private Double avaliacaoMedia = 0.0;

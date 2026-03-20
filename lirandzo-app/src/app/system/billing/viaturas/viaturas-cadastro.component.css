@@ -1,5 +1,21 @@
 /* Viaturas Cadastro - estilos específicos */
 
+.capacity-input-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.capacity-input-group .form-control:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.capacity-input-group .capacity-unit {
+  width: 80px;
+  flex-shrink: 0;
+}
+
 .foto-upload-area {
   margin-bottom: 1rem;
 }

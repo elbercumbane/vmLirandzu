@@ -34,6 +34,19 @@ public class Cotacao {
     @Column(name = "origin", nullable = false, length = 200)
     private String origem;
 
+    @Column(name = "request_source", length = 50)
+    private String fontePedido;
+
+    @Column(name = "tipo_servico", length = 50)
+    private String tipoServico;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "revisao_de_id")
+    private Cotacao revisaoDe;
+
+    @Column(name = "revisao_numero")
+    private Integer revisaoNumero;
+
     @NotBlank(message = "Destination is required")
     @Column(name = "destination", nullable = false, length = 200)
     private String destino;
@@ -94,9 +107,18 @@ public class Cotacao {
     protected void onCreate() {
         dataCriacao = LocalDateTime.now();
         dataAtualizacao = LocalDateTime.now();
-        if (dataCotacao == null) {
+        // Regra do sistema:
+        // - Se vier do PORTAL (fontePedido=PORTAL), mantemos a data enviada/atribuída.
+        // - Se for MANUAL (fontePedido nulo/outro), garantimos que a data é "hoje".
+        boolean isPortal = "PORTAL".equalsIgnoreCase(fontePedido);
+        if (!isPortal) {
+            dataCotacao = LocalDate.now();
+        } else if (dataCotacao == null) {
             dataCotacao = LocalDate.now();
         }
+
+        // Validade sempre = dataCotacao + 3 dias (mesmo que o frontend não envie).
+        dataValidade = dataCotacao.plusDays(3);
     }
 
     @PostPersist

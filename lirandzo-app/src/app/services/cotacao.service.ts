@@ -39,6 +39,7 @@ export interface CotacaoResponse {
   dataValidade?: string;
   status: string;
   observacoes?: string;
+  fontePedido?: string;
   condicoes?: string;
   operador?: string;
   dataResposta?: string;
@@ -56,7 +57,8 @@ export interface CotacaoPortalRequest {
   origem: string;
   destino: string;
   mensagem?: string;
-  formaEnvioPreferida: 'whatsapp' | 'pdf' | 'chamada';
+  formaEnvioPreferida: 'whatsapp' | 'email' | 'pdf' | 'chamada';
+  tipoServico?: 'TRANSPORTE' | 'COMPRA_TRANSPORTE';
 }
 
 @Injectable({
