@@ -26,6 +26,18 @@ export class BillingSidebarComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.tempoLogado = this.auth.getTempoLogado();
+    // Expandir menu activo conforme rota
+    const url = this.router.url;
+    if (url.includes('/cotacoes')) this.expandedMenus['cotacoes'] = true;
+    else if (url.includes('/clientes')) this.expandedMenus['clientes'] = true;
+    else if (url.includes('/encomendas') || url.includes('/baixas') || url.includes('/tesouraria') || url.includes('/para-facturar')) this.expandedMenus['facturacao'] = true;
+    else if (url.includes('/guias')) this.expandedMenus['guias'] = true;
+    else if (url.includes('/viagens')) this.expandedMenus['viagens'] = true;
+    else if (url.includes('/viaturas')) this.expandedMenus['viaturas'] = true;
+    else if (url.includes('/motoristas')) this.expandedMenus['motoristas'] = true;
+    else if (url.includes('/combustivel')) this.expandedMenus['combustivel'] = true;
+    else if (url.includes('/manutencao')) this.expandedMenus['manutencao'] = true;
+    else if (url.includes('/ocorrencias')) this.expandedMenus['viaturas'] = true;
     this.tempoInterval = setInterval(() => {
       this.tempoLogado = this.auth.getTempoLogado();
     }, 1000);

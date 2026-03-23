@@ -5,9 +5,9 @@
   <header class="login-header">
     <a routerLink="/" class="login-brand">
       <span class="login-logo-mark">VM</span>
-      <span class="login-logo-name">Lirandzo<br><em>Transportes</em></span>
+      <span class="login-logo-name">Lirandzo<br><em>{{ 'auth.brand.transport' | transloco }}</em></span>
     </a>
-    <a routerLink="/" class="login-portal-link">← Voltar para o portal</a>
+    <a routerLink="/" class="login-portal-link">← {{ 'auth.common.backToPortal' | transloco }}</a>
   </header>
 
   <div class="login-container">
@@ -16,49 +16,70 @@
         <span class="login-logo-mark">VM</span>
       </div>
       <h1 class="login-title">Lirandzo</h1>
-      <p class="login-subtitle">Fleet Hub — VM Transportes</p>
-      <p class="login-instruction">Entre com as suas credenciais</p>
+      <p class="login-subtitle">{{ 'auth.login.subtitle' | transloco }}</p>
+      <p class="login-instruction">{{ 'auth.login.instruction' | transloco }}</p>
 
       <form class="login-form" (ngSubmit)="onSubmit()">
         <div class="login-field">
-          <label for="username">Utilizador</label>
+          <label for="username">{{ 'auth.login.username' | transloco }}</label>
           <input
             id="username"
             type="text"
             [(ngModel)]="username"
             name="username"
-            placeholder="admin, gestor ou tecnico"
+            [placeholder]="'auth.login.usernamePlaceholder' | transloco"
             autocomplete="username"
             [disabled]="loading"
           />
         </div>
         <div class="login-field">
-          <label for="password">Senha</label>
-          <input
-            id="password"
-            type="password"
-            [(ngModel)]="password"
-            name="password"
-            placeholder="••••••••"
-            autocomplete="current-password"
-            [disabled]="loading"
-          />
+          <label for="password">{{ 'auth.login.password' | transloco }}</label>
+          <div class="password-wrapper">
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              [(ngModel)]="password"
+              name="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              [disabled]="loading"
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="showPassword = !showPassword"
+              [attr.aria-label]="showPassword ? ('auth.login.hidePassword' | transloco) : ('auth.login.showPassword' | transloco)"
+              tabindex="-1"
+            >
+              @if (showPassword) {
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              } @else {
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              }
+            </button>
+          </div>
         </div>
-        @if (error) {
-          <p class="login-error">{{ error }}</p>
+        @if (errorKey) {
+          <p class="login-error">{{ errorKey | transloco }}</p>
         }
         <button type="submit" class="login-submit" [disabled]="loading">
-          {{ loading ? 'A entrar...' : 'Entrar' }}
+          {{ loading ? ('auth.login.entering' | transloco) : ('auth.login.enter' | transloco) }}
         </button>
       </form>
 
-      <p class="login-hint">Utilizadores de teste: admin, gestor, tecnico — Senha: admin123</p>
+      <p class="login-hint">{{ 'auth.login.hint' | transloco }}</p>
 
-      <a routerLink="/recuperar-senha" class="login-forgot-link">Esqueceu a senha?</a>
+      <a routerLink="/recuperar-senha" class="login-forgot-link">{{ 'auth.login.forgotPassword' | transloco }}</a>
     </div>
 
     <div class="login-info">
-      <p class="login-sim-note">A autenticação é feita via API. O backend deve estar em execução (porta 8080).</p>
+      <p class="login-sim-note">{{ 'auth.login.simNote' | transloco }}</p>
     </div>
   </div>
 </main>

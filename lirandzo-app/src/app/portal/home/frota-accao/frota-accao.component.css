@@ -1,10 +1,12 @@
 .frota-accao {
   position: relative;
-  min-height: 480px;
+  min-height: 680px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  padding: 4.5rem 0 2.5rem;
 }
 
 .frota-accao-bg {
@@ -28,10 +30,10 @@
 
 .frota-accao-content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   text-align: center;
-  max-width: 800px;
-  padding: 5rem 2rem;
+  max-width: 920px;
+  padding: 1rem 2rem 2rem;
   color: white;
 }
 
@@ -48,25 +50,85 @@
 }
 
 .frota-accao-title {
-  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-size: clamp(2.3rem, 5.8vw, 4rem);
   font-weight: 800;
-  margin: 0 0 1rem;
+  margin: 0 0 1.2rem;
   letter-spacing: -0.03em;
 }
 
 .frota-accao-desc {
-  font-size: 1.15rem;
+  font-size: clamp(1.05rem, 1.9vw, 1.35rem);
   opacity: 0.95;
-  line-height: 1.7;
+  line-height: 1.75;
   margin: 0;
+}
+
+.frota-gallery {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-top: 0.75rem;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+
+.frota-gallery-track {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: max-content;
+  animation: frota-marquee 38s linear infinite;
+  will-change: transform;
+}
+
+.frota-gallery-card {
+  margin: 0;
+  width: clamp(210px, 24vw, 340px);
+  aspect-ratio: 16 / 10;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.35);
+  flex: 0 0 auto;
+}
+
+.frota-gallery-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+@keyframes frota-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-50% - 0.5rem));
+  }
 }
 
 @media (max-width: 640px) {
   .frota-accao {
-    min-height: 400px;
+    min-height: 620px;
+    padding: 3.5rem 0 2rem;
   }
 
   .frota-accao-content {
-    padding: 4rem 1.5rem;
+    padding: 0.75rem 1.25rem 1.5rem;
+  }
+
+  .frota-gallery {
+    margin-top: 1.5rem;
+  }
+
+  .frota-gallery-track {
+    gap: 0.75rem;
+    animation-duration: 28s;
+  }
+
+  .frota-gallery-card {
+    width: clamp(180px, 62vw, 260px);
   }
 }

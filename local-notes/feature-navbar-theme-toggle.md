@@ -16,5 +16,5 @@
   - Ajustado o CSS para `nav-login-wrap` e criado estilo `nav-theme-toggle` para combinar com o design existente (fundo claro, borda suave, hover azul).
 - **Comportamento**:
   - Ao clicar no botão de tema, o `ThemeService` altera o atributo `data-theme` no `document.documentElement`, usando as variáveis CSS já definidas em `src/styles.css` (`[data-theme="dark"]` e `[data-theme="light"]`).
-  - O fundo claro (`light`) passa a ser usado quando o utilizador alterna, respeitando também o valor guardado em `localStorage` (`lirandzo-theme`).
+  - O fundo claro (`light`) passa a ser usado quando o utilizador alterna (tema em memória, sem localStorage).
 

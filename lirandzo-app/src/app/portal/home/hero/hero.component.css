@@ -105,7 +105,7 @@
   position: relative;
   z-index: 2;
   width: 100%;
-  padding: 0 1rem;
+  padding: 0 1rem 0 4rem;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -113,10 +113,10 @@
 }
 
 @media (min-width: 640px) {
-  .hero-inner { padding: 0 1.5rem; }
+  .hero-inner { padding: 0 1.5rem 0 4.25rem; }
 }
 @media (min-width: 1024px) {
-  .hero-inner { padding: 0 2rem; }
+  .hero-inner { padding: 0 2rem 0 4.5rem; }
 }
 
 .hero-title {

@@ -13,7 +13,7 @@
 } @else if (error) {
   <div class="error-state">
     <p>{{ error }}</p>
-    <button type="button" class="btn-secondary" (click)="carregarEncomenda()">Tentar Novamente</button>
+    <button type="button" class="btn-secondary" (click)="carregarTudo()">Tentar Novamente</button>
     <a routerLink="/billing/encomendas" class="btn-secondary" style="margin-left: 0.5rem;">Voltar</a>
   </div>
 } @else if (encomenda) {
@@ -21,7 +21,12 @@
     <div class="card-header">
       <div>
         <h3>Encomenda {{ formatarNumero(encomenda.numeroEncomenda) }}</h3>
-        <p class="text-muted">Data: {{ formatarData(encomenda.dataEncomenda) }}</p>
+        <p class="text-muted">Factura: <strong>{{ formatarFactura(encomenda) }}</strong></p>
+        <p class="text-muted">Data factura: {{ formatarDataFactura(encomenda) }}</p>
+        <p class="text-muted">Data encomenda: {{ formatarData(encomenda.dataEncomenda) }}</p>
+        @if (encomenda.cotacao?.referencia) {
+          <p class="text-muted">Cotação origem: <a [routerLink]="['/billing/cotacoes/gerar', encomenda.cotacao!.id]">{{ encomenda.cotacao!.referencia }}</a></p>
+        }
       </div>
       <div>
         <span [class]="'badge ' + getStatusClass(encomenda.status)">
@@ -92,7 +97,110 @@
           <span class="detail-label">Valor em Dívida:</span>
           <span class="detail-value danger">{{ encomenda.valorDivida | number:'1.2-2' }} MZN</span>
         </div>
+        @if (valorPendenteExtrato > 0) {
+          <div class="detail-item" style="margin-top:0.75rem;padding:0.75rem;background:rgba(245,158,11,0.12);border-radius:8px;">
+            <span class="detail-label">Pendente confirmação (extrato):</span>
+            <span class="detail-value" style="color:var(--warning, #d97706);font-weight:600">{{ valorPendenteExtrato | number:'1.2-2' }} MZN</span>
+            <p style="margin:0.35rem 0 0;font-size:0.8rem;color:var(--text-muted);">Valor registado mas ainda não confirmado no banco / M-Pesa. Confirme na lista abaixo após verificar.</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:1.25rem;">
+      <div class="card-header" style="flex-wrap:wrap;gap:0.5rem;">
+        <div>
+          <h3 style="margin:0;">Pagamentos</h3>
+          <p class="text-muted" style="margin:0.25rem 0 0;font-size:0.85rem;">
+            Sem ligação ao banco: use a referência do SMS ou do extrato para cruzar manualmente.
+            Só os pagamentos <strong>confirmados</strong> reduzem a dívida.
+          </p>
+        </div>
+      </div>
+
+      <div class="table-wrapper" style="margin-top:1rem;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Valor</th>
+              <th>Método</th>
+              <th>Ref. banco / M-Pesa</th>
+              <th>Estado</th>
+              <th style="width:120px;">Acção</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of pagamentos; track p.id) {
+              <tr>
+                <td>{{ formatarData(p.dataPagamento || '') }}</td>
+                <td style="font-weight:600">{{ p.valor | number:'1.2-2' }} MZN</td>
+                <td>{{ p.metodoPagamento || '—' }}</td>
+                <td style="font-family:monospace;font-size:0.85rem;">{{ p.referencia || '—' }}</td>
+                <td><span class="badge" [ngClass]="badgeVerificacao(p.verificationStatus)">{{ labelVerificacao(p.verificationStatus) }}</span></td>
+                <td>
+                  @if (p.verificationStatus === 'PENDING_BANK') {
+                    <button type="button" class="btn-primary btn-sm" [disabled]="confirmandoId === p.id" (click)="confirmarNoExtrato(p)">
+                      {{ confirmandoId === p.id ? '…' : 'Confirmar' }}
+                    </button>
+                  } @else { — }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="empty-state">Nenhum pagamento registado.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="register-form" style="margin-top:1.25rem;border-top:1px solid var(--border, #e5e7eb);padding-top:1rem;">
+        <h4 style="margin-top:0;">Registar novo pagamento</h4>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Valor (MZN) *</label>
+            <input type="number" class="form-control" [(ngModel)]="novoPagamento.valor" name="valorPag" min="0.01" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data</label>
+            <input type="date" class="form-control" [(ngModel)]="novoPagamento.dataPagamento" name="dataPag" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Método</label>
+            <select class="form-control" [(ngModel)]="novoPagamento.metodoPagamento" name="metodoPag">
+              <option value="">—</option>
+              @for (m of metodosPagamento; track m) {
+                <option [value]="m">{{ m }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ref. extrato / M-Pesa</label>
+            <input type="text" class="form-control" [(ngModel)]="novoPagamento.referencia" name="refPag" placeholder="Ex.: ID da transação" />
+          </div>
+          <div class="form-group full-width">
+            <label class="form-label">Observações</label>
+            <input type="text" class="form-control" [(ngModel)]="novoPagamento.observacoes" name="obsPag" />
+          </div>
+          <div class="form-group full-width" style="display:flex;align-items:center;gap:0.5rem;">
+            <input type="checkbox" id="aguardaExtrato" [(ngModel)]="novoPagamento.aguardaExtrato" name="aguardaExtrato" />
+            <label for="aguardaExtrato" style="margin:0;font-weight:normal;">Ainda não confirmei no extrato / app — só registar (não contabiliza na dívida até confirmar)</label>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-primary" [disabled]="aGuardarPagamento" (click)="registarPagamento()">
+            {{ aGuardarPagamento ? 'A guardar…' : 'Registar pagamento' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
 }
+
+<app-notification-popup
+  *ngIf="showNotification"
+  [message]="notificationMessage"
+  [type]="notificationType"
+  [duration]="6000">
+</app-notification-popup>

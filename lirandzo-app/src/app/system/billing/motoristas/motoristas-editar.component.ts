@@ -16,9 +16,22 @@ import { NotificationPopupComponent } from '../../../shared/components/notificat
 export class MotoristasEditarComponent implements OnInit {
   motorista = {
     nome: '',
+    dataNascimento: '',
+    morada: '',
+    nomePai: '',
+    nomeMae: '',
+    nuit: '',
+    numeroBI: '',
     telefone: '',
+    telefone2: '',
+    nomeParenteEmergencia: '',
+    parentesco: '',
+    telefoneParenteEmergencia: '',
     numeroCarta: '',
-    status: 'ATIVO'
+    categoriaCarta: '',
+    dataEmissaoCarta: '',
+    dataValidadeCarta: '',
+    status: 'ACTIVE'
   };
 
   loading = true;
@@ -50,37 +63,41 @@ export class MotoristasEditarComponent implements OnInit {
     if (!this.motoristaId) {
       this.error = 'ID do motorista não fornecido';
       this.loading = false;
-      this.mostrarNotificacao('ID do motorista não fornecido', 'error');
       return;
     }
 
     this.loading = true;
     this.error = null;
     this.motoristaService.obterMotorista(this.motoristaId).subscribe({
-      next: (motoristaApi: Motorista) => {
-        try {
-          this.motorista.nome = motoristaApi.nome || '';
-          this.motorista.telefone = motoristaApi.telefone || '';
-          this.motorista.numeroCarta = motoristaApi.numeroCarta || '';
-          this.motorista.status = motoristaApi.status || 'ATIVO';
-          this.loading = false;
-        } catch (error) {
-          console.error('Erro ao processar dados do motorista:', error);
-          this.loading = false;
-          this.error = 'Erro ao processar dados do motorista';
-          this.mostrarNotificacao('Erro ao processar dados do motorista', 'error');
-        }
+      next: (m: Motorista) => {
+        this.motorista.nome = m.nome || '';
+        this.motorista.dataNascimento = m.dataNascimento || '';
+        this.motorista.morada = m.morada || '';
+        this.motorista.nomePai = m.nomePai || '';
+        this.motorista.nomeMae = m.nomeMae || '';
+        this.motorista.nuit = m.nuit || '';
+        this.motorista.numeroBI = m.numeroBI || '';
+        this.motorista.telefone = m.telefone || '';
+        this.motorista.telefone2 = m.telefone2 || '';
+        this.motorista.nomeParenteEmergencia = m.nomeParenteEmergencia || '';
+        this.motorista.parentesco = m.parentesco || '';
+        this.motorista.telefoneParenteEmergencia = m.telefoneParenteEmergencia || '';
+        this.motorista.numeroCarta = m.numeroCarta || '';
+        this.motorista.categoriaCarta = m.categoriaCarta || '';
+        this.motorista.dataEmissaoCarta = m.dataEmissaoCarta || '';
+        this.motorista.dataValidadeCarta = m.dataValidadeCarta || '';
+        this.motorista.status = m.status || 'ACTIVE';
+        this.loading = false;
       },
       error: (error) => {
         console.error('Erro ao carregar motorista:', error);
         this.loading = false;
-        const mensagemErro = error.status === 404 
-          ? 'Motorista não encontrado' 
+        this.error = error.status === 404
+          ? 'Motorista não encontrado'
           : error.status === 0
-          ? 'Não foi possível conectar ao servidor. Verifique se o backend está em execução.'
+          ? 'Não foi possível conectar ao servidor.'
           : `Erro ao carregar motorista: ${error.statusText || error.message}`;
-        this.error = mensagemErro;
-        this.mostrarNotificacao(mensagemErro, 'error');
+        this.mostrarNotificacao(this.error, 'error');
       }
     });
   }
@@ -89,9 +106,7 @@ export class MotoristasEditarComponent implements OnInit {
     this.notificationMessage = mensagem;
     this.notificationType = tipo;
     this.showNotification = true;
-    setTimeout(() => {
-      this.showNotification = false;
-    }, 7000);
+    setTimeout(() => { this.showNotification = false; }, 7000);
   }
 
   getBackLink(): string {
@@ -99,35 +114,38 @@ export class MotoristasEditarComponent implements OnInit {
   }
 
   salvar() {
-    // Prevenir dupla submissão
-    if (this.loading) {
-      return;
-    }
+    if (this.loading || !this.motoristaId) return;
 
-    if (!this.motorista.nome || !this.motorista.nome.trim()) {
+    if (!this.motorista.nome?.trim()) {
       this.mostrarNotificacao('Por favor, preencha o nome do motorista.', 'error');
-      return;
-    }
-
-    if (!this.motoristaId) {
-      this.mostrarNotificacao('Motorista não guardado', 'error');
       return;
     }
 
     const motoristaData: Motorista = {
       nome: this.motorista.nome.trim(),
+      dataNascimento: this.motorista.dataNascimento || undefined,
+      morada: this.motorista.morada?.trim() || undefined,
+      nomePai: this.motorista.nomePai?.trim() || undefined,
+      nomeMae: this.motorista.nomeMae?.trim() || undefined,
+      nuit: this.motorista.nuit?.trim() || undefined,
+      numeroBI: this.motorista.numeroBI?.trim() || undefined,
       telefone: this.motorista.telefone?.trim() || undefined,
+      telefone2: this.motorista.telefone2?.trim() || undefined,
+      nomeParenteEmergencia: this.motorista.nomeParenteEmergencia?.trim() || undefined,
+      parentesco: this.motorista.parentesco?.trim() || undefined,
+      telefoneParenteEmergencia: this.motorista.telefoneParenteEmergencia?.trim() || undefined,
       numeroCarta: this.motorista.numeroCarta?.trim() || undefined,
-      status: this.motorista.status as 'ATIVO' | 'INATIVO'
+      categoriaCarta: this.motorista.categoriaCarta || undefined,
+      dataEmissaoCarta: this.motorista.dataEmissaoCarta || undefined,
+      dataValidadeCarta: this.motorista.dataValidadeCarta || undefined,
+      status: this.motorista.status as 'ACTIVE' | 'INACTIVE'
     };
 
     this.loading = true;
     this.motoristaService.atualizarMotorista(this.motoristaId, motoristaData).subscribe({
       next: () => {
         this.mostrarNotificacao('Motorista guardado com sucesso!', 'success');
-        setTimeout(() => {
-          this.router.navigate(['/billing/motoristas', this.motoristaId]);
-        }, 1500);
+        setTimeout(() => this.router.navigate(['/billing/motoristas', this.motoristaId]), 1500);
       },
       error: (error) => {
         console.error('Erro ao atualizar motorista:', error);

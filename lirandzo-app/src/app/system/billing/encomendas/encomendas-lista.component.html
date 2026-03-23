@@ -2,14 +2,10 @@
   [showBack]="true"
   [showHelp]="true"
   [backLink]="'/billing'"
-  title="Encomendas"
-  subtitle="Gestão de encomendas e estado de pagamento"
-  helpTitle="Como usar Encomendas"
-  [helpItems]="[
-    'Use os filtros e a pesquisa para encontrar encomendas por nº, cliente ou produto.',
-    'Analise os KPIs para ver valor facturado, dívidas e taxa de pagamento.',
-    'Use o botão Nova Encomenda para registar novos pedidos.'
-  ]"
+  [title]="pageTitle"
+  [subtitle]="pageSubtitle"
+  [helpTitle]="helpTitle"
+  [helpItems]="helpItems"
 ></app-billing-section-header>
 
 <div class="kpi-grid">
@@ -75,7 +71,7 @@
       <input
         type="text"
         class="search-input"
-        placeholder="Pesquisar por nº, cliente ou produto..."
+        placeholder="Pesquisar por nº, factura, cliente ou produto..."
         [(ngModel)]="searchTerm"
       />
     </div>
@@ -128,6 +124,7 @@
         <thead>
           <tr>
             <th>Nº Encomenda</th>
+            <th>Factura</th>
             <th>Cliente</th>
             <th>Produto</th>
             <th>Origem→Destino</th>
@@ -143,6 +140,7 @@
           @for (e of filteredEncomendas; track e.id) {
             <tr>
               <td>{{ e.numero }}</td>
+              <td style="font-weight:600;color:var(--accent)">{{ e.factura }}</td>
               <td>{{ e.cliente }}</td>
               <td>{{ e.produto }}</td>
               <td>{{ e.origem }} → {{ e.destino }}</td>
@@ -183,7 +181,7 @@
             </tr>
           } @empty {
             <tr>
-              <td colspan="10" class="empty-state">
+              <td colspan="11" class="empty-state">
                 <p>Nenhuma encomenda encontrada na base de dados.</p>
               </td>
             </tr>

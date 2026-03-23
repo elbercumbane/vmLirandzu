@@ -1,6 +1,6 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, catchError, of } from 'rxjs';
+import { Observable, map, of } from 'rxjs';
 import { environment } from '@environments/environment';
 
 export type UserRole = 'admin' | 'gestor' | 'tecnico' | null;
@@ -90,8 +90,7 @@ export class AuthService {
         this.currentUser.set(profile);
         this.loginTime = Date.now();
         return profile;
-      }),
-      catchError(() => of(null))
+      })
     );
   }
 

@@ -1,11 +1,11 @@
 -- ============================================================================
--- Script para criar apenas a base de dados (sem tabelas)
--- Execute este script primeiro antes de executar init-database.sql
+-- Script to create the database only (no tables)
+-- Run this script first before executing init-database.sql
 -- ============================================================================
 
--- Criar base de dados (executar como superuser)
+-- Create database (run as superuser)
 CREATE DATABASE lirandzo_db
-    WITH 
+    WITH
     OWNER = postgres
     ENCODING = 'UTF8'
     TEMPLATE = template0

@@ -8,8 +8,13 @@ export interface Viatura {
   marca: string;
   modelo: string;
   matricula: string;
+  ano?: number;
+  cor?: string;
   tipo?: string;
   capacidade?: number;
+  capacidadeUnidade?: string;
+  combustivel?: string;
+  numeroChassis?: string;
   status?: string;
 }
 

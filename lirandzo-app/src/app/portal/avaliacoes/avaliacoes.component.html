@@ -2,10 +2,10 @@
   <section class="avaliacoes-banner">
     <div class="avaliacoes-banner-overlay"></div>
     <div class="avaliacoes-banner-content">
-      <p class="avaliacoes-banner-eyebrow">Avalie o nosso serviço</p>
-      <h1 class="avaliacoes-banner-title">Avalie-nos</h1>
+      <p class="avaliacoes-banner-eyebrow">{{ 'avaliacoesPage.eyebrow' | transloco }}</p>
+      <h1 class="avaliacoes-banner-title">{{ 'avaliacoesPage.title' | transloco }}</h1>
       <p class="avaliacoes-banner-desc">
-        A sua opinião é importante. Partilhe elogios, sugestões ou reclamações — ajudamos a melhorar.
+        {{ 'avaliacoesPage.desc' | transloco }}
       </p>
     </div>
   </section>
@@ -15,31 +15,31 @@
       @if (!submitted) {
         <form class="avaliacoes-form" (ngSubmit)="onSubmit()" #f="ngForm">
           <div class="form-group">
-            <label>Tipo de feedback <span class="required">*</span></label>
+            <label>{{ 'avaliacoesPage.feedbackType' | transloco }} <span class="required">*</span></label>
             <div class="radio-row">
               <label class="radio-card">
                 <input type="radio" name="tipo" value="sugestao" [(ngModel)]="form.tipo" />
-                <span class="radio-label">Sugestão</span>
-                <span class="radio-desc">Ideias para melhorar</span>
+                <span class="radio-label">{{ 'avaliacoesPage.sugestao' | transloco }}</span>
+                <span class="radio-desc">{{ 'avaliacoesPage.sugestaoDesc' | transloco }}</span>
               </label>
               <label class="radio-card">
                 <input type="radio" name="tipo" value="reclamacao" [(ngModel)]="form.tipo" />
-                <span class="radio-label">Reclamação</span>
-                <span class="radio-desc">Problemas a resolver</span>
+                <span class="radio-label">{{ 'avaliacoesPage.reclamacao' | transloco }}</span>
+                <span class="radio-desc">{{ 'avaliacoesPage.reclamacaoDesc' | transloco }}</span>
               </label>
               <label class="radio-card">
                 <input type="radio" name="tipo" value="elogio" [(ngModel)]="form.tipo" />
-                <span class="radio-label">Elogio</span>
-                <span class="radio-desc">O que correu bem</span>
+                <span class="radio-label">{{ 'avaliacoesPage.elogio' | transloco }}</span>
+                <span class="radio-desc">{{ 'avaliacoesPage.elogioDesc' | transloco }}</span>
               </label>
             </div>
           </div>
 
           <div class="form-group">
-            <label for="nota">Avaliação geral (1–5 estrelas)</label>
+            <label for="nota">{{ 'avaliacoesPage.ratingLabel' | transloco }}</label>
             <div class="estrelas">
               @for (star of [1,2,3,4,5]; track star) {
-                <button type="button" class="estrela" [class.active]="form.nota >= star" (click)="setNota(star)" [attr.aria-label]="star + ' estrela(s)'">
+                <button type="button" class="estrela" [class.active]="form.nota >= star" (click)="setNota(star)" [attr.aria-label]="star + ' ' + ('avaliacoesPage.starAria' | transloco)">
                   <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/>
                   </svg>
@@ -49,29 +49,29 @@
           </div>
 
           <div class="form-row">
-            <label for="nome">Nome <span class="required">*</span></label>
-            <input id="nome" type="text" [(ngModel)]="form.nome" name="nome" placeholder="O seu nome" required />
+            <label for="nome">{{ 'avaliacoesPage.nome' | transloco }} <span class="required">*</span></label>
+            <input id="nome" type="text" [(ngModel)]="form.nome" name="nome" [placeholder]="'avaliacoesPage.phNome' | transloco" required />
           </div>
           <div class="form-row">
-            <label for="email">E-mail <span class="required">*</span></label>
-            <input id="email" type="email" [(ngModel)]="form.email" name="email" placeholder="exemplo&#64;email.com" required />
+            <label for="email">{{ 'avaliacoesPage.email' | transloco }} <span class="required">*</span></label>
+            <input id="email" type="email" [(ngModel)]="form.email" name="email" [placeholder]="'avaliacoesPage.phEmail' | transloco" required />
           </div>
           <div class="form-row">
-            <label for="telefone">Telefone</label>
-            <input id="telefone" type="tel" [(ngModel)]="form.telefone" name="telefone" placeholder="Ex: 912 345 678" />
+            <label for="telefone">{{ 'avaliacoesPage.telefone' | transloco }}</label>
+            <input id="telefone" type="tel" [(ngModel)]="form.telefone" name="telefone" [placeholder]="'avaliacoesPage.phTel' | transloco" />
           </div>
           <div class="form-row full">
-            <label for="mensagem">Mensagem <span class="required">*</span></label>
-            <textarea id="mensagem" [(ngModel)]="form.mensagem" name="mensagem" rows="5" placeholder="Descreva o seu feedback, reclamação ou sugestão..." required></textarea>
+            <label for="mensagem">{{ 'avaliacoesPage.mensagem' | transloco }} <span class="required">*</span></label>
+            <textarea id="mensagem" [(ngModel)]="form.mensagem" name="mensagem" rows="5" [placeholder]="'avaliacoesPage.phMsg' | transloco" required></textarea>
           </div>
-          <button type="submit" class="avaliacoes-submit">Enviar</button>
+          <button type="submit" class="avaliacoes-submit">{{ 'avaliacoesPage.submit' | transloco }}</button>
         </form>
       } @else {
         <div class="avaliacoes-success">
           <span class="success-icon">✓</span>
-          <h2>Obrigado pelo seu feedback</h2>
-          <p>A sua mensagem foi recebida. A nossa equipa entrará em contacto se necessário.</p>
-          <a routerLink="/" class="success-link">Voltar ao início</a>
+          <h2>{{ 'avaliacoesPage.successTitle' | transloco }}</h2>
+          <p>{{ 'avaliacoesPage.successText' | transloco }}</p>
+          <a routerLink="/" class="success-link">{{ 'avaliacoesPage.backHome' | transloco }}</a>
         </div>
       }
     </div>

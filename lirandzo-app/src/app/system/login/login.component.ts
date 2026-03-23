@@ -2,12 +2,13 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TranslocoModule } from '@ngneat/transloco';
 import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, TranslocoModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -17,30 +18,34 @@ export class LoginComponent {
 
   username = '';
   password = '';
+  showPassword = false;
   loading = false;
-  error = '';
+  errorKey = '';
 
   onSubmit(): void {
-    this.error = '';
+    this.errorKey = '';
     const u = this.username.trim();
     const p = this.password;
     if (!u || !p) {
-      this.error = 'Introduza o utilizador e a senha.';
+      this.errorKey = 'auth.login.errors.required';
       return;
     }
     this.loading = true;
     this.auth.login(u, p).subscribe({
-      next: (user) => {
+      next: () => {
         this.loading = false;
-        if (user) {
-          this.router.navigate(['/billing']);
-        } else {
-          this.error = 'Utilizador ou senha incorrectos.';
-        }
+        this.router.navigate(['/billing']);
       },
-      error: () => {
+      error: (err) => {
         this.loading = false;
-        this.error = 'Erro de ligação. Verifique se o backend está em execução.';
+        const status = err?.status ?? 0;
+        if (status === 401) {
+          this.errorKey = 'auth.login.errors.invalidCredentials';
+        } else if (status === 0 || status === 404 || status === 502 || status === 504) {
+          this.errorKey = 'auth.login.errors.backendUnavailable';
+        } else {
+          this.errorKey = 'auth.login.errors.connection';
+        }
       }
     });
   }

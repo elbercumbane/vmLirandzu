@@ -18,12 +18,18 @@ export class ViaturasEditarComponent implements OnInit {
     matricula: '',
     marca: '',
     modelo: '',
+    ano: null as number | null,
+    cor: '',
     tipo: '',
     capacidade: null as number | null,
-    status: 'ATIVA'
+    capacidadeUnidade: 'KG',
+    combustivel: '',
+    numeroChassis: '',
+    status: 'ACTIVE'
   };
 
-  tiposViatura = ['Camião Pesado', 'Camião Médio', 'Camião Leve', 'Reboque', 'Semi-Reboque'];
+  tiposViatura = ['Camião Pesado', 'Camião Médio', 'Camião Leve', 'Carro ligeiro', 'Carro comercial', 'Reboque', 'Semi-Reboque', 'Outros'];
+  tipoOutros = '';
 
   loading = true;
   error: string | null = null;
@@ -51,53 +57,57 @@ export class ViaturasEditarComponent implements OnInit {
   }
 
   carregarViatura() {
-    if (!this.viaturaId) {
-      this.error = 'ID da viatura não fornecido';
-      this.loading = false;
-      this.mostrarNotificacao('ID da viatura não fornecido', 'error');
-      return;
-    }
+    if (!this.viaturaId) return;
 
     this.loading = true;
     this.error = null;
     this.viaturaService.obterViatura(this.viaturaId).subscribe({
-      next: (viaturaApi: Viatura) => {
-        try {
-          this.viatura.matricula = viaturaApi.matricula || '';
-          this.viatura.marca = viaturaApi.marca || '';
-          this.viatura.modelo = viaturaApi.modelo || '';
-          this.viatura.tipo = viaturaApi.tipo || '';
-          this.viatura.capacidade = viaturaApi.capacidade || null;
-          this.viatura.status = viaturaApi.status || 'ATIVA';
-          this.loading = false;
-        } catch (error) {
-          console.error('Erro ao processar dados da viatura:', error);
-          this.loading = false;
-          this.error = 'Erro ao processar dados da viatura';
-          this.mostrarNotificacao('Erro ao processar dados da viatura', 'error');
+      next: (v: Viatura) => {
+        this.viatura.matricula = v.matricula || '';
+        this.viatura.marca = v.marca || '';
+        this.viatura.modelo = v.modelo || '';
+        this.viatura.ano = v.ano ?? null;
+        this.viatura.cor = v.cor || '';
+        const tipoVal = v.tipo || '';
+        if (tipoVal.startsWith('Outros - ')) {
+          this.viatura.tipo = 'Outros';
+          this.tipoOutros = tipoVal.replace('Outros - ', '');
+        } else {
+          this.viatura.tipo = tipoVal;
+          this.tipoOutros = '';
         }
+        this.viatura.capacidade = v.capacidade ?? null;
+        this.viatura.capacidadeUnidade = v.capacidadeUnidade || 'KG';
+        this.viatura.combustivel = v.combustivel || '';
+        this.viatura.numeroChassis = v.numeroChassis || '';
+        this.viatura.status = v.status || 'ACTIVE';
+        this.loading = false;
       },
       error: (error) => {
         console.error('Erro ao carregar viatura:', error);
         this.loading = false;
-        const mensagemErro = error.status === 404 
-          ? 'Viatura não encontrada' 
-          : error.status === 0
-          ? 'Não foi possível conectar ao servidor. Verifique se o backend está em execução.'
+        this.error = error.status === 404 ? 'Viatura não encontrada' : error.status === 0
+          ? 'Não foi possível conectar ao servidor.'
           : `Erro ao carregar viatura: ${error.statusText || error.message}`;
-        this.error = mensagemErro;
-        this.mostrarNotificacao(mensagemErro, 'error');
+        this.mostrarNotificacao(this.error, 'error');
       }
     });
+  }
+
+  obterTipoParaGuardar(): string | undefined {
+    const t = this.viatura.tipo?.trim();
+    if (!t) return undefined;
+    if (t === 'Outros' && this.tipoOutros?.trim()) {
+      return `Outros - ${this.tipoOutros.trim()}`;
+    }
+    return t;
   }
 
   mostrarNotificacao(mensagem: string, tipo: 'success' | 'error') {
     this.notificationMessage = mensagem;
     this.notificationType = tipo;
     this.showNotification = true;
-    setTimeout(() => {
-      this.showNotification = false;
-    }, 7000);
+    setTimeout(() => { this.showNotification = false; }, 7000);
   }
 
   getBackLink(): string {
@@ -105,40 +115,31 @@ export class ViaturasEditarComponent implements OnInit {
   }
 
   salvar() {
-    if (!this.viatura.matricula || !this.viatura.matricula.trim()) {
-      this.mostrarNotificacao('Por favor, preencha a matrícula da viatura.', 'error');
+    if (!this.viatura.matricula?.trim() || !this.viatura.marca?.trim() || !this.viatura.modelo?.trim()) {
+      this.mostrarNotificacao('Preencha matrícula, marca e modelo.', 'error');
       return;
     }
-    if (!this.viatura.marca || !this.viatura.marca.trim()) {
-      this.mostrarNotificacao('Por favor, preencha a marca da viatura.', 'error');
-      return;
-    }
-    if (!this.viatura.modelo || !this.viatura.modelo.trim()) {
-      this.mostrarNotificacao('Por favor, preencha o modelo da viatura.', 'error');
-      return;
-    }
-
-    if (!this.viaturaId) {
-      this.mostrarNotificacao('Viatura não guardada', 'error');
-      return;
-    }
+    if (!this.viaturaId) return;
 
     const viaturaData: Viatura = {
       matricula: this.viatura.matricula.trim(),
       marca: this.viatura.marca.trim(),
       modelo: this.viatura.modelo.trim(),
-      tipo: this.viatura.tipo?.trim() || undefined,
+      ano: this.viatura.ano || undefined,
+      cor: this.viatura.cor?.trim() || undefined,
+      tipo: this.obterTipoParaGuardar(),
       capacidade: this.viatura.capacidade || undefined,
-      status: this.viatura.status as 'ATIVA' | 'EM_MANUTENCAO' | 'RESERVADA' | 'INATIVA'
+      capacidadeUnidade: this.viatura.capacidadeUnidade || 'KG',
+      combustivel: this.viatura.combustivel?.trim() || undefined,
+      numeroChassis: this.viatura.numeroChassis?.trim() || undefined,
+      status: this.viatura.status
     };
 
     this.loading = true;
     this.viaturaService.atualizarViatura(this.viaturaId, viaturaData).subscribe({
       next: () => {
-        this.mostrarNotificacao('Viatura guardada com sucesso!', 'success');
-        setTimeout(() => {
-          this.router.navigate(['/billing/viaturas', this.viaturaId]);
-        }, 1500);
+        this.mostrarNotificacao('Viatura actualizada com sucesso!', 'success');
+        setTimeout(() => this.router.navigate(['/billing/viaturas', this.viaturaId]), 1500);
       },
       error: (error) => {
         console.error('Erro ao atualizar viatura:', error);

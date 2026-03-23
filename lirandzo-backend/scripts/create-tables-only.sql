@@ -1,298 +1,357 @@
 -- ============================================================================
--- Script para criar apenas as tabelas (base de dados deve já existir)
--- Execute este script após criar a base de dados com create-database-only.sql
+-- Script to create tables only (database must already exist)
+-- Run this script after creating the database with create-database-only.sql
 -- ============================================================================
 
--- NOTA: Este script assume que você já está conectado à base de dados lirandzo_db
--- Use: psql -U postgres -d lirandzo_db -f create-tables-only.sql
+-- NOTE: This script assumes you are connected to database lirandzo_db
+-- Usage: psql -U postgres -d lirandzo_db -f create-tables-only.sql
 
 -- ============================================================================
--- SISTEMA DE AUTENTICAÇÃO E AUTORIZAÇÃO
+-- AUTHENTICATION AND AUTHORIZATION SYSTEM
 -- ============================================================================
 
--- Tabela de roles (papéis/permissões)
+-- Roles table (permissions)
 CREATE TABLE IF NOT EXISTS roles (
     id BIGSERIAL PRIMARY KEY,
-    nome VARCHAR(50) NOT NULL UNIQUE,
-    descricao VARCHAR(200),
-    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    name VARCHAR(50) NOT NULL UNIQUE,
+    description VARCHAR(200),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabela de usuários (sistema de login)
-CREATE TABLE IF NOT EXISTS usuarios (
+-- Users table (login system)
+CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     username VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL, -- Senha encriptada com BCrypt
-    nome VARCHAR(200) NOT NULL,
+    password VARCHAR(255) NOT NULL,  -- BCrypt encrypted
+    name VARCHAR(200) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    telefone VARCHAR(50),
-    ativo BOOLEAN NOT NULL DEFAULT true,
-    conta_nao_expirada BOOLEAN NOT NULL DEFAULT true,
-    credenciais_nao_expiradas BOOLEAN NOT NULL DEFAULT true,
-    conta_nao_bloqueada BOOLEAN NOT NULL DEFAULT true,
-    ultimo_login TIMESTAMP,
-    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    phone VARCHAR(50),
+    active BOOLEAN NOT NULL DEFAULT true,
+    account_non_expired BOOLEAN NOT NULL DEFAULT true,
+    credentials_non_expired BOOLEAN NOT NULL DEFAULT true,
+    account_non_locked BOOLEAN NOT NULL DEFAULT true,
+    last_login TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabela de junção: usuários e roles (Many-to-Many)
-CREATE TABLE IF NOT EXISTS usuarios_roles (
-    usuario_id BIGINT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+-- Junction table: users and roles (Many-to-Many)
+CREATE TABLE IF NOT EXISTS user_roles (
+    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     role_id BIGINT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
-    PRIMARY KEY (usuario_id, role_id)
+    PRIMARY KEY (user_id, role_id)
 );
 
 -- ============================================================================
--- GESTÃO DE CLIENTES E ENCOMENDAS
+-- CUSTOMERS AND ORDERS MANAGEMENT
 -- ============================================================================
 
--- Tabela de clientes
-CREATE TABLE IF NOT EXISTS clientes (
+-- Customers table
+CREATE TABLE IF NOT EXISTS customers (
     id BIGSERIAL PRIMARY KEY,
-    nome VARCHAR(200) NOT NULL,
-    telefone VARCHAR(50),
+    name VARCHAR(200) NOT NULL,
+    phone VARCHAR(50),
     email VARCHAR(100),
-    endereco VARCHAR(200),
-    nif VARCHAR(50),
-    valor_total_faturado DECIMAL(15,2) DEFAULT 0.0,
-    valor_em_divida DECIMAL(15,2) DEFAULT 0.0,
-    numero_encomendas INTEGER DEFAULT 0,
-    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    address VARCHAR(200),
+    tax_id VARCHAR(50),
+    total_invoiced_amount DECIMAL(15,2) DEFAULT 0.0,
+    debt_amount DECIMAL(15,2) DEFAULT 0.0,
+    order_count INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ============================================================================
--- GESTÃO DE VIATURAS E MOTORISTAS
+-- VEHICLES AND DRIVERS MANAGEMENT
 -- ============================================================================
 
--- Tabela de viaturas
-CREATE TABLE IF NOT EXISTS viaturas (
+-- Vehicles table
+CREATE TABLE IF NOT EXISTS vehicles (
     id BIGSERIAL PRIMARY KEY,
-    marca VARCHAR(100) NOT NULL,
-    modelo VARCHAR(100) NOT NULL,
-    matricula VARCHAR(20) NOT NULL UNIQUE,
-    tipo VARCHAR(50),
-    capacidade DECIMAL(10,2),
-    status VARCHAR(20) NOT NULL DEFAULT 'ATIVA',
-    numero_viagens INTEGER DEFAULT 0,
-    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    brand VARCHAR(100) NOT NULL,
+    model VARCHAR(100) NOT NULL,
+    license_plate VARCHAR(20) NOT NULL UNIQUE,
+    year INTEGER,
+    color VARCHAR(50),
+    type VARCHAR(50),
+    capacity DECIMAL(10,2),
+    capacity_unit VARCHAR(10),
+    fuel_type VARCHAR(50),
+    chassis_number VARCHAR(50),
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    trip_count INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabela de motoristas
-CREATE TABLE IF NOT EXISTS motoristas (
+-- Drivers table
+CREATE TABLE IF NOT EXISTS drivers (
     id BIGSERIAL PRIMARY KEY,
-    nome VARCHAR(200) NOT NULL,
-    telefone VARCHAR(50),
-    numero_carta VARCHAR(50),
-    avaliacao_media DECIMAL(3,2) DEFAULT 0.0,
-    numero_viagens INTEGER DEFAULT 0,
-    status VARCHAR(20) NOT NULL DEFAULT 'ATIVO',
-    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    name VARCHAR(200) NOT NULL,
+    date_of_birth DATE,
+    address VARCHAR(500),
+    father_name VARCHAR(200),
+    mother_name VARCHAR(200),
+    nuit VARCHAR(20),
+    id_document_number VARCHAR(50),
+    phone VARCHAR(50),
+    phone_2 VARCHAR(50),
+    emergency_contact_name VARCHAR(200),
+    emergency_contact_relationship VARCHAR(100),
+    emergency_contact_phone VARCHAR(50),
+    license_number VARCHAR(50),
+    license_category VARCHAR(10),
+    license_issue_date DATE,
+    license_expiry_date DATE,
+    average_rating DECIMAL(3,2) DEFAULT 0.0,
+    trip_count INTEGER DEFAULT 0,
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- ============================================================================
--- GESTÃO DE VIAGENS
--- ============================================================================
-
--- Tabela de viagens
-CREATE TABLE IF NOT EXISTS viagens (
+-- Vehicle occurrences
+CREATE TABLE IF NOT EXISTS vehicle_occurrences (
     id BIGSERIAL PRIMARY KEY,
-    motorista_id BIGINT REFERENCES motoristas(id) ON DELETE SET NULL,
-    viatura_id BIGINT REFERENCES viaturas(id) ON DELETE SET NULL,
-    origem VARCHAR(200) NOT NULL,
-    destino VARCHAR(200) NOT NULL,
-    data_partida DATE,
-    data_chegada_prevista DATE,
-    data_chegada_real DATE,
-    status VARCHAR(20) NOT NULL DEFAULT 'PLANEADA',
-    combustivel_consumido DECIMAL(10,2),
-    custo_combustivel DECIMAL(15,2),
-    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    occurrence_date DATE NOT NULL,
+    vehicle_id BIGINT NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
+    driver_id BIGINT REFERENCES drivers(id) ON DELETE SET NULL,
+    type VARCHAR(20) NOT NULL,
+    description VARCHAR(1000) NOT NULL,
+    severity VARCHAR(20),
+    status VARCHAR(20) NOT NULL DEFAULT 'ABERTO',
+    vehicle_impact VARCHAR(20) NOT NULL DEFAULT 'EM_REPARACAO',
+    estimated_cost DECIMAL(15,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX IF NOT EXISTS idx_vehicle_occurrences_vehicle ON vehicle_occurrences(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_vehicle_occurrences_driver ON vehicle_occurrences(driver_id);
+CREATE INDEX IF NOT EXISTS idx_vehicle_occurrences_date ON vehicle_occurrences(occurrence_date);
+CREATE INDEX IF NOT EXISTS idx_vehicle_occurrences_status ON vehicle_occurrences(status);
+
 -- ============================================================================
--- GESTÃO DE ENCOMENDAS E PAGAMENTOS
+-- TRIPS MANAGEMENT
 -- ============================================================================
 
--- Tabela de encomendas
-CREATE TABLE IF NOT EXISTS encomendas (
-    numero_encomenda BIGSERIAL PRIMARY KEY,
-    cliente_id BIGINT NOT NULL REFERENCES clientes(id) ON DELETE RESTRICT,
-    produto VARCHAR(200) NOT NULL,
-    origem VARCHAR(200) NOT NULL,
-    destino VARCHAR(200) NOT NULL,
-    valor_total DECIMAL(15,2) NOT NULL,
-    valor_pago DECIMAL(15,2) DEFAULT 0.0,
-    valor_divida DECIMAL(15,2) DEFAULT 0.0,
-    status VARCHAR(20) NOT NULL DEFAULT 'NAO_PAGO',
-    data_encomenda DATE,
-    viagem_id BIGINT REFERENCES viagens(id) ON DELETE SET NULL,
-    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Tabela de pagamentos
-CREATE TABLE IF NOT EXISTS pagamentos (
+-- Trips table
+CREATE TABLE IF NOT EXISTS trips (
     id BIGSERIAL PRIMARY KEY,
-    encomenda_id BIGINT NOT NULL REFERENCES encomendas(numero_encomenda) ON DELETE CASCADE,
-    valor DECIMAL(15,2) NOT NULL,
-    data_pagamento DATE,
-    referencia VARCHAR(100),
-    observacoes VARCHAR(500),
-    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    driver_id BIGINT REFERENCES drivers(id) ON DELETE SET NULL,
+    vehicle_id BIGINT REFERENCES vehicles(id) ON DELETE SET NULL,
+    origin VARCHAR(200) NOT NULL,
+    destination VARCHAR(200) NOT NULL,
+    departure_date DATE,
+    expected_arrival_date DATE,
+    actual_arrival_date DATE,
+    status VARCHAR(20) NOT NULL DEFAULT 'PLANNED',
+    fuel_consumed DECIMAL(10,2),
+    fuel_cost DECIMAL(15,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ============================================================================
--- ÍNDICES PARA MELHORAR PERFORMANCE
+-- ORDERS AND PAYMENTS MANAGEMENT
 -- ============================================================================
 
--- Índices para sistema de autenticação
-CREATE INDEX IF NOT EXISTS idx_usuarios_username ON usuarios(username);
-CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios(email);
-CREATE INDEX IF NOT EXISTS idx_usuarios_ativo ON usuarios(ativo);
-CREATE INDEX IF NOT EXISTS idx_roles_nome ON roles(nome);
-CREATE INDEX IF NOT EXISTS idx_usuarios_roles_usuario ON usuarios_roles(usuario_id);
-CREATE INDEX IF NOT EXISTS idx_usuarios_roles_role ON usuarios_roles(role_id);
+-- Orders table
+CREATE TABLE IF NOT EXISTS orders (
+    order_number BIGSERIAL PRIMARY KEY,
+    customer_id BIGINT NOT NULL REFERENCES customers(id) ON DELETE RESTRICT,
+    product VARCHAR(200) NOT NULL,
+    origin VARCHAR(200) NOT NULL,
+    destination VARCHAR(200) NOT NULL,
+    total_amount DECIMAL(15,2) NOT NULL,
+    paid_amount DECIMAL(15,2) DEFAULT 0.0,
+    debt_amount DECIMAL(15,2) DEFAULT 0.0,
+    status VARCHAR(20) NOT NULL DEFAULT 'UNPAID',
+    order_date DATE,
+    trip_id BIGINT REFERENCES trips(id) ON DELETE SET NULL,
+    invoice_number VARCHAR(50),
+    invoice_date DATE,
+    quotation_id BIGINT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
--- Índices para clientes
-CREATE INDEX IF NOT EXISTS idx_clientes_nif ON clientes(nif);
-CREATE INDEX IF NOT EXISTS idx_clientes_email ON clientes(email);
-CREATE INDEX IF NOT EXISTS idx_clientes_nome ON clientes(nome);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_orders_invoice_number ON orders(invoice_number) WHERE invoice_number IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_orders_quotation_id ON orders(quotation_id);
 
--- Índices para viaturas
-CREATE INDEX IF NOT EXISTS idx_viaturas_matricula ON viaturas(matricula);
-CREATE INDEX IF NOT EXISTS idx_viaturas_status ON viaturas(status);
-
--- Índices para motoristas
-CREATE INDEX IF NOT EXISTS idx_motoristas_status ON motoristas(status);
-CREATE INDEX IF NOT EXISTS idx_motoristas_nome ON motoristas(nome);
-
--- Índices para viagens
-CREATE INDEX IF NOT EXISTS idx_viagens_motorista ON viagens(motorista_id);
-CREATE INDEX IF NOT EXISTS idx_viagens_viatura ON viagens(viatura_id);
-CREATE INDEX IF NOT EXISTS idx_viagens_status ON viagens(status);
-CREATE INDEX IF NOT EXISTS idx_viagens_data_partida ON viagens(data_partida);
-
--- Índices para encomendas
-CREATE INDEX IF NOT EXISTS idx_encomendas_cliente ON encomendas(cliente_id);
-CREATE INDEX IF NOT EXISTS idx_encomendas_status ON encomendas(status);
-CREATE INDEX IF NOT EXISTS idx_encomendas_data ON encomendas(data_encomenda);
-CREATE INDEX IF NOT EXISTS idx_encomendas_viagem ON encomendas(viagem_id);
-
--- Índices para pagamentos
-CREATE INDEX IF NOT EXISTS idx_pagamentos_encomenda ON pagamentos(encomenda_id);
-CREATE INDEX IF NOT EXISTS idx_pagamentos_data ON pagamentos(data_pagamento);
-
--- ============================================================================
--- GESTÃO DE COTAÇÕES
--- ============================================================================
-
--- Tabela de cotações
-CREATE TABLE IF NOT EXISTS cotacoes (
+-- Payments table
+CREATE TABLE IF NOT EXISTS payments (
     id BIGSERIAL PRIMARY KEY,
-    referencia VARCHAR(50) UNIQUE,
-    cliente_id BIGINT NOT NULL REFERENCES clientes(id) ON DELETE RESTRICT,
-    origem VARCHAR(200) NOT NULL,
-    destino VARCHAR(200) NOT NULL,
-    tipo_veiculo VARCHAR(100),
-    descricao_carga VARCHAR(500),
-    valor_total DECIMAL(15,2),
-    custo_transporte DECIMAL(15,2),
-    custo_recolha DECIMAL(15,2),
-    custo_bill_of_entry DECIMAL(15,2),
-    data_cotacao DATE,
-    data_validade DATE,
-    status VARCHAR(20) NOT NULL DEFAULT 'PENDENTE',
-    observacoes VARCHAR(500),
-    condicoes VARCHAR(500),
-    operador VARCHAR(200),
-    forma_envio_preferida VARCHAR(50),
-    forma_envio_realizada VARCHAR(50),
-    data_resposta TIMESTAMP,
-    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    order_id BIGINT NOT NULL REFERENCES orders(order_number) ON DELETE CASCADE,
+    amount DECIMAL(15,2) NOT NULL,
+    payment_date DATE,
+    reference VARCHAR(100),
+    notes VARCHAR(500),
+    payment_method VARCHAR(50),
+    verification_status VARCHAR(30) NOT NULL DEFAULT 'CONFIRMED',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Índices para cotações
-CREATE INDEX IF NOT EXISTS idx_cotacoes_cliente ON cotacoes(cliente_id);
-CREATE INDEX IF NOT EXISTS idx_cotacoes_status ON cotacoes(status);
-CREATE INDEX IF NOT EXISTS idx_cotacoes_data ON cotacoes(data_cotacao);
-CREATE INDEX IF NOT EXISTS idx_cotacoes_referencia ON cotacoes(referencia);
+CREATE INDEX IF NOT EXISTS idx_payments_verification_status ON payments(verification_status);
 
 -- ============================================================================
--- GESTÃO DE GUIAS DE REMESSA
+-- INDEXES FOR PERFORMANCE
 -- ============================================================================
 
--- Tabela de guias de remessa
-CREATE TABLE IF NOT EXISTS guias_remessa (
+-- Authentication indexes
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_active ON users(active);
+CREATE INDEX IF NOT EXISTS idx_roles_name ON roles(name);
+CREATE INDEX IF NOT EXISTS idx_user_roles_user ON user_roles(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_roles_role ON user_roles(role_id);
+
+-- Customer indexes
+CREATE INDEX IF NOT EXISTS idx_customers_tax_id ON customers(tax_id);
+CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email);
+CREATE INDEX IF NOT EXISTS idx_customers_name ON customers(name);
+
+-- Vehicle indexes
+CREATE INDEX IF NOT EXISTS idx_vehicles_license_plate ON vehicles(license_plate);
+CREATE INDEX IF NOT EXISTS idx_vehicles_status ON vehicles(status);
+
+-- Driver indexes
+CREATE INDEX IF NOT EXISTS idx_drivers_status ON drivers(status);
+CREATE INDEX IF NOT EXISTS idx_drivers_name ON drivers(name);
+
+-- Trip indexes
+CREATE INDEX IF NOT EXISTS idx_trips_driver ON trips(driver_id);
+CREATE INDEX IF NOT EXISTS idx_trips_vehicle ON trips(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_trips_status ON trips(status);
+CREATE INDEX IF NOT EXISTS idx_trips_departure_date ON trips(departure_date);
+
+-- Order indexes
+CREATE INDEX IF NOT EXISTS idx_orders_customer ON orders(customer_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
+CREATE INDEX IF NOT EXISTS idx_orders_order_date ON orders(order_date);
+CREATE INDEX IF NOT EXISTS idx_orders_trip ON orders(trip_id);
+
+-- Payment indexes
+CREATE INDEX IF NOT EXISTS idx_payments_order ON payments(order_id);
+CREATE INDEX IF NOT EXISTS idx_payments_payment_date ON payments(payment_date);
+
+-- ============================================================================
+-- QUOTATIONS MANAGEMENT
+-- ============================================================================
+
+-- Quotations table (schema em inglês - sua config + colunas novas do Elber)
+CREATE TABLE IF NOT EXISTS quotations (
     id BIGSERIAL PRIMARY KEY,
-    referencia VARCHAR(50) UNIQUE,
-    data_guia DATE,
-    motorista_id BIGINT REFERENCES motoristas(id) ON DELETE SET NULL,
-    viatura_id BIGINT REFERENCES viaturas(id) ON DELETE SET NULL,
-    viagem_id BIGINT REFERENCES viagens(id) ON DELETE SET NULL,
-    origem VARCHAR(200) NOT NULL,
-    destino VARCHAR(200) NOT NULL,
-    km_saida INTEGER,
-    km_chegada INTEGER,
-    km_percorridos INTEGER,
-    valor_total DECIMAL(15,2),
-    status VARCHAR(20) NOT NULL DEFAULT 'PENDENTE',
-    observacoes VARCHAR(500),
-    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    reference VARCHAR(50) UNIQUE,
+    customer_id BIGINT NOT NULL REFERENCES customers(id) ON DELETE RESTRICT,
+    origin VARCHAR(200) NOT NULL,
+    destination VARCHAR(200) NOT NULL,
+    vehicle_type VARCHAR(100),
+    cargo_description VARCHAR(500),
+    total_amount DECIMAL(15,2),
+    transport_cost DECIMAL(15,2),
+    collection_cost DECIMAL(15,2),
+    bill_of_entry_cost DECIMAL(15,2),
+    discount_amount DECIMAL(15,2) DEFAULT 0.00,
+    vat_amount DECIMAL(15,2) DEFAULT 0.00,
+    vat_rate DECIMAL(5,2) DEFAULT 0.00,
+    vat_reason VARCHAR(200) DEFAULT 'ISENTO',
+    quotation_date DATE,
+    validity_date DATE,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    notes VARCHAR(500),
+    terms VARCHAR(500),
+    operator VARCHAR(200),
+    preferred_delivery_method VARCHAR(50),
+    actual_delivery_method VARCHAR(50),
+    response_date TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabela de itens de guia de remessa
-CREATE TABLE IF NOT EXISTS itens_guia_remessa (
+-- Quotation indexes
+CREATE INDEX IF NOT EXISTS idx_quotations_customer ON quotations(customer_id);
+CREATE INDEX IF NOT EXISTS idx_quotations_status ON quotations(status);
+CREATE INDEX IF NOT EXISTS idx_quotations_quotation_date ON quotations(quotation_date);
+CREATE INDEX IF NOT EXISTS idx_quotations_reference ON quotations(reference);
+
+ALTER TABLE orders DROP CONSTRAINT IF EXISTS fk_orders_quotation;
+ALTER TABLE orders ADD CONSTRAINT fk_orders_quotation FOREIGN KEY (quotation_id) REFERENCES quotations(id) ON DELETE SET NULL;
+
+-- ============================================================================
+-- DELIVERY NOTES MANAGEMENT
+-- ============================================================================
+
+-- Delivery notes table
+CREATE TABLE IF NOT EXISTS delivery_notes (
     id BIGSERIAL PRIMARY KEY,
-    guia_remessa_id BIGINT NOT NULL REFERENCES guias_remessa(id) ON DELETE CASCADE,
-    cliente_id BIGINT REFERENCES clientes(id) ON DELETE SET NULL,
-    encomenda_id BIGINT REFERENCES encomendas(numero_encomenda) ON DELETE SET NULL,
-    descricao VARCHAR(500) NOT NULL,
-    quantidade INTEGER NOT NULL DEFAULT 1,
-    peso VARCHAR(50),
-    observacao VARCHAR(200)
+    reference VARCHAR(50) UNIQUE,
+    note_date DATE,
+    driver_id BIGINT REFERENCES drivers(id) ON DELETE SET NULL,
+    vehicle_id BIGINT REFERENCES vehicles(id) ON DELETE SET NULL,
+    trip_id BIGINT REFERENCES trips(id) ON DELETE SET NULL,
+    origin VARCHAR(200) NOT NULL,
+    destination VARCHAR(200) NOT NULL,
+    departure_km INTEGER,
+    arrival_km INTEGER,
+    distance_km INTEGER,
+    total_amount DECIMAL(15,2),
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    notes VARCHAR(500),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Índices para guias de remessa
-CREATE INDEX IF NOT EXISTS idx_guias_motorista ON guias_remessa(motorista_id);
-CREATE INDEX IF NOT EXISTS idx_guias_viatura ON guias_remessa(viatura_id);
-CREATE INDEX IF NOT EXISTS idx_guias_viagem ON guias_remessa(viagem_id);
-CREATE INDEX IF NOT EXISTS idx_guias_status ON guias_remessa(status);
-CREATE INDEX IF NOT EXISTS idx_guias_data ON guias_remessa(data_guia);
-CREATE INDEX IF NOT EXISTS idx_guias_referencia ON guias_remessa(referencia);
-CREATE INDEX IF NOT EXISTS idx_itens_guia ON itens_guia_remessa(guia_remessa_id);
+-- Delivery note items table
+CREATE TABLE IF NOT EXISTS delivery_note_items (
+    id BIGSERIAL PRIMARY KEY,
+    delivery_note_id BIGINT NOT NULL REFERENCES delivery_notes(id) ON DELETE CASCADE,
+    customer_id BIGINT REFERENCES customers(id) ON DELETE SET NULL,
+    order_id BIGINT REFERENCES orders(order_number) ON DELETE SET NULL,
+    description VARCHAR(500) NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 1,
+    weight VARCHAR(50),
+    note VARCHAR(200)
+);
+
+-- Delivery note indexes
+CREATE INDEX IF NOT EXISTS idx_delivery_notes_driver ON delivery_notes(driver_id);
+CREATE INDEX IF NOT EXISTS idx_delivery_notes_vehicle ON delivery_notes(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_delivery_notes_trip ON delivery_notes(trip_id);
+CREATE INDEX IF NOT EXISTS idx_delivery_notes_status ON delivery_notes(status);
+CREATE INDEX IF NOT EXISTS idx_delivery_notes_note_date ON delivery_notes(note_date);
+CREATE INDEX IF NOT EXISTS idx_delivery_notes_reference ON delivery_notes(reference);
+CREATE INDEX IF NOT EXISTS idx_delivery_note_items_note ON delivery_note_items(delivery_note_id);
 
 -- ============================================================================
--- DADOS INICIAIS (SEEDS)
+-- INITIAL DATA (SEEDS)
 -- ============================================================================
 
--- Inserir roles padrão
-INSERT INTO roles (nome, descricao) VALUES
-    ('ROLE_ADMIN', 'Administrador do sistema com acesso total'),
-    ('ROLE_GERENTE', 'Gerente com acesso a gestão completa'),
-    ('ROLE_USER', 'Utilizador padrão com acesso limitado')
-ON CONFLICT (nome) DO NOTHING;
+-- Insert default roles
+INSERT INTO roles (name, description) VALUES
+    ('ROLE_ADMIN', 'System administrator with full access'),
+    ('ROLE_MANAGER', 'Manager with complete management access'),
+    ('ROLE_USER', 'Standard user with limited access')
+ON CONFLICT (name) DO NOTHING;
 
--- Inserir usuário administrador padrão
--- Senha: admin123 (deve ser alterada após primeiro login)
--- NOTA: O hash BCrypt abaixo é um exemplo. Para gerar um hash válido:
--- 1. Use BCryptPasswordEncoder do Spring Security
--- 2. Ou crie o usuário via API após implementar autenticação
--- Hash BCrypt para "admin123" (exemplo - gerar novo hash antes de usar):
--- $2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi
-INSERT INTO usuarios (username, password, nome, email, ativo, conta_nao_expirada, credenciais_nao_expiradas, conta_nao_bloqueada) VALUES
-    ('admin', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Administrador', 'admin@lirandzo.co.mz', true, true, true, true)
+-- Insert default admin users
+-- Password: admin123 (should be changed after first login)
+-- NOTE: BCrypt hash for "admin123": $2a$10$zBXgb379fjOVWtFpMjrCIeqILSwRf5lqx1rCTlbhLIHpuegQK82Wu
+INSERT INTO users (username, password, name, email, active, account_non_expired, credentials_non_expired, account_non_locked) VALUES
+    ('admin', '$2a$10$zBXgb379fjOVWtFpMjrCIeqILSwRf5lqx1rCTlbhLIHpuegQK82Wu', 'System Administrator', 'admin@lirandzo.co.mz', true, true, true, true),
+    ('gestor', '$2a$10$zBXgb379fjOVWtFpMjrCIeqILSwRf5lqx1rCTlbhLIHpuegQK82Wu', 'Carlos Mondlane', 'gestor@lirandzo.co.mz', true, true, true, true),
+    ('tecnico', '$2a$10$zBXgb379fjOVWtFpMjrCIeqILSwRf5lqx1rCTlbhLIHpuegQK82Wu', 'Ana Silva', 'tecnico@lirandzo.co.mz', true, true, true, true)
 ON CONFLICT (username) DO NOTHING;
 
--- Associar role de admin ao usuário admin
-INSERT INTO usuarios_roles (usuario_id, role_id)
-SELECT u.id, r.id
-FROM usuarios u, roles r
-WHERE u.username = 'admin' AND r.nome = 'ROLE_ADMIN'
-ON CONFLICT DO NOTHING;
+INSERT INTO user_roles (user_id, role_id)
+SELECT u.id, r.id FROM users u, roles r WHERE u.username = 'admin' AND r.name = 'ROLE_ADMIN'
+ON CONFLICT (user_id, role_id) DO NOTHING;
+
+INSERT INTO user_roles (user_id, role_id)
+SELECT u.id, r.id FROM users u, roles r WHERE u.username = 'gestor' AND r.name = 'ROLE_MANAGER'
+ON CONFLICT (user_id, role_id) DO NOTHING;
+
+INSERT INTO user_roles (user_id, role_id)
+SELECT u.id, r.id FROM users u, roles r WHERE u.username = 'tecnico' AND r.name = 'ROLE_USER'
+ON CONFLICT (user_id, role_id) DO NOTHING;

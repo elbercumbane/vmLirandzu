@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "itens_guia_remessa")
+@Table(name = "delivery_note_items")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,32 +19,32 @@ public class ItemGuiaRemessa {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "Guia de remessa é obrigatória")
+    @NotNull(message = "Delivery note is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "guia_remessa_id", nullable = false)
+    @JoinColumn(name = "delivery_note_id", nullable = false)
     @JsonIgnoreProperties({"itens"})
     private GuiaRemessa guiaRemessa;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cliente_id")
+    @JoinColumn(name = "customer_id")
     @JsonIgnoreProperties({"encomendas"})
     private Cliente cliente;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "encomenda_id")
+    @JoinColumn(name = "order_id")
     @JsonIgnoreProperties({"cliente", "viagem", "pagamentos"})
     private Encomenda encomenda;
 
-    @NotBlank(message = "Descrição é obrigatória")
-    @Column(nullable = false, length = 500)
+    @NotBlank(message = "Description is required")
+    @Column(name = "description", nullable = false, length = 500)
     private String descricao;
 
-    @Column(nullable = false)
+    @Column(name = "quantity", nullable = false)
     private Integer quantidade = 1;
 
-    @Column(length = 50)
+    @Column(name = "weight", length = 50)
     private String peso;
 
-    @Column(length = 200)
+    @Column(name = "note", length = 200)
     private String observacao;
 }

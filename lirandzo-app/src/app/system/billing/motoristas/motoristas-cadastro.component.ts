@@ -16,9 +16,22 @@ import { NotificationPopupComponent } from '../../../shared/components/notificat
 export class MotoristasCadastroComponent {
   motorista = {
     nome: '',
+    dataNascimento: '',
+    morada: '',
+    nomePai: '',
+    nomeMae: '',
+    nuit: '',
+    numeroBI: '',
     telefone: '',
+    telefone2: '',
+    nomeParenteEmergencia: '',
+    parentesco: '',
+    telefoneParenteEmergencia: '',
     numeroCarta: '',
-    status: 'ATIVO'
+    categoriaCarta: '',
+    dataEmissaoCarta: '',
+    dataValidadeCarta: '',
+    status: 'ACTIVE'
   };
 
   loading = false;
@@ -32,10 +45,7 @@ export class MotoristasCadastroComponent {
   ) {}
 
   salvar() {
-    // Prevenir dupla submissão
-    if (this.loading) {
-      return;
-    }
+    if (this.loading) return;
 
     if (!this.motorista.nome || !this.motorista.nome.trim()) {
       this.mostrarNotificacao('Por favor, preencha o nome do motorista.', 'error');
@@ -44,9 +54,22 @@ export class MotoristasCadastroComponent {
 
     const motoristaData: Motorista = {
       nome: this.motorista.nome.trim(),
+      dataNascimento: this.motorista.dataNascimento || undefined,
+      morada: this.motorista.morada?.trim() || undefined,
+      nomePai: this.motorista.nomePai?.trim() || undefined,
+      nomeMae: this.motorista.nomeMae?.trim() || undefined,
+      nuit: this.motorista.nuit?.trim() || undefined,
+      numeroBI: this.motorista.numeroBI?.trim() || undefined,
       telefone: this.motorista.telefone?.trim() || undefined,
+      telefone2: this.motorista.telefone2?.trim() || undefined,
+      nomeParenteEmergencia: this.motorista.nomeParenteEmergencia?.trim() || undefined,
+      parentesco: this.motorista.parentesco?.trim() || undefined,
+      telefoneParenteEmergencia: this.motorista.telefoneParenteEmergencia?.trim() || undefined,
       numeroCarta: this.motorista.numeroCarta?.trim() || undefined,
-      status: this.motorista.status as 'ATIVO' | 'INATIVO'
+      categoriaCarta: this.motorista.categoriaCarta || undefined,
+      dataEmissaoCarta: this.motorista.dataEmissaoCarta || undefined,
+      dataValidadeCarta: this.motorista.dataValidadeCarta || undefined,
+      status: this.motorista.status as 'ACTIVE' | 'INACTIVE'
     };
 
     this.loading = true;

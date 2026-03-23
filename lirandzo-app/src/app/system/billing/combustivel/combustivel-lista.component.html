@@ -1,0 +1,105 @@
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="'/billing'"
+  [showHelp]="true"
+  title="Abastecimentos"
+  subtitle="Registo de combustível por viatura"
+  helpTitle="Abastecimentos"
+  [helpItems]="[
+    'Registe cada abastecimento com data, litros e custo.',
+    'A quilometragem ajuda a calcular consumo médio.',
+    'Pode filtrar por viatura ou posto.'
+  ]"
+></app-billing-section-header>
+
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--accent)"></div>
+    <div class="kpi-icon" style="color: var(--accent)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="22" x2="12" y2="2"></line><path d="M17 7H7a5 5 0 0 0 0 10h10a5 5 0 0 0 0-10z"></path></svg>
+    </div>
+    <div class="kpi-label">Total Abastecimentos</div>
+    <div class="kpi-value">{{ abastecimentos.length }}</div>
+    <div class="kpi-sub">registados</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--success)"></div>
+    <div class="kpi-icon" style="color: var(--success)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+    </div>
+    <div class="kpi-label">Litros Total</div>
+    <div class="kpi-value">{{ totalLitros | number:'1.1-1' }}</div>
+    <div class="kpi-sub">L</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--warning)"></div>
+    <div class="kpi-icon" style="color: var(--warning)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+    </div>
+    <div class="kpi-label">Custo Total</div>
+    <div class="kpi-value">{{ totalCusto | number:'1.0-0' }} <small>MZN</small></div>
+    <div class="kpi-sub">investido</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <div class="search-wrapper">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" class="search-input" placeholder="Pesquisar por matrícula, viatura ou posto..." [(ngModel)]="searchTerm">
+    </div>
+    <a routerLink="/billing/combustivel/novo" class="btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      Novo Abastecimento
+    </a>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state"><p>A carregar abastecimentos...</p></div>
+  } @else if (error) {
+    <div class="error-state">
+      <p>{{ error }}</p>
+      <button type="button" class="btn-secondary" (click)="carregar()">Tentar Novamente</button>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Viatura</th>
+            <th>Litros</th>
+            <th>Custo (MZN)</th>
+            <th>Quilometragem</th>
+            <th>Posto</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (a of filtered; track a.id) {
+            <tr>
+              <td>{{ formatarData(a.refuelDate) }}</td>
+              <td>
+                <a [routerLink]="['/billing/viaturas', a.vehicleId]" class="link-viatura" title="Ver viatura">
+                  <span style="font-weight: 600; color: var(--primary)">{{ a.vehiclePlate }}</span>
+                  <span style="font-size: 0.75rem; color: var(--text-muted)">{{ a.vehicleName }}</span>
+                </a>
+              </td>
+              <td style="font-weight: 600">{{ a.liters | number:'1.1-1' }}</td>
+              <td style="font-weight: 600">{{ (a.cost || 0) | number:'1.0-0' }}</td>
+              <td>{{ a.kmReading ?? '—' }}</td>
+              <td>{{ a.station || '—' }}</td>
+              <td>
+                <a [routerLink]="['/billing/combustivel', a.id, 'editar']" class="btn-icon" title="Editar">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </a>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="7" class="empty-state">Nenhum abastecimento registado.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

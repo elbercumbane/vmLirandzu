@@ -21,28 +21,28 @@ public class Role {
     private Long id;
 
     @Column(nullable = false, unique = true, length = 50)
-    private String nome; // ROLE_ADMIN, ROLE_USER, ROLE_GERENTE, etc.
+    private String name;  // ROLE_ADMIN, ROLE_USER, ROLE_MANAGER, etc.
 
-    @Column(length = 200)
-    private String descricao;
+    @Column(name = "description", length = 200)
+    private String description;
 
-    @Column(name = "data_criacao")
-    private LocalDateTime dataCriacao;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-    @Column(name = "data_atualizacao")
-    private LocalDateTime dataAtualizacao;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @ManyToMany(mappedBy = "roles")
     private List<Usuario> usuarios = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
-        dataCriacao = LocalDateTime.now();
-        dataAtualizacao = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        dataAtualizacao = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 }

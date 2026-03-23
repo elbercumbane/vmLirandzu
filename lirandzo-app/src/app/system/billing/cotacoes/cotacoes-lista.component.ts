@@ -48,7 +48,13 @@ export class CotacoesListaComponent implements OnInit {
 
     this.cotacaoService.listarCotacoes().subscribe({
       next: (cotacoes: CotacaoResponse[]) => {
-        this.pedidos = cotacoes.map(c => this.mapearCotacao(c));
+        // Mostrar mais recentes primeiro (pedidos antigos ficam por último).
+        const sorted = [...cotacoes].sort((a, b) => {
+          const ta = a.dataCriacao ? new Date(a.dataCriacao).getTime() : (a.dataCotacao ? new Date(a.dataCotacao).getTime() : 0);
+          const tb = b.dataCriacao ? new Date(b.dataCriacao).getTime() : (b.dataCotacao ? new Date(b.dataCotacao).getTime() : 0);
+          return tb - ta;
+        });
+        this.pedidos = sorted.map(c => this.mapearCotacao(c));
         this.loading = false;
       },
       error: (error: unknown) => {
@@ -66,16 +72,16 @@ export class CotacoesListaComponent implements OnInit {
     const email = c.cliente?.email || '';
     const contacto = telefone || email || '';
 
-    const dataCotacaoObj = c.dataCotacao ? new Date(c.dataCotacao) : null;
-    const dataEntrada = dataCotacaoObj
-      ? dataCotacaoObj.toLocaleDateString('pt-MZ', {
+    const dataCriacaoObj = c.dataCriacao ? new Date(c.dataCriacao) : null;
+    const dataEntrada = dataCriacaoObj
+      ? dataCriacaoObj.toLocaleDateString('pt-MZ', {
           day: '2-digit',
           month: '2-digit',
           year: 'numeric'
         })
       : '';
-    const horaEntrada = dataCotacaoObj
-      ? dataCotacaoObj.toLocaleTimeString('pt-MZ', {
+    const horaEntrada = dataCriacaoObj
+      ? dataCriacaoObj.toLocaleTimeString('pt-MZ', {
           hour: '2-digit',
           minute: '2-digit'
         })
@@ -91,27 +97,45 @@ export class CotacoesListaComponent implements OnInit {
         })
       : '';
 
-    let tempoResposta = '';
-    if (c.dataCotacao && c.dataResposta) {
-      const inicio = new Date(c.dataCotacao);
-      const fim = new Date(c.dataResposta);
-      const diffMs = fim.getTime() - inicio.getTime();
-      if (diffMs > 0) {
-        const diffMin = Math.round(diffMs / 60000);
-        const horas = Math.floor(diffMin / 60);
-        const minutos = diffMin % 60;
-        tempoResposta = horas > 0 ? `${horas}h ${minutos}min` : `${minutos}min`;
-      }
+    let tempoResposta = '—';
+    const statusUpperTempo = c.status?.toUpperCase() || '';
+    const isRespondido = statusUpperTempo === 'RESPONDIDO' || statusUpperTempo === 'RESPONDED';
+    if (c.dataCriacao && c.dataResposta && isRespondido) {
+      const inicioMs = new Date(c.dataCriacao).getTime();
+      const fimMs = new Date(c.dataResposta).getTime();
+      const diffMs = fimMs - inicioMs;
+      tempoResposta = diffMs >= 0 ? this.formatarDuracao(diffMs) : '—';
     }
 
-    const statusMap: { [key: string]: string } = {
-      'PENDENTE': 'PENDENTE',
-      'RESPONDIDO': 'RESPONDIDO',
-      'COTACAO_GERADA': 'COTAÇÃO GERADA',
-      'EXPIRADA': 'EXPIRADA',
-      'CANCELADA': 'CANCELADA'
-    };
-    const estado = statusMap[c.status?.toUpperCase() || ''] || 'PENDENTE';
+    // Mapeamento do status vindo do backend (enum em inglês) para UI em PT.
+    const statusUpper = c.status?.toUpperCase() || '';
+    let estado = 'PENDENTE';
+    switch (statusUpper) {
+      case 'PENDING':
+      case 'PENDENTE':
+        estado = 'PENDENTE';
+        break;
+      case 'RESPONDED':
+      case 'RESPONDIDO':
+        estado = 'RESPONDIDO';
+        break;
+      case 'QUOTATION_GENERATED':
+      case 'COTACAO_GERADA':
+      case 'COTACAO GERADA':
+      case 'COTAÇÃO GERADA':
+        estado = 'COTAÇÃO GERADA';
+        break;
+      case 'EXPIRED':
+      case 'EXPIRADA':
+        estado = 'EXPIRADA';
+        break;
+      case 'CANCELLED':
+      case 'CANCELADA':
+        estado = 'CANCELADA';
+        break;
+      default:
+        estado = 'PENDENTE';
+    }
 
     return {
       id: c.id,
@@ -131,32 +155,45 @@ export class CotacoesListaComponent implements OnInit {
     };
   }
 
-  get pedidosFiltrados() {
-    let lista = this.pedidos;
-    if (this.filtroEstado !== 'TODOS') {
-      lista = lista.filter(p => p.estado === this.filtroEstado);
+  private formatarDuracao(diffMs: number): string {
+    const totalSeconds = Math.floor(diffMs / 1000);
+    if (totalSeconds <= 0) return '—';
+
+    const dias = Math.floor(totalSeconds / 86400);
+    const horas = Math.floor((totalSeconds % 86400) / 3600);
+    const minutos = Math.floor((totalSeconds % 3600) / 60);
+    const segundos = totalSeconds % 60;
+
+    const pluralDia = dias === 1 ? 'dia' : 'dias';
+    const pluralMin = minutos === 1 ? 'minuto' : 'minutos';
+
+    if (dias > 0) {
+      const partes: string[] = [`${dias} ${pluralDia}`];
+      if (horas > 0) partes.push(`${horas}h`);
+      if (minutos > 0) partes.push(`${minutos} ${pluralMin}`);
+      partes.push(`${segundos}s`);
+      return partes.join(' e ');
     }
-    if (this.filtro.trim()) {
-      const f = this.filtro.toLowerCase();
-      lista = lista.filter(p =>
-        p.cliente.toLowerCase().includes(f) ||
-        p.ref.toLowerCase().includes(f) ||
-        p.destino.toLowerCase().includes(f) ||
-        p.descricaoCarga.toLowerCase().includes(f)
-      );
-    }
-    return lista;
+
+    const mm = String(minutos).padStart(2, '0');
+    return `${horas}h:${mm} e ${segundos}s`;
   }
 
-  get totalPendentes() { return this.pedidos.filter(p => p.estado === 'PENDENTE').length; }
-  get totalRespondidos() { return this.pedidos.filter(p => p.estado === 'RESPONDIDO').length; }
-  get totalGerados() { return this.pedidos.filter(p => p.estado === 'COTAÇÃO GERADA').length; }
+  get pedidosFiltrados() {
+    // Esta página mostra apenas pedidos NÃO respondidos.
+    return this.pedidos.filter(p => p.estado !== 'RESPONDIDO');
+  }
+
+  get totalPendentes() { return this.pedidosFiltrados.filter(p => p.estado === 'PENDENTE').length; }
+  get totalRespondidos() { return 0; }
+  get totalGerados() { return this.pedidosFiltrados.filter(p => p.estado === 'COTAÇÃO GERADA').length; }
 
   getBadgeClass(estado: string): string {
     switch (estado) {
       case 'PENDENTE': return 'badge badge-warning';
       case 'RESPONDIDO': return 'badge badge-info';
       case 'COTAÇÃO GERADA': return 'badge badge-success';
+      case 'CANCELADA': return 'badge badge-danger';
       default: return 'badge';
     }
   }

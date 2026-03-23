@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslocoModule, TranslocoService } from '@ngneat/transloco';
 
 interface ServiceDetail {
   id: string;
@@ -15,78 +16,61 @@ interface ServiceDetail {
 @Component({
   selector: 'app-all-services',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslocoModule],
   templateUrl: './all-services.component.html',
   styleUrl: './all-services.component.css'
 })
-export class AllServicesComponent {
+export class AllServicesComponent implements OnInit {
+  private transloco = inject(TranslocoService);
 
-  metrics = [
-    { value: '+10', label: 'Anos de Experiência', trend: 'Desde 2014', fill: 100 },
-    { value: '50+', label: 'Veículos na Frota', trend: 'Rastreados 24/7', fill: 85 },
-    { value: '99%', label: 'Entregas no Prazo', trend: 'Confiabilidade', fill: 99 },
-    { value: '24/7', label: 'Monitoramento', trend: 'GPS em tempo real', fill: 100 }
+  metrics: { value: string; label: string; trend: string; fill: number }[] = [];
+  services: ServiceDetail[] = [];
+  marqueeTags: string[] = [];
+
+  private readonly svcMeta = [
+    { key: 'truck', icon: 'truck', image: '/images/hero-truck-1.jpg' },
+    { key: 'procurement', icon: 'procurement', image: '/images/about-warehouse.jpg' },
+    { key: 'tracking', icon: 'tracking', image: '/camiao-terminal-carga.jpeg' },
+    { key: 'logistics', icon: 'logistics', image: '/images/hero-warehouse-3.jpg' },
+    { key: 'warehouse', icon: 'warehouse', image: '/images/about-warehouse.jpg' },
+    { key: 'customs', icon: 'customs', image: '/camiao-carga-sacos.jpeg' }
   ];
 
-  services: ServiceDetail[] = [
-    {
-      id: 'SRV-01',
-      icon: 'truck',
-      badge: 'Frota Própria',
-      title: 'Transporte Rodoviário',
-      description: 'Frota própria rastreada GPS 24 horas nos corredores Joanesburgo–Maputo e rotas nacionais.',
-      features: ['Cargas completas e fraccionadas', 'Rastreamento em tempo real', 'Motoristas certificados'],
-      image: '/images/hero-truck-1.jpg'
-    },
-    {
-      id: 'SRV-02',
-      icon: 'procurement',
-      badge: 'ZA → MZ',
-      title: 'Procurement & Sourcing',
-      description: 'Compra de mercadorias na África do Sul com entrega directa em Moçambique.',
-      features: ['Negociação com fornecedores', 'Consolidação de cargas', 'Documentação incluída'],
-      image: '/images/about-warehouse.jpg'
-    },
-    {
-      id: 'SRV-03',
-      icon: 'tracking',
-      badge: 'GPS 24/7',
-      title: 'Rastreamento GPS',
-      description: 'Acompanhe sua carga em tempo real através do painel web ou app móvel.',
-      features: ['Localização precisa', 'Notificações automáticas', 'Histórico de viagens'],
-      image: '/camiao-terminal-carga.jpeg'
-    },
-    {
-      id: 'SRV-04',
-      icon: 'logistics',
-      badge: 'End-to-End',
-      title: 'Logística Integrada',
-      description: 'Armazenagem, picking, expedição e entrega porta a porta na ZA e MZ.',
-      features: ['Armazéns estratégicos', 'Cross-docking', 'Distribuição last-mile'],
-      image: '/images/hero-warehouse-3.jpg'
-    },
-    {
-      id: 'SRV-05',
-      icon: 'warehouse',
-      badge: 'Maputo',
-      title: 'Armazenagem & Stock',
-      description: 'Espaços seguros para consolidação, stockagem temporária ou distribuição.',
-      features: ['Armazéns cobertos', 'Controlo digital', 'Segurança 24h'],
-      image: '/images/about-warehouse.jpg'
-    },
-    {
-      id: 'SRV-06',
-      icon: 'customs',
-      badge: '< 2h',
-      title: 'Despacho Aduaneiro',
-      description: 'Documentação e formalidades aduaneiras para importações e exportações.',
-      features: ['Desalfandegamento ágil', 'Assessoria fiscal', '4 fronteiras'],
-      image: '/camiao-carga-sacos.jpeg'
-    }
-  ];
+  private readonly svcIds = ['SRV-01', 'SRV-02', 'SRV-03', 'SRV-04', 'SRV-05', 'SRV-06'];
 
-  marqueeTags = [
-    'Rastreamento GPS', 'Gestão de Frota', 'Logística Integrada', 'Despacho Aduaneiro',
-    'Armazenagem', 'Transporte Rodoviário', 'Procurement', 'Cross-Border'
-  ];
+  ngOnInit(): void {
+    const build = () => this.buildContent();
+    this.transloco.load(this.transloco.getActiveLang() || 'pt').subscribe(() => build());
+    this.transloco.langChanges$.subscribe(lang => {
+      this.transloco.load(lang).subscribe(() => build());
+    });
+  }
+
+  private buildContent(): void {
+    const t = (k: string) => this.transloco.translate(k);
+    this.metrics = (['m1', 'm2', 'm3', 'm4'] as const).map(k => {
+      const p = `servicesPage.metrics.${k}`;
+      return {
+        value: t(`${p}.value`),
+        label: t(`${p}.label`),
+        trend: t(`${p}.trend`),
+        fill: +t(`${p}.fill`) || 0
+      };
+    });
+
+    this.services = this.svcMeta.map((meta, i) => {
+      const p = `servicesPage.services.${meta.key}`;
+      return {
+        id: this.svcIds[i],
+        icon: meta.icon,
+        image: meta.image,
+        badge: t(`${p}.badge`),
+        title: t(`${p}.title`),
+        description: t(`${p}.description`),
+        features: [t(`${p}.f1`), t(`${p}.f2`), t(`${p}.f3`)]
+      };
+    });
+
+    this.marqueeTags = (['t1', 't2', 't3', 't4', 't5', 't6', 't7', 't8'] as const).map(k => t(`servicesPage.marquee.${k}`));
+  }
 }

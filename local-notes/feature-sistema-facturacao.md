@@ -18,7 +18,7 @@ Foi criado um sistema completo de facturação integrado no mesmo projeto Angula
 - `config.model.ts` - Configurações da empresa e utilizadores
 
 ### 2. **Serviços** (`src/app/services/`)
-- `storage.service.ts` - Gerencia localStorage para persistência de dados
+- Dados obtidos via API (sem localStorage)
 - `encomenda.service.ts` - Lógica de negócio para encomendas (criação, cálculos, status)
 
 ### 3. **Componentes Principais** (`src/app/facturacao/`)
@@ -115,7 +115,7 @@ Foi criado um sistema completo de facturação integrado no mesmo projeto Angula
 
 ## Notas Técnicas
 
-- Dados armazenados em `localStorage` (MVP)
+- Dados obtidos via API do backend
 - Todos os cálculos são automáticos (status, dívida, totais)
 - Numeração de encomendas sequencial por ano
 - Formulários com validação em tempo real
@@ -125,7 +125,7 @@ Foi criado um sistema completo de facturação integrado no mesmo projeto Angula
 ## Como Identificar Problemas
 
 - **Erro de rota**: Verificar `app.routes.ts` e imports dos componentes
-- **Dados não aparecem**: Verificar `localStorage` no DevTools
+- **Dados não aparecem**: Verificar se o backend está em execução e a ligação à API
 - **Cálculos errados**: Verificar `encomenda.service.ts` métodos de cálculo
 - **Estilos não aplicam**: Verificar se Tailwind está configurado corretamente
 

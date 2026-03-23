@@ -12,6 +12,12 @@
   ]"
 ></app-billing-section-header>
 
+@if (erro) {
+  <div class="card" style="margin-bottom: 1rem; border-color: var(--danger);">
+    <p style="margin: 0; color: var(--danger);">{{ erro }}</p>
+  </div>
+}
+
 <div class="card">
   <form (ngSubmit)="salvar()">
     <div class="form-section-title">Dados Pessoais</div>
@@ -61,7 +67,7 @@
 
     <div class="form-actions">
       <a routerLink="/billing/clientes" class="btn-secondary">Cancelar</a>
-      <button type="submit" class="btn-primary">Salvar Cliente</button>
+      <button type="submit" class="btn-primary" [disabled]="guardando">{{ guardando ? 'A guardar…' : 'Salvar cliente' }}</button>
     </div>
   </form>
 </div>

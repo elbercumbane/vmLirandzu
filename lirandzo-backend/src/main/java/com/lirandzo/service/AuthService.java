@@ -48,7 +48,7 @@ public class AuthService {
         }
 
         boolean isAdmin = usuario.getRoles().stream()
-                .map(Role::getNome)
+                .map(Role::getName)
                 .anyMatch("ROLE_ADMIN"::equals);
 
         if (isAdmin) {
@@ -56,8 +56,8 @@ public class AuthService {
         }
 
         boolean isGestor = usuario.getRoles().stream()
-                .map(Role::getNome)
-                .anyMatch("ROLE_GERENTE"::equals);
+                .map(Role::getName)
+                .anyMatch("ROLE_MANAGER"::equals);
 
         if (isGestor) {
             return "gestor";

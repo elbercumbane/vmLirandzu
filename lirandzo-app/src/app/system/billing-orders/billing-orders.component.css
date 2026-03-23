@@ -96,14 +96,14 @@
   font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 10px 30px rgba(249, 115, 22, 0.5);
+  box-shadow: 0 10px 30px rgba(220, 38, 38, 0.5);
   transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
 .orders-new-button:hover {
   transform: translateY(-1px);
   background: var(--accent-hover);
-  box-shadow: 0 14px 40px rgba(249, 115, 22, 0.7);
+  box-shadow: 0 14px 40px rgba(220, 38, 38, 0.7);
 }
 
 .orders-new-icon {
@@ -454,7 +454,7 @@
   width: 24px;
   height: 24px;
   border-radius: 999px;
-  background: radial-gradient(circle at 30% 0, #F97316, #1D4ED8);
+  background: radial-gradient(circle at 30% 0, #DC2626, #1D4ED8);
   display: inline-flex;
   align-items: center;
   justify-content: center;

@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "cotacoes")
+@Table(name = "quotations")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,81 +22,122 @@ public class Cotacao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, length = 50)
+    @Column(name = "reference", unique = true, length = 50)
     private String referencia;
 
-    @NotNull(message = "Cliente é obrigatório")
+    @NotNull(message = "Customer is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cliente_id", nullable = false)
+    @JoinColumn(name = "customer_id", nullable = false)
+    @JsonIgnoreProperties({"encomendas"})
     private Cliente cliente;
 
-    @NotBlank(message = "Origem é obrigatória")
-    @Column(nullable = false, length = 200)
+    @NotBlank(message = "Origin is required")
+    @Column(name = "origin", nullable = false, length = 200)
     private String origem;
 
-    @NotBlank(message = "Destino é obrigatório")
-    @Column(nullable = false, length = 200)
+    @Column(name = "request_source", length = 50)
+    private String fontePedido;
+
+    @Column(name = "tipo_servico", length = 50)
+    private String tipoServico;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "revisao_de_id")
+    private Cotacao revisaoDe;
+
+    @Column(name = "revisao_numero")
+    private Integer revisaoNumero;
+
+    @NotBlank(message = "Destination is required")
+    @Column(name = "destination", nullable = false, length = 200)
     private String destino;
 
-    @Column(name = "tipo_veiculo", length = 100)
+    @Column(name = "vehicle_type", length = 100)
     private String tipoVeiculo;
 
-    @Column(name = "descricao_carga", length = 500)
+    @Column(name = "cargo_description", length = 500)
     private String descricaoCarga;
 
-    @Column(name = "valor_total", columnDefinition = "DECIMAL(15,2)")
+    @Column(name = "total_amount", columnDefinition = "DECIMAL(15,2)")
     private Double valorTotal;
 
-    @Column(name = "custo_transporte", columnDefinition = "DECIMAL(15,2)")
+    @Column(name = "transport_cost", columnDefinition = "DECIMAL(15,2)")
     private Double custoTransporte;
 
-    @Column(name = "custo_recolha", columnDefinition = "DECIMAL(15,2)")
+    @Column(name = "collection_cost", columnDefinition = "DECIMAL(15,2)")
     private Double custoRecolha;
 
-    @Column(name = "custo_bill_of_entry", columnDefinition = "DECIMAL(15,2)")
+    @Column(name = "bill_of_entry_cost", columnDefinition = "DECIMAL(15,2)")
     private Double custoBillOfEntry;
 
-    @Column(name = "data_cotacao")
+    @Column(name = "discount_amount", columnDefinition = "DECIMAL(15,2)")
+    private Double discountAmount;
+
+    @Column(name = "vat_amount", columnDefinition = "DECIMAL(15,2)")
+    private Double vatAmount;
+
+    @Column(name = "vat_rate", columnDefinition = "DECIMAL(5,2)")
+    private Double vatRate;
+
+    @Column(name = "vat_reason", length = 200)
+    private String vatReason;
+
+    @Column(name = "quotation_date")
     private LocalDate dataCotacao;
 
-    @Column(name = "data_validade")
+    @Column(name = "validity_date")
     private LocalDate dataValidade;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private StatusCotacao status = StatusCotacao.PENDENTE;
+    private StatusCotacao status = StatusCotacao.PENDING;
 
-    @Column(length = 500)
+    @Column(name = "notes", length = 500)
     private String observacoes;
 
-    @Column(length = 500)
+    @Column(name = "terms", length = 500)
     private String condicoes;
 
-    @Column(name = "operador", length = 200)
+    @Column(name = "operator", length = 200)
     private String operador;
 
-    @Column(name = "forma_envio_preferida", length = 50)
+    @Column(name = "preferred_delivery_method", length = 50)
     private String formaEnvioPreferida;
 
-    @Column(name = "forma_envio_realizada", length = 50)
+    @Column(name = "actual_delivery_method", length = 50)
     private String formaEnvioRealizada;
 
-    @Column(name = "data_resposta")
+    @Column(name = "response_date")
     private LocalDateTime dataResposta;
 
-    @Column(name = "data_criacao")
+    @Column(name = "created_at")
     private LocalDateTime dataCriacao;
 
-    @Column(name = "data_atualizacao")
+    @Column(name = "updated_at")
     private LocalDateTime dataAtualizacao;
 
     @PrePersist
     protected void onCreate() {
         dataCriacao = LocalDateTime.now();
         dataAtualizacao = LocalDateTime.now();
-        if (dataCotacao == null) {
+        // Regra do sistema:
+        // - Se vier do PORTAL (fontePedido=PORTAL), mantemos a data enviada/atribuída.
+        // - Se for MANUAL (fontePedido nulo/outro), garantimos que a data é "hoje".
+        boolean isPortal = "PORTAL".equalsIgnoreCase(fontePedido);
+        if (!isPortal) {
+            dataCotacao = LocalDate.now();
+        } else if (dataCotacao == null) {
             dataCotacao = LocalDate.now();
         }
+
+        // Validade sempre = dataCotacao + 7 dias (mesmo que o frontend não envie).
+        dataValidade = dataCotacao.plusDays(7);
+
+        // Regras padrão financeiras (para o cenário atual de isenção)
+        if (discountAmount == null) discountAmount = 0.00;
+        if (vatAmount == null) vatAmount = 0.00;
+        if (vatRate == null) vatRate = 0.00;
+        if (vatReason == null || vatReason.isBlank()) vatReason = "ISENTO";
     }
 
     @PostPersist
@@ -112,6 +153,6 @@ public class Cotacao {
     }
 
     public enum StatusCotacao {
-        PENDENTE, RESPONDIDO, COTACAO_GERADA, EXPIRADA, CANCELADA
+        PENDING, RESPONDED, QUOTATION_GENERATED, EXPIRED, CANCELLED, INVOICED
     }
 }

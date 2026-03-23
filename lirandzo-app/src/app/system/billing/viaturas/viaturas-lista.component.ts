@@ -10,8 +10,13 @@ interface ViaturaDisplay {
   matricula: string;
   marca: string;
   modelo: string;
+  ano?: number;
+  cor: string;
   tipo: string;
   capacidade: number;
+  capacidadeUnidade: string;
+  combustivel: string;
+  numeroChassis: string;
   status: string;
 }
 
@@ -55,6 +60,10 @@ export class ViaturasListaComponent implements OnInit {
 
   private mapearViatura(viatura: Viatura): ViaturaDisplay {
     const statusMap: { [key: string]: string } = {
+      'ACTIVE': 'OPERACIONAL',
+      'UNDER_MAINTENANCE': 'MANUTENÇÃO',
+      'RESERVED': 'RESERVADA',
+      'INACTIVE': 'PARADO',
       'ATIVA': 'OPERACIONAL',
       'EM_MANUTENCAO': 'MANUTENÇÃO',
       'RESERVADA': 'RESERVADA',
@@ -68,8 +77,13 @@ export class ViaturasListaComponent implements OnInit {
       matricula: viatura.matricula || '',
       marca: viatura.marca || '',
       modelo: viatura.modelo || '',
-      tipo: viatura.tipo || 'N/A',
+      ano: viatura.ano,
+      cor: viatura.cor || '',
+      tipo: viatura.tipo || '—',
       capacidade: viatura.capacidade || 0,
+      capacidadeUnidade: viatura.capacidadeUnidade || 'KG',
+      combustivel: viatura.combustivel || '',
+      numeroChassis: viatura.numeroChassis || '',
       status: statusDisplay
     };
   }
@@ -81,11 +95,13 @@ export class ViaturasListaComponent implements OnInit {
     }
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
-      list = list.filter(v => 
-        v.matricula.toLowerCase().includes(term) || 
-        v.marca.toLowerCase().includes(term) ||
-        v.modelo.toLowerCase().includes(term)
-      );
+      list = list.filter(v => {
+        const ch = v.numeroChassis || '';
+        return v.matricula.toLowerCase().includes(term) ||
+          v.marca.toLowerCase().includes(term) ||
+          v.modelo.toLowerCase().includes(term) ||
+          ch.toLowerCase().includes(term);
+      });
     }
     return list;
   }
@@ -100,4 +116,12 @@ export class ViaturasListaComponent implements OnInit {
   }
 
   setFilter(f: string) { this.activeFilter = f; }
+
+  formatarCapacidade(v: ViaturaDisplay): string {
+    if (v.capacidade == null || v.capacidade === 0) return '—';
+    const u = (v.capacidadeUnidade || 'KG').toLowerCase();
+    const n = Number(v.capacidade);
+    const fmt = n % 1 === 0 ? String(n) : n.toFixed(2);
+    return `${fmt} ${u === 'ton' ? 'ton' : 'kg'}`;
+  }
 }

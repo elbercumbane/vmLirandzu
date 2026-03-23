@@ -52,17 +52,6 @@
     <div class="kpi-value" style="color: var(--info)">{{ emViagem }}</div>
     <div class="kpi-sub">em rota</div>
   </div>
-  <div class="kpi-card">
-    <div class="kpi-top-line" style="background: var(--warning)"></div>
-    <div class="kpi-icon" style="color: var(--warning)">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-      </svg>
-    </div>
-    <div class="kpi-label">Avaliação Média</div>
-    <div class="kpi-value">{{ avaliacaoMedia }} <small>/5</small></div>
-    <div class="kpi-sub">desempenho da equipa</div>
-  </div>
 </div>
 
 <div class="card">
@@ -106,14 +95,6 @@
     <button
       type="button"
       class="filter-chip"
-      [class.active]="activeFilter === 'FÉRIAS'"
-      (click)="setFilter('FÉRIAS')"
-    >
-      Férias
-    </button>
-    <button
-      type="button"
-      class="filter-chip"
       [class.active]="activeFilter === 'INACTIVO'"
       (click)="setFilter('INACTIVO')"
     >
@@ -138,7 +119,8 @@
             <th>Nome</th>
             <th>Telefone</th>
             <th>Carta</th>
-            <th>Avaliação</th>
+            <th>Categoria</th>
+            <th>Validade Carta</th>
             <th>Status</th>
             <th>Acções</th>
           </tr>
@@ -149,16 +131,8 @@
               <td>{{ m.nome }}</td>
               <td>{{ m.telefone }}</td>
               <td>{{ m.carta }}</td>
-              <td>
-                <span class="avaliacao-stars" title="{{ m.avaliacao }}">
-                  @for (i of [1,2,3,4,5]; track i) {
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" [class.filled]="i <= m.avaliacao">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                    </svg>
-                  }
-                </span>
-                <span class="avaliacao-num">{{ m.avaliacao | number:'1.1-1' }}</span>
-              </td>
+              <td>{{ m.categoria }}</td>
+              <td>{{ m.validadeCarta }}</td>
               <td>
                 @switch (m.status) {
                   @case ('DISPONÍVEL') {
@@ -195,7 +169,7 @@
             </tr>
           } @empty {
             <tr>
-              <td colspan="6" class="empty-state">
+              <td colspan="7" class="empty-state">
                 <p>Nenhum motorista encontrado.</p>
               </td>
             </tr>

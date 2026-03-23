@@ -280,7 +280,7 @@
             <polyline
               [attr.points]="getInvoicedLinePoints()"
               fill="none"
-              stroke="#F97316"
+              stroke="#DC2626"
               stroke-width="2"
             />
             <!-- Received line -->
@@ -298,12 +298,12 @@
               stroke-width="2"
             />
             <!-- Dots for January data -->
-            <circle cx="50" [attr.cy]="getLineY(monthlyData[0].invoiced, maxMonthlyValue, 220)" r="4" fill="#F97316" />
+            <circle cx="50" [attr.cy]="getLineY(monthlyData[0].invoiced, maxMonthlyValue, 220)" r="4" fill="#DC2626" />
             <circle cx="50" [attr.cy]="getLineY(monthlyData[0].received, maxMonthlyValue, 220)" r="4" fill="#22C55E" />
             <circle cx="50" [attr.cy]="getLineY(monthlyData[0].debt, maxMonthlyValue, 220)" r="4" fill="#EF4444" />
           </svg>
           <div class="reports-chart-legend">
-            <span class="reports-legend-item"><span class="reports-legend-dot" style="background: #F97316;"></span> Facturado</span>
+            <span class="reports-legend-item"><span class="reports-legend-dot" style="background: #DC2626;"></span> Facturado</span>
             <span class="reports-legend-item"><span class="reports-legend-dot" style="background: #22C55E;"></span> Recebido</span>
             <span class="reports-legend-item"><span class="reports-legend-dot" style="background: #EF4444;"></span> Dívida</span>
           </div>

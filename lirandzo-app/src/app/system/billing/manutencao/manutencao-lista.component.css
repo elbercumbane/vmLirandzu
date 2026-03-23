@@ -1,0 +1,4 @@
+.link-viatura { display: flex; flex-direction: column; text-decoration: none; }
+.link-viatura:hover span:first-child { text-decoration: underline; }
+.btn-icon { display: inline-flex; align-items: center; justify-content: center; padding: 0.35rem; border-radius: 6px; color: var(--text-muted); text-decoration: none; transition: background 0.2s, color 0.2s; }
+.btn-icon:hover { background: var(--bg-card-inner); color: var(--primary); }

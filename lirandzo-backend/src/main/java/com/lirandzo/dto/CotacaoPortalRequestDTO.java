@@ -10,7 +10,8 @@ public record CotacaoPortalRequestDTO(
         String origem,
         String destino,
         String mensagem,
-        String formaEnvioPreferida
+        String formaEnvioPreferida,
+        String tipoServico
 ) {
 }
 

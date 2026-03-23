@@ -25,6 +25,16 @@ export interface EncomendaResponse {
   valorDivida: number;
   status: string;
   dataEncomenda: string;
+  invoiceNumber?: string;
+  invoiceDate?: string;
+  cotacao?: { id: number; referencia?: string };
+}
+
+/** Corpo de POST /facturacao/cotacao/:id/emitir — só o necessário para redireccionar ao detalhe. */
+export interface EmitirFacturaResponse {
+  numeroEncomenda: number;
+  invoiceNumber?: string;
+  invoiceDate?: string;
 }
 
 @Injectable({
@@ -49,5 +59,10 @@ export class EncomendaService {
 
   atualizarEncomenda(id: number, encomenda: EncomendaRequest): Observable<EncomendaResponse> {
     return this.http.put<EncomendaResponse>(`${this.apiUrl}/encomendas/${id}`, encomenda);
+  }
+
+  /** Cria encomenda com factura a partir de uma cotação enviada (estado respondida ou cotação gerada). */
+  emitirFacturaDeCotacao(cotacaoId: number): Observable<EmitirFacturaResponse> {
+    return this.http.post<EmitirFacturaResponse>(`${this.apiUrl}/facturacao/cotacao/${cotacaoId}/emitir`, {});
   }
 }

@@ -110,14 +110,14 @@
   width: 56px;
   height: 56px;
   border-radius: 0.85rem;
-  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
   font-size: 1.2rem;
-  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
 }
 
 .login-title {
@@ -177,13 +177,43 @@
 
 .login-field input:focus {
   outline: none;
-  border-color: var(--brand-red, #F97316);
+  border-color: var(--brand-red, #dc2626);
   background: rgba(255, 255, 255, 0.08);
 }
 
 .login-field input:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+}
+
+.password-wrapper input {
+  padding-right: 2.75rem;
+  flex: 1;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.password-toggle:hover {
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .login-error {
@@ -196,7 +226,7 @@
   padding: 0.9rem 1.5rem;
   border-radius: 0.6rem;
   border: none;
-  background: linear-gradient(135deg, var(--brand-red, #F97316) 0%, var(--brand-red-hover, #EA580C) 100%);
+  background: linear-gradient(135deg, var(--brand-red, #dc2626) 0%, var(--brand-red-hover, #b91c1c) 100%);
   color: #fff;
   font-size: 0.95rem;
   font-weight: 700;

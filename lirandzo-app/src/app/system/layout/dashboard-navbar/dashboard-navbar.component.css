@@ -65,8 +65,8 @@
   width: 34px;
   height: 34px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #F97316, #C45C0A);
-  box-shadow: 0 0 12px rgba(249, 115, 22, 0.25);
+  background: linear-gradient(135deg, #DC2626, #991B1B);
+  box-shadow: 0 0 12px rgba(220, 38, 38, 0.28);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -444,7 +444,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #F97316, #C45C0A);
+  background: linear-gradient(135deg, #DC2626, #991B1B);
   color: #fff;
   font-weight: 700;
   font-size: 12px;
@@ -852,7 +852,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #F97316, #C45C0A);
+  background: linear-gradient(135deg, #DC2626, #991B1B);
   color: #fff;
   font-weight: 700;
   font-size: 13px;

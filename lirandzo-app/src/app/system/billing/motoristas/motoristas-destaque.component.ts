@@ -1,22 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
+import { MotoristaService, Motorista } from '../../../services/motorista.service';
 
-interface MotoristaStoreMock {
-  id: string;
+interface MotoristaDesempenho {
+  id: number;
   nome: string;
-  desempenhoScore: number;      // 0-100
-  totalViagens: number;
-  totalKmPercorridos: number;
+  avaliacaoMedia: number;
+  desempenhoScore: number;  // 0-100, derivado de avaliacaoMedia
+  numeroViagens: number;
 }
-
-const MOTORISTAS_STORE_MOCK: MotoristaStoreMock[] = [
-  { id: 'MOT-001', nome: 'Manuel Sitoe',    desempenhoScore: 92, totalViagens: 23, totalKmPercorridos: 18450 },
-  { id: 'MOT-002', nome: 'Pedro Nhantumbo', desempenhoScore: 85, totalViagens: 18, totalKmPercorridos: 15200 },
-  { id: 'MOT-003', nome: 'António Bila',    desempenhoScore: 78, totalViagens: 31, totalKmPercorridos: 26500 },
-  { id: 'MOT-004', nome: 'Domingos Cuamba', desempenhoScore: 95, totalViagens: 12, totalKmPercorridos: 9100 },
-  { id: 'MOT-005', nome: 'Rosa Mahumane',   desempenhoScore: 88, totalViagens: 8,  totalKmPercorridos: 6800 },
-];
 
 @Component({
   selector: 'app-motoristas-destaque',
@@ -25,17 +18,48 @@ const MOTORISTAS_STORE_MOCK: MotoristaStoreMock[] = [
   templateUrl: './motoristas-destaque.component.html',
   styleUrls: ['../shared/billing-page.css', './motoristas-destaque.component.css']
 })
-export class MotoristasDestaqueComponent {
-  private get motoristasOrdenados(): MotoristaStoreMock[] {
-    return [...MOTORISTAS_STORE_MOCK].sort((a, b) => b.desempenhoScore - a.desempenhoScore);
+export class MotoristasDestaqueComponent implements OnInit {
+  motoristasDesempenho: MotoristaDesempenho[] = [];
+  loading = true;
+  error: string | null = null;
+
+  constructor(private motoristaService: MotoristaService) {}
+
+  ngOnInit() {
+    this.carregarMotoristas();
   }
 
-  get motoristasDesempenho() {
-    return this.motoristasOrdenados;
+  carregarMotoristas() {
+    this.loading = true;
+    this.error = null;
+    this.motoristaService.listarMotoristas().subscribe({
+      next: (lista: Motorista[]) => {
+        this.motoristasDesempenho = lista.map(m => ({
+          id: m.id || 0,
+          nome: m.nome || '',
+          avaliacaoMedia: m.avaliacaoMedia || 0,
+          desempenhoScore: Math.round((m.avaliacaoMedia || 0) * 20),
+          numeroViagens: m.numeroViagens || 0
+        })).sort((a, b) => b.desempenhoScore - a.desempenhoScore);
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Erro ao carregar motoristas:', err);
+        this.error = 'Erro ao carregar dados.';
+        this.loading = false;
+        this.motoristasDesempenho = [];
+      }
+    });
   }
 
-  get top3() {
-    return this.motoristasOrdenados.slice(0, 3);
+  get avaliacaoMediaGeral(): string {
+    if (this.motoristasDesempenho.length === 0) return '0.0';
+    const sum = this.motoristasDesempenho.reduce((a, m) => a + m.avaliacaoMedia, 0);
+    return (sum / this.motoristasDesempenho.length).toFixed(1);
+  }
+
+  get top3(): MotoristaDesempenho[] {
+    return this.motoristasDesempenho.slice(0, 3);
   }
 
   getIniciais(nome: string): string {
@@ -44,7 +68,7 @@ export class MotoristasDestaqueComponent {
       .filter(p => !!p)
       .slice(0, 2)
       .map(p => p[0].toUpperCase())
-      .join('');
+      .join('') || '?';
   }
 
   getScoreClass(score: number): string {
@@ -53,4 +77,3 @@ export class MotoristasDestaqueComponent {
     return 'driver-score-low';
   }
 }
-

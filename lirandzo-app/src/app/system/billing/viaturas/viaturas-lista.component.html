@@ -96,8 +96,9 @@
           <tr>
             <th>Matrícula</th>
             <th>Marca/Modelo</th>
+            <th>Ano</th>
             <th>Tipo</th>
-            <th>Capacidade (ton)</th>
+            <th>Capacidade</th>
             <th>Status</th>
             <th>Acções</th>
           </tr>
@@ -107,8 +108,9 @@
             <tr>
               <td><strong>{{ v.matricula }}</strong></td>
               <td>{{ v.marca }} {{ v.modelo }}</td>
+              <td>{{ v.ano || '—' }}</td>
               <td>{{ v.tipo }}</td>
-              <td>{{ v.capacidade | number:'1.0-0' }}</td>
+              <td>{{ formatarCapacidade(v) }}</td>
               <td>
                 <span class="badge" [class.badge-success]="v.status === 'OPERACIONAL'" [class.badge-warning]="v.status === 'MANUTENÇÃO'" [class.badge-danger]="v.status === 'PARADO'">
                   {{ v.status }}

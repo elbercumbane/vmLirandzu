@@ -83,7 +83,7 @@ button {
   --bg-table-odd: #0E182C;
   --bg-table-even: #101C30;
   --bg-dropdown: #111E34;
-  --bg-hover: rgba(249, 115, 22, 0.06);
+  --bg-hover: rgba(220, 38, 38, 0.06);
   --bg-icon: rgba(12, 21, 36, 0.8);
   --bg-code: rgba(15, 23, 42, 0.9);
   --bg-overlay: rgba(0, 0, 0, 0.5);
@@ -103,11 +103,11 @@ button {
   --shadow-dropdown: 0 16px 48px rgba(0, 0, 0, 0.4);
   --shadow-sidebar: 4px 0 30px rgba(0, 0, 0, 0.3);
 
-  --accent: #F97316;
-  --accent-hover: #EA580C;
-  --accent-soft: rgba(249, 115, 22, 0.08);
-  --accent-border: rgba(249, 115, 22, 0.3);
-  --accent-glow: rgba(249, 115, 22, 0.25);
+  --accent: #EF4444;
+  --accent-hover: #DC2626;
+  --accent-soft: rgba(239, 68, 68, 0.1);
+  --accent-border: rgba(239, 68, 68, 0.35);
+  --accent-glow: rgba(239, 68, 68, 0.28);
 
   --success: #22C55E;
   --warning: #EAB308;
@@ -116,7 +116,7 @@ button {
 
   --danger-soft: rgba(239, 68, 68, 0.1);
   --danger-border: rgba(239, 68, 68, 0.2);
-  --warning-soft: rgba(249, 115, 22, 0.1);
+  --warning-soft: rgba(239, 68, 68, 0.1);
   --info-soft: rgba(59, 130, 246, 0.1);
 
   --scrollbar-track: #0E182C;
@@ -136,7 +136,7 @@ button {
   --bg-table-odd: #FFFFFF;
   --bg-table-even: #F8FAFC;
   --bg-dropdown: #FFFFFF;
-  --bg-hover: rgba(249, 115, 22, 0.04);
+  --bg-hover: rgba(220, 38, 38, 0.05);
   --bg-icon: #F1F5F9;
   --bg-code: #F1F5F9;
   --bg-overlay: rgba(0, 0, 0, 0.3);
@@ -156,11 +156,11 @@ button {
   --shadow-dropdown: 0 10px 40px rgba(0, 0, 0, 0.12);
   --shadow-sidebar: 2px 0 12px rgba(0, 0, 0, 0.06);
 
-  --accent: #EA580C;
-  --accent-hover: #C2410C;
-  --accent-soft: rgba(234, 88, 12, 0.06);
-  --accent-border: rgba(234, 88, 12, 0.25);
-  --accent-glow: rgba(234, 88, 12, 0.15);
+  --accent: #DC2626;
+  --accent-hover: #B91C1C;
+  --accent-soft: rgba(220, 38, 38, 0.08);
+  --accent-border: rgba(220, 38, 38, 0.28);
+  --accent-glow: rgba(220, 38, 38, 0.18);
 
   --success: #16A34A;
   --warning: #CA8A04;
@@ -169,7 +169,7 @@ button {
 
   --danger-soft: rgba(220, 38, 38, 0.06);
   --danger-border: rgba(220, 38, 38, 0.15);
-  --warning-soft: rgba(234, 88, 12, 0.06);
+  --warning-soft: rgba(220, 38, 38, 0.08);
   --info-soft: rgba(37, 99, 235, 0.06);
 
   --scrollbar-track: #F1F5F9;

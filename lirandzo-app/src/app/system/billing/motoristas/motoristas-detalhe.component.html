@@ -39,18 +39,30 @@
 
     <div class="detail-grid">
       <div class="detail-section">
-        <h4>Informações Pessoais</h4>
+        <h4>Identificação</h4>
         <div class="detail-item">
           <span class="detail-label">Nome:</span>
           <span class="detail-value">{{ motorista.nome }}</span>
         </div>
         <div class="detail-item">
-          <span class="detail-label">Telefone:</span>
-          <span class="detail-value">{{ motorista.telefone || 'N/A' }}</span>
+          <span class="detail-label">Data de nascimento:</span>
+          <span class="detail-value">{{ formatarData(motorista.dataNascimento) }}</span>
         </div>
         <div class="detail-item">
-          <span class="detail-label">Status:</span>
-          <span class="detail-value">{{ formatarStatus(motorista.status) }}</span>
+          <span class="detail-label">Morada:</span>
+          <span class="detail-value">{{ motorista.morada || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Filiação:</span>
+          <span class="detail-value">{{ formatarFiliacao(motorista) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">NUIT:</span>
+          <span class="detail-value">{{ motorista.nuit || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Nº BI / Documento:</span>
+          <span class="detail-value">{{ motorista.numeroBI || 'N/A' }}</span>
         </div>
       </div>
 
@@ -61,8 +73,48 @@
           <span class="detail-value">{{ motorista.numeroCarta || 'N/A' }}</span>
         </div>
         <div class="detail-item">
+          <span class="detail-label">Categoria:</span>
+          <span class="detail-value">{{ motorista.categoriaCarta || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Data de emissão:</span>
+          <span class="detail-value">{{ formatarData(motorista.dataEmissaoCarta) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Data de validade:</span>
+          <span class="detail-value">{{ formatarData(motorista.dataValidadeCarta) }}</span>
+        </div>
+        <div class="detail-item">
           <span class="detail-label">Avaliação Média:</span>
           <span class="detail-value highlight">{{ (motorista.avaliacaoMedia || 0) | number:'1.1-1' }} / 5.0</span>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h4>Contactos</h4>
+        <div class="detail-item">
+          <span class="detail-label">Telefone:</span>
+          <span class="detail-value">{{ motorista.telefone || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Telefone alternativo:</span>
+          <span class="detail-value">{{ motorista.telefone2 || 'N/A' }}</span>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h4>Contacto de Emergência</h4>
+        <div class="detail-item">
+          <span class="detail-label">Nome do parente:</span>
+          <span class="detail-value">{{ motorista.nomeParenteEmergencia || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Parentesco:</span>
+          <span class="detail-value">{{ motorista.parentesco || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Telefone:</span>
+          <span class="detail-value">{{ motorista.telefoneParenteEmergencia || 'N/A' }}</span>
         </div>
       </div>
     </div>
