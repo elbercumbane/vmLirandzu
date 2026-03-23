@@ -67,7 +67,10 @@ export class CotacoesCadastroComponent implements OnInit {
   // Preview modal
   showPreview: boolean = false;
   modoPdfOnly: boolean = false;
+  /** Com pdfOnly=1: gera PDF e abre num novo separador (lista «Visualizar PDF»). */
+  modoAutoPdf: boolean = false;
   modoConfirmacaoGeracao: boolean = false;
+  private autoPdfJaDisparado = false;
 
   ultimaCotacaoId: number | null = null;
   private ultimaCotacaoRef: string = '';
@@ -90,8 +93,9 @@ export class CotacoesCadastroComponent implements OnInit {
     this.cotacao.validade = this.calcularValidadeISO(this.cotacao.data);
     this.cotacao.observacoes = 'MANUAL';
 
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe((params) => {
       this.modoPdfOnly = params['pdfOnly'] === '1';
+      this.modoAutoPdf = params['autoPdf'] === '1';
     });
 
     // Verificar se há um ID na rota (pedido existente)
@@ -104,6 +108,10 @@ export class CotacoesCadastroComponent implements OnInit {
   }
 
   carregarDadosPedido(pedidoId: number): void {
+    const qp = this.route.snapshot.queryParamMap;
+    this.modoPdfOnly = qp.get('pdfOnly') === '1';
+    this.modoAutoPdf = qp.get('autoPdf') === '1';
+
     this.cotacaoService.obterCotacao(pedidoId).subscribe({
       next: (cotacao: CotacaoResponse) => {
         this.modoPortal = (cotacao.fontePedido || '').toUpperCase() === 'PORTAL';
@@ -170,11 +178,12 @@ export class CotacoesCadastroComponent implements OnInit {
         this.cotacao.referencia = cotacao.referencia || '';
         this.ultimaCotacaoRef = cotacao.referencia || '';
         
-        // Se veio pelo botão "PDF" da lista, gerar automaticamente e voltar para "enviadas"
         if (this.modoPdfOnly) {
           setTimeout(() => {
-            // No modo "ver PDF", abrimos o preview para o operador poder confirmar visualmente.
             this.showPreview = true;
+            if (this.modoAutoPdf) {
+              setTimeout(() => void this.abrirPdfEmNovaAba(), 900);
+            }
           }, 500);
         }
       },
@@ -836,6 +845,50 @@ export class CotacoesCadastroComponent implements OnInit {
     this.modoConfirmacaoGeracao = false;
   }
 
+  private getPdfExportOptions() {
+    return {
+      margin: [10, 10, 10, 10] as [number, number, number, number],
+      filename: `${this.getQuotationDocumentName()}.pdf`,
+      image: { type: 'jpeg' as const, quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      },
+      jsPDF: {
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait' as const
+      },
+      pagebreak: { mode: ['css', 'legacy'] as ('css' | 'legacy')[] }
+    };
+  }
+
+  private async abrirPdfEmNovaAba(): Promise<void> {
+    if (this.autoPdfJaDisparado) return;
+    this.autoPdfJaDisparado = true;
+    const element = document.getElementById('cotacao-preview-content');
+    if (!element) {
+      this.mostrarNotificacao('Erro ao gerar PDF: conteúdo não encontrado.', 'error');
+      this.autoPdfJaDisparado = false;
+      return;
+    }
+    const opt = this.getPdfExportOptions();
+    try {
+      const blobUrl = (await html2pdf().set(opt).from(element).outputPdf('bloburl')) as string;
+      window.open(blobUrl, '_blank', 'noopener,noreferrer');
+      this.fecharPreview();
+      setTimeout(() => {
+        this.router.navigate(['/billing/cotacoes/enviadas']);
+      }, 200);
+    } catch (error: unknown) {
+      console.error('Erro ao gerar PDF:', error);
+      this.mostrarNotificacao('Erro ao gerar PDF. Tente novamente.', 'error');
+      this.autoPdfJaDisparado = false;
+    }
+  }
+
   async guardarPDF(silent: boolean = false): Promise<void> {
     // Obter o elemento HTML do preview
     const element = document.getElementById('cotacao-preview-content');
@@ -844,24 +897,7 @@ export class CotacoesCadastroComponent implements OnInit {
       return;
     }
 
-    // Configurações para o PDF
-    const opt = {
-      margin: [10, 10, 10, 10] as [number, number, number, number],
-      filename: `${this.getQuotationDocumentName()}.pdf`,
-      image: { type: 'jpeg' as const, quality: 0.98 },
-      html2canvas: { 
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff'
-      },
-      jsPDF: { 
-        unit: 'mm', 
-        format: 'a4', 
-        orientation: 'portrait' as const
-      },
-      pagebreak: { mode: ['css', 'legacy'] }
-    };
+    const opt = this.getPdfExportOptions();
 
     try {
       // Gerar e guardar o PDF
@@ -873,7 +909,7 @@ export class CotacoesCadastroComponent implements OnInit {
 
       // Quando o operador veio apenas para ver/baixar o PDF,
       // após gerar o ficheiro regressamos à lista.
-      if (this.modoPdfOnly) {
+      if (this.modoPdfOnly && !this.modoAutoPdf) {
         setTimeout(() => {
           this.router.navigate(['/billing/cotacoes/enviadas']);
         }, 300);

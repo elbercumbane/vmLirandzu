@@ -64,18 +64,8 @@
   flex-shrink: 0;
 }
 
-.billing-sidebar-logo-name {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  line-height: 1.2;
-}
-
-.billing-sidebar-logo-name em {
-  font-size: 0.68rem;
-  font-weight: 400;
-  color: var(--text-muted);
-  font-style: normal;
+.billing-sidebar-logo-mark svg {
+  display: block;
 }
 
 /* Nav */

@@ -9,4 +9,10 @@ import { TranslocoModule } from '@ngneat/transloco';
   templateUrl: './frota-accao.component.html',
   styleUrl: './frota-accao.component.css'
 })
-export class FrotaAccaoComponent {}
+export class FrotaAccaoComponent {
+  readonly fleetImages: string[] = [
+    '/motorista-cabine.jpg',
+    '/camiao-carga-sacos.jpeg',
+    '/camiao-terminal-carga.jpeg',
+  ];
+}

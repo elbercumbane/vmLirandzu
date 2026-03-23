@@ -2,10 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { combineLatest } from 'rxjs';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
 import { CotacaoService, CotacaoResponse } from '../../../services/cotacao.service';
 import { EncomendaService, EmitirFacturaResponse } from '../../../services/encomenda.service';
 import { NotificationPopupComponent } from '../../../shared/components/notification-popup/notification-popup.component';
+
+/** Estados apresentados na UI (mapeados a partir do backend). */
+export const ESTADO_PROPOSTA_PRONTA = 'PROPOSTA PRONTA';
+export const ESTADO_ACEITE_CLIENTE = 'ACEITE PELO CLIENTE';
+export const ESTADO_FACTURADA = 'FACTURADA';
+export const ESTADO_CANCELADA = 'CANCELADA';
 
 interface CotacaoEnviadaDisplay {
   id: number;
@@ -29,7 +36,7 @@ interface CotacaoEnviadaDisplay {
 @Component({
   selector: 'app-cotacoes-enviadas',
   standalone: true,
-  imports: [CommonModule, FormsModule, BillingSectionHeaderComponent, NotificationPopupComponent],
+  imports: [CommonModule, FormsModule, RouterLink, BillingSectionHeaderComponent, NotificationPopupComponent],
   templateUrl: './cotacoes-enviadas.component.html',
   styleUrls: ['../shared/billing-page.css', './cotacoes-enviadas.component.css']
 })
@@ -39,6 +46,19 @@ export class CotacoesEnviadasComponent implements OnInit {
   cotacoes: CotacaoEnviadaDisplay[] = [];
   loading = true;
   error: string | null = null;
+
+  /** Rota `/billing/cotacoes/para-facturar`: só emissão de factura, sem duplicar lógica de comercial. */
+  modoParaFacturar = false;
+
+  pageTitle = 'Cotações enviadas';
+  pageSubtitle = 'Propostas geradas: negocie, registe a aceitação do contacto e só depois facture noutro passo';
+  helpTitle = 'Fluxo comercial';
+  helpItems: string[] = [
+    'Quem pede cotação é um contacto — só passa a «cliente» no sentido de facturação quando existe documento (encomenda/factura).',
+    '«Proposta pronta»: ainda pode ajustar valores no ecrã de gerar cotação antes de o contacto aceitar.',
+    '«Registar aceitação»: use quando o contacto confirmou a proposta (telefone, WhatsApp, e-mail). Depois vá a Facturação → Cotações para facturar.',
+    '«Anular proposta»: a negociação não segue; não gera factura.'
+  ];
 
   highlightId: number | null = null;
 
@@ -51,6 +71,13 @@ export class CotacoesEnviadasComponent implements OnInit {
 
   emitindoCotacaoId: number | null = null;
 
+  readonly estados = {
+    propostaPronta: ESTADO_PROPOSTA_PRONTA,
+    aceite: ESTADO_ACEITE_CLIENTE,
+    facturada: ESTADO_FACTURADA,
+    cancelada: ESTADO_CANCELADA
+  };
+
   constructor(
     private cotacaoService: CotacaoService,
     private encomendaService: EncomendaService,
@@ -58,28 +85,54 @@ export class CotacoesEnviadasComponent implements OnInit {
     private route: ActivatedRoute
   ) {}
 
-  ngOnInit() {
-    this.route.queryParams.subscribe(params => {
+  ngOnInit(): void {
+    combineLatest([this.route.data, this.route.queryParams]).subscribe(([data, params]) => {
+      this.modoParaFacturar = !!data['cotacaoModoParaFacturar'];
       const raw = params['highlightId'];
       this.highlightId = raw ? Number(raw) : null;
-      if (this.highlightId) {
-        // Forçar o filtro para mostrar apenas as cotações pendentes de confirmação
-        this.filtroEstado = 'COTAÇÃO GERADA';
+
+      this.aplicarTextosCabecalho();
+
+      if (this.modoParaFacturar) {
+        this.filtroEstado = ESTADO_ACEITE_CLIENTE;
+      } else if (this.highlightId) {
+        this.filtroEstado = ESTADO_PROPOSTA_PRONTA;
       }
+
       this.carregarCotacoes();
     });
   }
 
-  carregarCotacoes() {
+  private aplicarTextosCabecalho(): void {
+    if (this.modoParaFacturar) {
+      this.pageTitle = 'Cotações para facturar';
+      this.pageSubtitle = 'Apenas propostas já aceites pelo contacto — emita a factura aqui';
+      this.helpTitle = 'Facturação a partir da cotação';
+      this.helpItems = [
+        'Só aparecem linhas com aceitação registada (estado «Aceite pelo cliente»).',
+        'Se ainda precisa de ajustar preços, volte ao menu Comercial → Cotações enviadas, abra «Ajustar proposta» e só depois registe de novo a aceitação.',
+        'Emitir factura cria a encomenda e liga à cotação; aí sim o contacto entra no circuito de cliente facturado.'
+      ];
+    } else {
+      this.pageTitle = 'Cotações enviadas';
+      this.pageSubtitle = 'Propostas geradas: negocie, registe a aceitação do contacto e só depois facture noutro passo';
+      this.helpTitle = 'Fluxo comercial';
+      this.helpItems = [
+        'Quem pede cotação é um contacto — só passa a «cliente» no sentido de facturação quando existe documento (encomenda/factura).',
+        '«Proposta pronta»: ainda pode ajustar valores no ecrã de gerar cotação antes de o contacto aceitar.',
+        '«Registar aceitação»: use quando o contacto confirmou a proposta. A factura emite-se em Facturação → Cotações para facturar.',
+        '«Anular proposta»: a negociação não segue.'
+      ];
+    }
+  }
+
+  carregarCotacoes(): void {
     this.loading = true;
     this.error = null;
 
     this.cotacaoService.listarCotacoes().subscribe({
       next: (cotacoes: CotacaoResponse[]) => {
-        console.log('Todas as cotações recebidas:', cotacoes);
-        // Filtrar apenas cotações geradas e enviadas
-        // No backend, o enum é QUOTATION_GENERATED.
-        const enviadas = cotacoes.filter(c => {
+        const enviadas = cotacoes.filter((c) => {
           const statusUpper = (c.status || '').toUpperCase();
           return (
             statusUpper === 'QUOTATION_GENERATED' ||
@@ -93,15 +146,11 @@ export class CotacoesEnviadasComponent implements OnInit {
             statusUpper === 'CANCELADA'
           );
         });
-        console.log('Cotações enviadas filtradas:', enviadas);
-        this.cotacoes = enviadas.map(c => this.mapearCotacao(c));
+        this.cotacoes = enviadas.map((c) => this.mapearCotacao(c));
         this.loading = false;
-
-        // Depois de renderizar a tabela, destaca e faz scroll.
         setTimeout(() => this.destaquearLinha(), 50);
       },
-      error: (error: unknown) => {
-        console.error('Erro ao carregar cotações:', error);
+      error: () => {
         this.error = 'Erro ao carregar cotações da base de dados';
         this.loading = false;
         this.cotacoes = [];
@@ -118,7 +167,7 @@ export class CotacoesEnviadasComponent implements OnInit {
   }
 
   private mapearCotacao(c: CotacaoResponse): CotacaoEnviadaDisplay {
-    const clienteNome = c.cliente?.nome || 'Cliente não especificado';
+    const clienteNome = c.cliente?.nome || 'Contacto não especificado';
     const telefone = c.cliente?.telefone || '';
     const email = c.cliente?.email || '';
     const contacto = telefone || email || '';
@@ -151,8 +200,8 @@ export class CotacoesEnviadasComponent implements OnInit {
     const statusUpper = (c.status || '').toUpperCase();
     let tempoResposta = '—';
     if (c.dataCriacao && c.dataResposta) {
-      const isRespondido = statusUpper === 'RESPONDED' || statusUpper === 'RESPONDIDO';
-      if (isRespondido) {
+      const isAceite = statusUpper === 'RESPONDED' || statusUpper === 'RESPONDIDO';
+      if (isAceite) {
         const inicioMs = new Date(c.dataCriacao).getTime();
         const fimMs = new Date(c.dataResposta).getTime();
         const diffMs = fimMs - inicioMs;
@@ -160,27 +209,27 @@ export class CotacoesEnviadasComponent implements OnInit {
       }
     }
     const statusMap: { [key: string]: string } = {
-      'RESPONDED': 'RESPONDIDO',
-      'RESPONDIDO': 'RESPONDIDO',
-      'QUOTATION_GENERATED': 'COTAÇÃO GERADA',
-      'COTACAO_GERADA': 'COTAÇÃO GERADA',
-      'COTACAO GERADA': 'COTAÇÃO GERADA',
-      'INVOICED': 'FACTURADA',
-      'FACTURADA': 'FACTURADA',
-      'CANCELLED': 'CANCELADA',
-      'CANCELADA': 'CANCELADA'
+      RESPONDED: ESTADO_ACEITE_CLIENTE,
+      RESPONDIDO: ESTADO_ACEITE_CLIENTE,
+      QUOTATION_GENERATED: ESTADO_PROPOSTA_PRONTA,
+      COTACAO_GERADA: ESTADO_PROPOSTA_PRONTA,
+      'COTACAO GERADA': ESTADO_PROPOSTA_PRONTA,
+      INVOICED: ESTADO_FACTURADA,
+      FACTURADA: ESTADO_FACTURADA,
+      CANCELLED: ESTADO_CANCELADA,
+      CANCELADA: ESTADO_CANCELADA
     };
-    const estado = statusMap[statusUpper] || 'RESPONDIDO';
+    const estado = statusMap[statusUpper] || ESTADO_ACEITE_CLIENTE;
 
     const formaEnvioMap: { [key: string]: string } = {
-      'whatsapp': 'WhatsApp',
-      'email': 'E-mail',
-      'pdf': 'PDF / Impressão',
-      'chamada': 'Chamada Telefónica'
+      whatsapp: 'WhatsApp',
+      email: 'E-mail',
+      pdf: 'PDF / Impressão',
+      chamada: 'Chamada Telefónica'
     };
-    const formaEnvio = c.formaEnvioRealizada 
+    const formaEnvio = c.formaEnvioRealizada
       ? formaEnvioMap[c.formaEnvioRealizada.toLowerCase()] || c.formaEnvioRealizada
-      : c.formaEnvioPreferida 
+      : c.formaEnvioPreferida
         ? formaEnvioMap[c.formaEnvioPreferida.toLowerCase()] || c.formaEnvioPreferida
         : '—';
 
@@ -223,7 +272,6 @@ export class CotacoesEnviadasComponent implements OnInit {
     const pluralMin = minutos === 1 ? 'minuto' : 'minutos';
 
     if (dias > 0) {
-      // Ex: 2 dias e 20 minutos e 10s
       const partes: string[] = [`${dias} ${pluralDia}`];
       if (horas > 0) partes.push(`${horas}h`);
       if (minutos > 0) partes.push(`${minutos} ${pluralMin}`);
@@ -231,48 +279,58 @@ export class CotacoesEnviadasComponent implements OnInit {
       return partes.join(' e ');
     }
 
-    // Ex: 25h:20 e 30s
     const mm = String(minutos).padStart(2, '0');
     return `${horas}h:${mm} e ${segundos}s`;
   }
 
-  get cotacoesFiltradas() {
+  get cotacoesFiltradas(): CotacaoEnviadaDisplay[] {
     let lista = this.cotacoes;
     if (this.filtroEstado !== 'TODOS') {
-      lista = lista.filter(c => c.estado === this.filtroEstado);
+      lista = lista.filter((c) => c.estado === this.filtroEstado);
     }
     if (this.filtro.trim()) {
       const f = this.filtro.toLowerCase();
-      lista = lista.filter(c =>
-        c.cliente.toLowerCase().includes(f) ||
-        c.ref.toLowerCase().includes(f) ||
-        c.destino.toLowerCase().includes(f) ||
-        c.descricaoCarga.toLowerCase().includes(f) ||
-        c.formaEnvio.toLowerCase().includes(f)
+      lista = lista.filter(
+        (c) =>
+          c.cliente.toLowerCase().includes(f) ||
+          c.ref.toLowerCase().includes(f) ||
+          c.destino.toLowerCase().includes(f) ||
+          c.descricaoCarga.toLowerCase().includes(f) ||
+          c.formaEnvio.toLowerCase().includes(f)
       );
     }
-    // Ordenar: "por enviar" (COTAÇÃO GERADA) sempre em cima
     return lista.sort((a, b) => {
-      const ap = a.estado === 'COTAÇÃO GERADA' ? 0 : 1;
-      const bp = b.estado === 'COTAÇÃO GERADA' ? 0 : 1;
+      const ap = a.estado === ESTADO_PROPOSTA_PRONTA ? 0 : 1;
+      const bp = b.estado === ESTADO_PROPOSTA_PRONTA ? 0 : 1;
       return ap - bp;
     });
   }
 
-  get totalGerados() { return this.cotacoes.filter(c => c.estado === 'COTAÇÃO GERADA').length; }
+  get totalPropostasProntas(): number {
+    return this.cotacoes.filter((c) => c.estado === ESTADO_PROPOSTA_PRONTA).length;
+  }
+
+  get totalAceitesFacturaveis(): number {
+    return this.cotacoes.filter((c) => c.estado === ESTADO_ACEITE_CLIENTE).length;
+  }
 
   getBadgeClass(estado: string): string {
     switch (estado) {
-      case 'COTAÇÃO GERADA': return 'badge badge-success';
-      case 'RESPONDIDO': return 'badge badge-info';
-      case 'FACTURADA': return 'badge badge-success';
-      case 'CANCELADA': return 'badge badge-danger';
-      default: return 'badge badge-success';
+      case ESTADO_PROPOSTA_PRONTA:
+        return 'badge badge-warning';
+      case ESTADO_ACEITE_CLIENTE:
+        return 'badge badge-info';
+      case ESTADO_FACTURADA:
+        return 'badge badge-success';
+      case ESTADO_CANCELADA:
+        return 'badge badge-danger';
+      default:
+        return 'badge badge-neutral';
     }
   }
 
   podeEmitirFactura(estado: string): boolean {
-    return estado === 'RESPONDIDO' || estado === 'COTAÇÃO GERADA';
+    return this.modoParaFacturar && estado === ESTADO_ACEITE_CLIENTE;
   }
 
   emitirFactura(c: CotacaoEnviadaDisplay): void {
@@ -294,34 +352,32 @@ export class CotacoesEnviadasComponent implements OnInit {
       },
       error: (err: unknown) => {
         this.emitindoCotacaoId = null;
-        const body = err && typeof err === 'object' && 'error' in err ? (err as { error?: { error?: string } }).error : undefined;
+        const body =
+          err && typeof err === 'object' && 'error' in err ? (err as { error?: { error?: string } }).error : undefined;
         const msg = body?.error || 'Não foi possível emitir a factura.';
-        console.error(err);
         this.mostrarNotificacao(msg, 'error');
       }
     });
   }
 
-  baixarOuVerPdf(c: CotacaoEnviadaDisplay): void {
-    // Gera o PDF novamente no componente de cotação
-    // (sem alterar status) usando query param.
-    this.router.navigate(['/billing/cotacoes/gerar', c.id], {
-      queryParams: { pdfOnly: '1' }
+  visualizarPdfNovaAba(c: CotacaoEnviadaDisplay): void {
+    const tree = this.router.createUrlTree(['/billing/cotacoes/gerar', c.id], {
+      queryParams: { pdfOnly: '1', autoPdf: '1' }
     });
+    const url = this.router.serializeUrl(tree);
+    window.open(`${window.location.origin}${url}`, '_blank', 'noopener,noreferrer');
   }
 
-  confirmarEnvio(c: CotacaoEnviadaDisplay): void {
-    // Ao confirmar o envio (operador), a cotação passa para RESPONDED
-    // para sair da lista de "geradas pendentes".
+  registarAceitacaoCliente(c: CotacaoEnviadaDisplay): void {
     this.cotacaoService.obterCotacao(c.id).subscribe({
       next: (cotacao: CotacaoResponse) => {
         if (!cotacao.cliente?.id) {
-          this.error = 'Cliente inválido na cotação';
+          this.error = 'Dados do contacto inválidos na cotação';
           return;
         }
 
         const formaEnvioRealizadaRaw =
-          (cotacao.formaEnvioPreferida || cotacao.formaEnvioRealizada || c.formaEnvioRaw || 'pdf');
+          cotacao.formaEnvioPreferida || cotacao.formaEnvioRealizada || c.formaEnvioRaw || 'pdf';
 
         const payload = {
           cliente: { id: cotacao.cliente.id },
@@ -347,31 +403,35 @@ export class CotacoesEnviadasComponent implements OnInit {
           next: () => {
             this.filtroEstado = 'TODOS';
             this.carregarCotacoes();
-            this.mostrarNotificacao('Cotação enviada e confirmada com sucesso!', 'success');
+            this.mostrarNotificacao(
+              'Aceitação pelo contacto registada. Pode emitir a factura em Facturação → Cotações para facturar.',
+              'success'
+            );
           },
-          error: (error: unknown) => {
-            console.error('Erro ao confirmar envio:', error);
-            this.error = 'Erro ao confirmar envio';
-            this.mostrarNotificacao('Erro ao confirmar envio. Tente novamente.', 'error');
+          error: () => {
+            this.error = 'Erro ao registar aceitação';
+            this.mostrarNotificacao('Erro ao registar aceitação. Tente novamente.', 'error');
           }
         });
       },
-      error: (error: unknown) => {
-        console.error('Erro ao obter cotação:', error);
+      error: () => {
         this.error = 'Erro ao obter cotação';
         this.mostrarNotificacao('Erro ao obter cotação. Tente novamente.', 'error');
       }
     });
   }
 
-  cancelarCotacao(c: CotacaoEnviadaDisplay): void {
-    const confirmar = confirm(`Cancelar cotação ${c.ref}? Esta cotação ficará inválida.`);
+  anularProposta(c: CotacaoEnviadaDisplay): void {
+    const confirmar = window.confirm(
+      `Anular a proposta ${c.ref}?\n\n` +
+        'O contacto deixa de estar neste fluxo comercial (não será facturado por esta linha). Se premir «Não», a proposta mantém-se.'
+    );
     if (!confirmar) return;
 
     this.cotacaoService.obterCotacao(c.id).subscribe({
       next: (cotacao: CotacaoResponse) => {
         if (!cotacao.cliente?.id) {
-          this.error = 'Cliente inválido na cotação';
+          this.error = 'Dados do contacto inválidos na cotação';
           return;
         }
 
@@ -399,17 +459,15 @@ export class CotacoesEnviadasComponent implements OnInit {
           next: () => {
             this.filtroEstado = 'TODOS';
             this.carregarCotacoes();
-            this.mostrarNotificacao('Cotação cancelada com sucesso!', 'success');
+            this.mostrarNotificacao('Proposta anulada.', 'success');
           },
-          error: (error: unknown) => {
-            console.error('Erro ao cancelar cotação:', error);
-            this.error = 'Erro ao cancelar cotação';
-            this.mostrarNotificacao('Erro ao cancelar cotação. Tente novamente.', 'error');
+          error: () => {
+            this.error = 'Erro ao anular proposta';
+            this.mostrarNotificacao('Erro ao anular proposta. Tente novamente.', 'error');
           }
         });
       },
-      error: (error: unknown) => {
-        console.error('Erro ao obter cotação:', error);
+      error: () => {
         this.error = 'Erro ao obter cotação';
         this.mostrarNotificacao('Erro ao obter cotação. Tente novamente.', 'error');
       }
@@ -420,7 +478,6 @@ export class CotacoesEnviadasComponent implements OnInit {
     this.notificationMessage = message;
     this.notificationType = type;
     this.showNotification = true;
-
     setTimeout(() => {
       this.showNotification = false;
     }, 7000);

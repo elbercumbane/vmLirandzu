@@ -10,6 +10,9 @@ export interface Cliente {
   email?: string;
   endereco?: string;
   nif?: string;
+  valorTotalFaturado?: number;
+  valorEmDivida?: number;
+  numeroEncomendas?: number;
 }
 
 @Injectable({
@@ -19,6 +22,10 @@ export class ClienteService {
   private apiUrl = environment.apiUrl || 'http://localhost:8080/api';
 
   constructor(private http: HttpClient) {}
+
+  listarClientes(): Observable<Cliente[]> {
+    return this.http.get<Cliente[]>(`${this.apiUrl}/clientes`);
+  }
 
   buscarClientes(nome?: string, telefone?: string): Observable<Cliente[]> {
     const params: any = {};

@@ -2,14 +2,10 @@
   [showBack]="true"
   [backLink]="'/billing'"
   [showHelp]="true"
-  title="Cotações Enviadas"
-  subtitle="Visualize todas as cotações que foram enviadas aos clientes"
-  helpTitle="Como usar Cotações Enviadas"
-  [helpItems]="[
-    'Esta página mostra apenas cotações que foram respondidas ou geradas e enviadas.',
-    'Use os filtros para ver cotações respondidas ou com cotação gerada.',
-    'Pesquise por cliente, referência, destino ou forma de envio para localizar cotações específicas.'
-  ]"
+  [title]="pageTitle"
+  [subtitle]="pageSubtitle"
+  [helpTitle]="helpTitle"
+  [helpItems]="helpItems"
 ></app-billing-section-header>
 
 <div class="kpi-grid">
@@ -23,10 +19,25 @@
         <line x1="16" y1="17" x2="8" y2="17"></line>
       </svg>
     </div>
-    <div class="kpi-label">Total Enviadas</div>
+    <div class="kpi-label">{{ modoParaFacturar ? 'Na fila de facturação' : 'No pipeline' }}</div>
     <div class="kpi-value">{{ cotacoes.length }}</div>
     <div class="kpi-sub">{{ cotacoesFiltradas.length }} visível(is)</div>
   </div>
+  @if (!modoParaFacturar) {
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: #d97706"></div>
+    <div class="kpi-icon" style="color: #d97706">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12 6 12 12 16 14"></polyline>
+      </svg>
+    </div>
+    <div class="kpi-label">Propostas prontas</div>
+    <div class="kpi-value" style="color: #d97706">{{ totalPropostasProntas }}</div>
+    <div class="kpi-sub">aguardam aceitação do contacto</div>
+  </div>
+  }
+  @if (modoParaFacturar) {
   <div class="kpi-card">
     <div class="kpi-top-line" style="background: var(--success)"></div>
     <div class="kpi-icon" style="color: var(--success)">
@@ -35,21 +46,26 @@
         <polyline points="22 4 12 14.01 9 11.01"></polyline>
       </svg>
     </div>
-    <div class="kpi-label">Cotações Geradas</div>
-    <div class="kpi-value" style="color: var(--success)">{{ totalGerados }}</div>
-    <div class="kpi-sub">enviadas aos clientes</div>
+    <div class="kpi-label">Aceites (facturáveis)</div>
+    <div class="kpi-value" style="color: var(--success)">{{ totalAceitesFacturaveis }}</div>
+    <div class="kpi-sub">prontos para emitir factura</div>
   </div>
+  }
 </div>
 
 <div class="card">
   <div class="toolbar">
-    <input type="text" class="search-input" [(ngModel)]="filtro" placeholder="Pesquisar por cliente, referência, destino, forma de envio...">
+    <input type="text" class="search-input" [(ngModel)]="filtro" placeholder="Pesquisar por contacto, referência, destino, forma de envio...">
     <div class="filter-chips">
-      <button class="filter-chip" [class.active]="filtroEstado === 'TODOS'" (click)="filtroEstado = 'TODOS'">Todos</button>
-        <button class="filter-chip" [class.active]="filtroEstado === 'COTAÇÃO GERADA'" (click)="filtroEstado = 'COTAÇÃO GERADA'">Pendente de Confirmação</button>
-      <button class="filter-chip" [class.active]="filtroEstado === 'RESPONDIDO'" (click)="filtroEstado = 'RESPONDIDO'">Enviadas</button>
-        <button class="filter-chip" [class.active]="filtroEstado === 'CANCELADA'" (click)="filtroEstado = 'CANCELADA'">Canceladas</button>
-      <button class="filter-chip" [class.active]="filtroEstado === 'FACTURADA'" (click)="filtroEstado = 'FACTURADA'">Facturadas</button>
+      <button type="button" class="filter-chip" [class.active]="filtroEstado === 'TODOS'" (click)="filtroEstado = 'TODOS'">Todos</button>
+      @if (!modoParaFacturar) {
+        <button type="button" class="filter-chip" [class.active]="filtroEstado === estados.propostaPronta" (click)="filtroEstado = estados.propostaPronta">Proposta pronta</button>
+      }
+      <button type="button" class="filter-chip" [class.active]="filtroEstado === estados.aceite" (click)="filtroEstado = estados.aceite">Aceite pelo contacto</button>
+      <button type="button" class="filter-chip" [class.active]="filtroEstado === estados.facturada" (click)="filtroEstado = estados.facturada">Facturadas</button>
+      @if (!modoParaFacturar) {
+        <button type="button" class="filter-chip" [class.active]="filtroEstado === estados.cancelada" (click)="filtroEstado = estados.cancelada">Anuladas</button>
+      }
     </div>
   </div>
 
@@ -68,15 +84,15 @@
         <thead>
           <tr>
             <th>Ref.</th>
-            <th>Cliente</th>
+            <th>Contacto (pedido)</th>
             <th>Rota</th>
             <th>Carga</th>
             <th>Entrada</th>
             <th>Estado</th>
             <th>Forma de Envio</th>
             <th>Operador</th>
-            <th>Tempo Resposta</th>
-            <th style="width: 110px;">Ações</th>
+            <th>Tempo até aceitação</th>
+            <th style="min-width: 140px;">Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -104,10 +120,19 @@
             <td>{{ c.operador || '—' }}</td>
             <td>{{ c.tempoResposta || '—' }}</td>
             <td>
-              <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                <button type="button" class="btn-secondary btn-sm" (click)="baixarOuVerPdf(c)">
-                  PDF
+              <div class="cotacao-acoes">
+                <button type="button" class="btn-secondary btn-sm" (click)="visualizarPdfNovaAba(c)" title="Abre o PDF num separador novo">
+                  Visualizar PDF
                 </button>
+                @if (!modoParaFacturar && c.estado === estados.propostaPronta) {
+                  <a [routerLink]="['/billing/cotacoes/gerar', c.id]" class="btn-secondary btn-sm cotacao-acoes-link">Ajustar proposta</a>
+                  <button type="button" class="btn-primary btn-sm" (click)="registarAceitacaoCliente(c)">
+                    Registar aceitação
+                  </button>
+                  <button type="button" class="btn-danger btn-sm" (click)="anularProposta(c)">
+                    Anular proposta
+                  </button>
+                }
                 @if (podeEmitirFactura(c.estado)) {
                   <button
                     type="button"
@@ -118,21 +143,13 @@
                     {{ emitindoCotacaoId === c.id ? 'A emitir…' : 'Emitir factura' }}
                   </button>
                 }
-                @if (c.estado === 'COTAÇÃO GERADA') {
-                  <button type="button" class="btn-secondary btn-sm" (click)="confirmarEnvio(c)">
-                    Confirmar envio
-                  </button>
-                  <button type="button" class="btn-danger btn-sm" (click)="cancelarCotacao(c)">
-                    Cancelar
-                  </button>
-                }
               </div>
             </td>
           </tr>
           } @empty {
             <tr>
               <td colspan="10" class="empty-state">
-                <p>Nenhuma cotação enviada encontrada</p>
+                <p>{{ modoParaFacturar ? 'Nenhuma cotação aceite pendente de facturação.' : 'Nenhuma cotação neste filtro.' }}</p>
               </td>
             </tr>
           }

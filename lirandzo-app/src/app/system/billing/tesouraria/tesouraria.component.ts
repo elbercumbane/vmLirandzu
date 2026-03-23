@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { AuthService } from '../../../shared/services/auth.service';
 import { forkJoin } from 'rxjs';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
 import { PagamentoService, PagamentoResponse } from '../../../services/pagamento.service';
@@ -37,11 +38,27 @@ interface DividaRow {
   styleUrls: ['../shared/billing-page.css', './tesouraria.component.css']
 })
 export class TesourariaComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private auth = inject(AuthService);
+
+  /** Rota `/billing/baixas`: texto orientado ao operador (fluxo mãe de cobrança). */
+  modoFluxoBaixas = false;
+  pageTitle = 'Tesouraria';
+  pageSubtitle = 'Receitas da operação, fila de conciliação com o banco e dívidas';
+  helpTitle = 'Pagamentos sem banco integrado';
+
   helpItems = [
     'Os recebimentos vêm das encomendas: abra cada encomenda e registe o valor com a referência do M-Pesa ou extrato.',
     'Se ainda não verificou no banco, marque «aguarda extrato»; o valor aparece na aba Conciliação até confirmar.',
-    'Após cruzar com o extrato ou app M-Pesa, confirme o pagamento para actualizar a dívida do cliente.',
+    'Só perfis Administrador e Gestor podem confirmar na conciliação (valida que o dinheiro entrou).',
     'As despesas mostradas são exemplos locais até existir módulo de despesas na base de dados.'
+  ];
+
+  fluxoBaixasPassos = [
+    { n: 1, titulo: 'Registar pagamento', texto: 'Na ficha da encomenda, em «Pagamentos», lance valor, método e referência.' },
+    { n: 2, titulo: 'Aguarda extrato?', texto: 'Se ainda não cruzou com o banco/M-Pesa, o movimento vem para a aba Conciliação.' },
+    { n: 3, titulo: 'Confirmar (Admin / Gestor)', texto: 'Quem valida o extrato confirma; a dívida do cliente actualiza-se automaticamente.' },
+    { n: 4, titulo: 'Acompanhar dívidas', texto: 'Use a aba Dívidas para quem deve; pagamento total antecipado, parcial ou zero fica visível na lista de facturas.' }
   ];
 
   activeTab: 'RECEBIMENTOS' | 'CONCILIACAO' | 'DESPESAS' | 'DIVIDAS' = 'RECEBIMENTOS';
@@ -81,7 +98,23 @@ export class TesourariaComponent implements OnInit {
     private encomendaService: EncomendaService
   ) {}
 
+  get podeConfirmarConciliacao(): boolean {
+    return this.auth.canConfirmPayment();
+  }
+
   ngOnInit(): void {
+    this.modoFluxoBaixas = !!this.route.snapshot.data['tesourariaModoBaixas'];
+    if (this.modoFluxoBaixas) {
+      this.pageTitle = 'Baixas & tesouraria';
+      this.pageSubtitle = 'Fluxo de cobrança: registar → conciliar → confirmar → controlar dívidas';
+      this.helpTitle = 'Como usar as baixas';
+      this.helpItems = [
+        'Pense na factura como documento único: pagamentos parciais são vários lançamentos na mesma encomenda, não uma segunda factura.',
+        'Quem opera regista o pagamento; só Admin ou Gestor confirma quando o banco bate certo.',
+        'Cliente em dívida aparece na aba Dívidas e na lista de facturas com filtro «Não pago» ou «Parcial».'
+      ];
+      this.activeTab = 'RECEBIMENTOS';
+    }
     const hoje = new Date().toISOString().split('T')[0];
     this.novoRecebimento.data = hoje;
     this.carregarDados();
@@ -181,6 +214,9 @@ export class TesourariaComponent implements OnInit {
   }
 
   confirmarPagamento(p: PagamentoResponse): void {
+    if (!this.podeConfirmarConciliacao) {
+      return;
+    }
     this.confirmandoId = p.id;
     this.pagamentoService.confirmarConciliacao(p.id).subscribe({
       next: () => {

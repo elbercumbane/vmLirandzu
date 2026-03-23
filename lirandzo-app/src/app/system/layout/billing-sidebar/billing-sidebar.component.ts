@@ -30,7 +30,7 @@ export class BillingSidebarComponent implements OnInit, OnDestroy {
     const url = this.router.url;
     if (url.includes('/cotacoes')) this.expandedMenus['cotacoes'] = true;
     else if (url.includes('/clientes')) this.expandedMenus['clientes'] = true;
-    else if (url.includes('/encomendas')) this.expandedMenus['encomendas'] = true;
+    else if (url.includes('/encomendas') || url.includes('/baixas') || url.includes('/tesouraria') || url.includes('/para-facturar')) this.expandedMenus['facturacao'] = true;
     else if (url.includes('/guias')) this.expandedMenus['guias'] = true;
     else if (url.includes('/viagens')) this.expandedMenus['viagens'] = true;
     else if (url.includes('/viaturas')) this.expandedMenus['viaturas'] = true;

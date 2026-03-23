@@ -1,9 +1,15 @@
 <div class="billing-sidebar-overlay" [class.open]="isOpen" (click)="onToggle()"></div>
 <aside class="billing-sidebar" [class.open]="isOpen">
   <div class="billing-sidebar-header">
-    <div class="billing-sidebar-logo">
-      <span class="billing-sidebar-logo-mark">VM</span>
-      <span class="billing-sidebar-logo-name">Lirandzo<br><em>Sistema de Gestão de Frota</em></span>
+    <div class="billing-sidebar-logo" aria-hidden="true">
+      <span class="billing-sidebar-logo-mark">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 17h4V5H2v12h3"></path>
+          <path d="M20 17h2v-3.34a1 1 0 0 0-.14-.51l-2.34-4.68A2 2 0 0 0 17.76 7H14"></path>
+          <circle cx="7.5" cy="17.5" r="2.5"></circle>
+          <circle cx="17.5" cy="17.5" r="2.5"></circle>
+        </svg>
+      </span>
     </div>
   </div>
 
@@ -73,38 +79,32 @@
         </button>
         <ul class="sidebar-submenu">
           <li><a routerLink="/billing/clientes" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="sidebar-sub-link" (click)="onToggle()"><svg class="sidebar-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="6" rx="2"></rect><path d="M3 14h7v6H3z"></path><path d="M14 14h7v3h-7z"></path></svg>Lista</a></li>
+          <li><a routerLink="/billing/clientes/novo" routerLinkActive="active" class="sidebar-sub-link" (click)="onToggle()"><svg class="sidebar-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>Novo cliente</a></li>
           <li><a routerLink="/billing/clientes/historico" routerLinkActive="active" class="sidebar-sub-link" (click)="onToggle()"><svg class="sidebar-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Histórico</a></li>
         </ul>
       </li>
 
-      <!-- 2. Factura → pagamentos -->
-      <li class="sidebar-section-label">2. Facturação &amp; cobrança</li>
+      <!-- 2. Facturação (fluxo espelhado ao comercial: origem → documento → cobrança) -->
+      <li class="sidebar-section-label">2. Facturação &amp; tesouraria</li>
 
-      <!-- Encomendas -->
-      <li class="sidebar-group" [class.expanded]="isExpanded('encomendas')">
-        <button type="button" class="sidebar-link sidebar-group-toggle" (click)="toggleMenu('encomendas')">
+      <li class="sidebar-group" [class.expanded]="isExpanded('facturacao')">
+        <button type="button" class="sidebar-link sidebar-group-toggle" (click)="toggleMenu('facturacao')">
           <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
           </svg>
-          <span>Encomendas</span>
+          <span>Facturação</span>
           <svg class="sidebar-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </button>
         <ul class="sidebar-submenu">
-          <li><a routerLink="/billing/encomendas" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="sidebar-sub-link" (click)="onToggle()"><svg class="sidebar-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>Lista (facturas)</a></li>
-          <li><a routerLink="/billing/encomendas/nova" routerLinkActive="active" class="sidebar-sub-link" (click)="onToggle()"><svg class="sidebar-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>Nova factura manual</a></li>
+          <li><a routerLink="/billing/cotacoes/para-facturar" routerLinkActive="active" class="sidebar-sub-link" (click)="onToggle()"><svg class="sidebar-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>1. Cotações para facturar</a></li>
+          <li><a routerLink="/billing/encomendas/nova" routerLinkActive="active" class="sidebar-sub-link" (click)="onToggle()"><svg class="sidebar-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>2. Nova factura</a></li>
+          <li><a routerLink="/billing/encomendas" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="sidebar-sub-link" (click)="onToggle()"><svg class="sidebar-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>3. Lista de facturas</a></li>
+          <li><a routerLink="/billing/encomendas/pagas" routerLinkActive="active" class="sidebar-sub-link" (click)="onToggle()"><svg class="sidebar-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>4. Facturas pagas</a></li>
+          <li><a routerLink="/billing/baixas" routerLinkActive="active" class="sidebar-sub-link" (click)="onToggle()"><svg class="sidebar-sub-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>5. Baixas &amp; tesouraria</a></li>
         </ul>
-      </li>
-
-      <li>
-        <a routerLink="/billing/tesouraria" routerLinkActive="active" class="sidebar-link" (click)="onToggle()">
-          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="1" x2="12" y2="23"></line>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-          </svg>
-          <span>Tesouraria</span>
-        </a>
       </li>
 
       <!-- 3. Transporte no terreno -->

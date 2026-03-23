@@ -154,7 +154,7 @@ public class CotacaoService {
                     cotacao.setOperador(cotacaoAtualizada.getOperador());
                     cotacao.setFormaEnvioPreferida(cotacaoAtualizada.getFormaEnvioPreferida());
                     cotacao.setFormaEnvioRealizada(cotacaoAtualizada.getFormaEnvioRealizada());
-                    // Regra do sistema: o "tempo resposta" fecha quando o operador confirma o envio (RESPONDED).
+                    // RESPONDED = aceitação pelo cliente (após negociação / envio da proposta). Fecha o "tempo até resposta".
                     if (cotacaoAtualizada.getStatus() == StatusCotacao.RESPONDED) {
                         cotacao.setDataResposta(java.time.LocalDateTime.now());
                     }

@@ -2,11 +2,28 @@
   [showBack]="true"
   [showHelp]="true"
   [backLink]="'/billing'"
-  title="Tesouraria"
-  subtitle="Receitas da operação, fila de conciliação com o banco e dívidas"
-  helpTitle="Pagamentos sem banco integrado"
+  [title]="pageTitle"
+  [subtitle]="pageSubtitle"
+  [helpTitle]="helpTitle"
   [helpItems]="helpItems"
 ></app-billing-section-header>
+
+@if (modoFluxoBaixas) {
+  <div class="card fluxo-baixas-card">
+    <h3 class="fluxo-baixas-heading">Fluxo de cobrança (resumo para o operador)</h3>
+    <ol class="fluxo-baixas-steps">
+      @for (passo of fluxoBaixasPassos; track passo.n) {
+        <li class="fluxo-baixas-step">
+          <span class="fluxo-baixas-n">{{ passo.n }}</span>
+          <div>
+            <strong>{{ passo.titulo }}</strong>
+            <p>{{ passo.texto }}</p>
+          </div>
+        </li>
+      }
+    </ol>
+  </div>
+}
 
 @if (loading) {
   <div class="card">
@@ -124,8 +141,11 @@
 
   @if (activeTab === 'CONCILIACAO') {
     <p class="text-muted" style="padding:0 0 1rem;margin:0;font-size:0.9rem;">
-      Estes valores foram registados com «aguarda extrato». Quando cruzar com o extrato ou M-Pesa, confirme para atualizar a dívida do cliente.
+      Estes valores foram registados com «aguarda extrato». Quando cruzar com o extrato ou M-Pesa, <strong>só Administrador ou Gestor</strong> confirma para atualizar a dívida do cliente.
     </p>
+    @if (!podeConfirmarConciliacao) {
+      <p class="fluxo-perfil-aviso">O seu perfil pode ver esta fila, mas não confirmar conciliação. Peça a um administrador ou gestor.</p>
+    }
     <div class="table-wrapper">
       <table class="data-table">
         <thead>
@@ -155,7 +175,7 @@
                 } @else { — }
               </td>
               <td>
-                <button type="button" class="btn-primary btn-sm" [disabled]="confirmandoId === p.id" (click)="confirmarPagamento(p)">
+                <button type="button" class="btn-primary btn-sm" [disabled]="confirmandoId === p.id || !podeConfirmarConciliacao" (click)="confirmarPagamento(p)" [title]="!podeConfirmarConciliacao ? 'Apenas Admin ou Gestor' : ''">
                   {{ confirmandoId === p.id ? '…' : 'Confirmar' }}
                 </button>
               </td>

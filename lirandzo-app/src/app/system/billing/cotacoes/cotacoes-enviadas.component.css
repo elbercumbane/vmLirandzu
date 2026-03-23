@@ -9,3 +9,18 @@
   outline: 2px solid rgba(245, 158, 11, 0.8);
   outline-offset: -2px;
 }
+
+.cotacao-acoes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  align-items: stretch;
+}
+
+a.cotacao-acoes-link {
+  text-align: center;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
 import { EncomendaService, EncomendaResponse } from '../../../services/encomenda.service';
@@ -35,9 +35,34 @@ export class EncomendasListaComponent implements OnInit {
   loading = true;
   error: string | null = null;
 
-  constructor(private encomendaService: EncomendaService) {}
+  pageTitle = 'Facturas (encomendas)';
+  pageSubtitle = 'Gestão de encomendas, números de factura e estado de pagamento';
+  helpTitle = 'Como usar esta lista';
+  helpItems: string[] = [
+    'Use os filtros e a pesquisa para encontrar encomendas por nº, factura, cliente ou produto.',
+    'O estado reflecte o total pago face ao total da factura: pago integral, parcial ou em falta.',
+    'Para emitir a partir de uma cotação aceite, use «Cotações para facturar» no menu.',
+    'Para registar pagamentos e conciliar com o banco, use «Baixas & tesouraria».'
+  ];
+
+  constructor(
+    private encomendaService: EncomendaService,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit() {
+    const pagas = this.route.snapshot.url.some((s) => s.path === 'pagas');
+    if (pagas) {
+      this.activeFilter = 'PAGO';
+      this.pageTitle = 'Facturas pagas';
+      this.pageSubtitle = 'Apenas encomendas com pagamento integral confirmado';
+      this.helpTitle = 'Lista só de facturas liquidadas';
+      this.helpItems = [
+        'Esta vista mostra só documentos com saldo zero (total = pago).',
+        'Para pagamentos parciais ou em dívida, volte à «Lista de facturas» e filtre por Parcial ou Não pago.',
+        'O histórico de recebimentos por linha está na página da encomenda e na tesouraria.'
+      ];
+    }
     this.carregarEncomendas();
   }
 
