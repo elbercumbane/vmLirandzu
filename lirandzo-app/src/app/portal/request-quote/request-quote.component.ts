@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TranslocoModule, TranslocoService } from '@ngneat/transloco';
 import { CotacaoPortalRequest, CotacaoService } from '../../services/cotacao.service';
+import { gsap } from 'gsap';
 
 type FormaEnvio = CotacaoPortalRequest['formaEnvioPreferida'];
 
@@ -13,9 +14,10 @@ type FormaEnvio = CotacaoPortalRequest['formaEnvioPreferida'];
   templateUrl: './request-quote.component.html',
   styleUrl: './request-quote.component.css'
 })
-export class RequestQuoteComponent {
+export class RequestQuoteComponent implements AfterViewInit {
   private cotacaoService = inject(CotacaoService);
   private transloco = inject(TranslocoService);
+  private el = inject(ElementRef);
 
   submitted = false;
   loading = false;
@@ -26,6 +28,23 @@ export class RequestQuoteComponent {
     detalhes: false,
     mensagem: false
   };
+
+  ngAfterViewInit(): void {
+    const host = this.el.nativeElement as HTMLElement;
+    const heroInner = host.querySelector('.quote-hero-inner') as HTMLElement | null;
+    const formCard = host.querySelector('.quote-form-card') as HTMLElement | null;
+    const cardBody = host.querySelector('.quote-form-card-body') as HTMLElement | null;
+
+    if (heroInner) {
+      gsap.fromTo(heroInner, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' });
+    }
+    if (formCard) {
+      gsap.fromTo(formCard, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out', delay: 0.08 });
+    }
+    if (cardBody) {
+      gsap.fromTo(cardBody, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out', delay: 0.12 });
+    }
+  }
   form = {
     name: '',
     email: '',

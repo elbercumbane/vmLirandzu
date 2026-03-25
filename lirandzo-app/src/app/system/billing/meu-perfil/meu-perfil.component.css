@@ -1,0 +1,93 @@
+.perfil-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 1.25rem;
+}
+
+.perfil-card {
+  padding: 1.35rem;
+}
+
+.perfil-topo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.perfil-avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 0.8rem;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.perfil-identidade h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+
+.perfil-identidade p {
+  margin: 0.2rem 0 0.45rem;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+
+.perfil-detalhes {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.perfil-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 0.65rem;
+  background: var(--bg-card-inner);
+  border: 1px solid var(--border-subtle);
+}
+
+.perfil-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.status-ok {
+  color: var(--success);
+}
+
+.perfil-titulo {
+  margin: 0 0 0.9rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.perfil-lista {
+  margin: 0;
+  padding-left: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.perfil-lista li + li {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .perfil-grid {
+    grid-template-columns: 1fr;
+  }
+}

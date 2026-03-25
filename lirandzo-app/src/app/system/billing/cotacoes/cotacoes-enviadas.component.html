@@ -89,6 +89,7 @@
             <th>Carga</th>
             <th>Entrada</th>
             <th>Estado</th>
+            <th>Ajuste</th>
             <th>Forma de Envio</th>
             <th>Operador</th>
             <th>Tempo até aceitação</th>
@@ -114,6 +115,7 @@
               }
             </td>
             <td><span [class]="getBadgeClass(c.estado)">{{ c.estado }}</span></td>
+            <td>{{ c.ajusteInfo || '—' }}</td>
             <td>
               <span class="badge badge-info" style="font-size: 0.75rem;">{{ c.formaEnvio }}</span>
             </td>
@@ -121,16 +123,13 @@
             <td>{{ c.tempoResposta || '—' }}</td>
             <td>
               <div class="cotacao-acoes">
-                <button type="button" class="btn-secondary btn-sm" (click)="visualizarPdfNovaAba(c)" title="Abre o PDF num separador novo">
-                  Visualizar PDF
+                <button type="button" class="btn-secondary btn-sm" (click)="visualizarPdfNovaAba(c)" title="Abre a cotação num separador novo">
+                  Visualizar Cotação
                 </button>
                 @if (!modoParaFacturar && c.estado === estados.propostaPronta) {
                   <a [routerLink]="['/billing/cotacoes/gerar', c.id]" class="btn-secondary btn-sm cotacao-acoes-link">Ajustar proposta</a>
                   <button type="button" class="btn-primary btn-sm" (click)="registarAceitacaoCliente(c)">
                     Registar aceitação
-                  </button>
-                  <button type="button" class="btn-danger btn-sm" (click)="anularProposta(c)">
-                    Anular proposta
                   </button>
                 }
                 @if (podeEmitirFactura(c.estado)) {
@@ -148,7 +147,7 @@
           </tr>
           } @empty {
             <tr>
-              <td colspan="10" class="empty-state">
+              <td colspan="11" class="empty-state">
                 <p>{{ modoParaFacturar ? 'Nenhuma cotação aceite pendente de facturação.' : 'Nenhuma cotação neste filtro.' }}</p>
               </td>
             </tr>

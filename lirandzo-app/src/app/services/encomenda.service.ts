@@ -53,6 +53,10 @@ export class EncomendaService {
     return this.http.get<EncomendaResponse[]>(`${this.apiUrl}/encomendas`);
   }
 
+  listarEncomendasPorCliente(clienteId: number): Observable<EncomendaResponse[]> {
+    return this.http.get<EncomendaResponse[]>(`${this.apiUrl}/encomendas/cliente/${clienteId}`);
+  }
+
   obterEncomenda(id: number): Observable<EncomendaResponse> {
     return this.http.get<EncomendaResponse>(`${this.apiUrl}/encomendas/${id}`);
   }

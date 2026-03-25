@@ -1,0 +1,43 @@
+<app-billing-section-header
+  title="Meu Perfil"
+  subtitle="Dados da conta e permissões de acesso no sistema."
+  [showBack]="true"
+  backLink="/billing"
+></app-billing-section-header>
+
+<div class="perfil-grid" *ngIf="userProfile() as user">
+  <section class="card perfil-card">
+    <div class="perfil-topo">
+      <div class="perfil-avatar">{{ user.avatar }}</div>
+      <div class="perfil-identidade">
+        <h3>{{ user.nome }}</h3>
+        <p>{{ user.email }}</p>
+        <span class="badge badge-info">{{ roleLabel }}</span>
+      </div>
+    </div>
+
+    <div class="perfil-detalhes">
+      <div class="perfil-item">
+        <span class="perfil-label">ID do utilizador</span>
+        <strong>#{{ user.id }}</strong>
+      </div>
+      <div class="perfil-item">
+        <span class="perfil-label">Estado da conta</span>
+        <strong [class.status-ok]="contaAtiva">Ativa</strong>
+      </div>
+      <div class="perfil-item">
+        <span class="perfil-label">Nível de acesso</span>
+        <strong>{{ roleLabel }}</strong>
+      </div>
+    </div>
+  </section>
+
+  <section class="card perfil-card">
+    <h3 class="perfil-titulo">Permissões</h3>
+    <ul class="perfil-lista">
+      <li>Acesso ao painel de faturação e operações.</li>
+      <li>Gestão de cotações, clientes, viaturas e motoristas.</li>
+      <li>Acesso a configurações depende do perfil (admin/gestor).</li>
+    </ul>
+  </section>
+</div>

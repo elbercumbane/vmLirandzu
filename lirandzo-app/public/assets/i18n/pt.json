@@ -213,6 +213,7 @@
       "backToPortal": "Voltar para o portal"
     },
     "login": {
+      "welcome": "Bem-vindo ao",
       "subtitle": "Fleet Hub — VM Transportes",
       "instruction": "Entre com as suas credenciais",
       "username": "Utilizador",
@@ -233,6 +234,13 @@
       }
     },
     "forgot": {
+      "chip": "Fleet Hub",
+      "asideTitle": "Recuperação de acesso",
+      "asideLead": "Restabeleça a sua palavra-passe com um fluxo seguro. Receberá um link válido por tempo limitado.",
+      "benefit1": "Ligação encriptada (HTTPS)",
+      "benefit2": "Apenas o email da sua conta",
+      "benefit3": "Redirecionamento automático após envio",
+      "trustNote": "Nunca pedimos a sua palavra-passe por email.",
       "title": "Recuperar senha",
       "instruction": "Digite o seu email e enviaremos um link para redefinir a sua senha.",
       "success": "Email enviado! Verifique a sua caixa de entrada. Redirecionando para o login...",

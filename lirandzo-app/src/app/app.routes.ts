@@ -1,11 +1,14 @@
 import { Routes } from '@angular/router';
 import { configuracoesGuard } from './shared/guards/configuracoes.guard';
+import { systemAuthGuard } from './shared/guards/system-auth.guard';
 
 export const routes: Routes = [
   { path: '', loadComponent: () => import('./portal/home/home.component').then(m => m.HomeComponent) },
   { path: 'rastreio', loadComponent: () => import('./portal/order-tracking/order-tracking.component').then(m => m.OrderTrackingComponent) },
   { path: 'orcamento', loadComponent: () => import('./portal/request-quote/request-quote.component').then(m => m.RequestQuoteComponent) },
-  { path: 'login', loadComponent: () => import('./system/login/login.component').then(m => m.LoginComponent) },
+  { path: 'login', redirectTo: 'login-sistema', pathMatch: 'full' },
+  { path: 'login-sistema', loadComponent: () => import('./system/login/login.component').then(m => m.LoginComponent), data: { accessContext: 'sistema' } },
+  { path: 'login-cliente', loadComponent: () => import('./portal/client-login/client-login.component').then(m => m.ClientLoginComponent) },
   { path: 'recuperar-senha', loadComponent: () => import('./system/login/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent) },
   { path: 'servicos', loadComponent: () => import('./portal/all-services/all-services.component').then(m => m.AllServicesComponent) },
   { path: 'sobre', loadComponent: () => import('./portal/about/about.component').then(m => m.AboutComponent) },
@@ -13,12 +16,14 @@ export const routes: Routes = [
   { path: 'noticias/:id', loadComponent: () => import('./portal/noticias/noticia-detalhe/noticia-detalhe.component').then(m => m.NoticiaDetalheComponent) },
   { path: 'noticias', loadComponent: () => import('./portal/noticias/noticias.component').then(m => m.NoticiasComponent) },
   { path: 'contato', loadComponent: () => import('./portal/contato/contato.component').then(m => m.ContatoComponent) },
+  { path: 'contacto', loadComponent: () => import('./portal/contato/contato.component').then(m => m.ContatoComponent) },
   { path: 'avaliacoes', loadComponent: () => import('./portal/avaliacoes/avaliacoes.component').then(m => m.AvaliacoesComponent) },
   { path: 'area-cliente', loadComponent: () => import('./portal/client-area/client-area.component').then(m => m.ClientAreaComponent) },
 
   {
     path: 'billing',
     loadComponent: () => import('./system/billing/layout/billing-layout.component').then(m => m.BillingLayoutComponent),
+    canActivate: [systemAuthGuard],
     children: [
       { path: '', loadComponent: () => import('./system/billing/dashboard/billing-dashboard.component').then(m => m.BillingDashboardComponent) },
       { path: 'viaturas', loadComponent: () => import('./system/billing/viaturas/viaturas-lista.component').then(m => m.ViaturasListaComponent) },
@@ -65,6 +70,7 @@ export const routes: Routes = [
       { path: 'manutencao/:id/editar', loadComponent: () => import('./system/billing/manutencao/manutencao-editar.component').then(m => m.ManutencaoEditarComponent) },
       { path: 'baixas', loadComponent: () => import('./system/billing/tesouraria/tesouraria.component').then(m => m.TesourariaComponent), data: { tesourariaModoBaixas: true } },
       { path: 'tesouraria', loadComponent: () => import('./system/billing/tesouraria/tesouraria.component').then(m => m.TesourariaComponent) },
+      { path: 'meu-perfil', loadComponent: () => import('./system/billing/meu-perfil/meu-perfil.component').then(m => m.MeuPerfilComponent) },
       { path: 'relatorios', loadComponent: () => import('./system/billing-reports/billing-reports.component').then(m => m.BillingReportsComponent) },
       { path: 'configuracoes', loadComponent: () => import('./system/billing-settings/billing-settings.component').then(m => m.BillingSettingsComponent), canActivate: [configuracoesGuard] },
     ]

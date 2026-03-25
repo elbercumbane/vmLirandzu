@@ -1,4 +1,4 @@
-{
+﻿{
   "nav": {
     "home": "Home",
     "about": "About Us",
@@ -213,6 +213,7 @@
       "backToPortal": "Back to portal"
     },
     "login": {
+      "welcome": "Welcome to",
       "subtitle": "Fleet Hub — VM Transport",
       "instruction": "Sign in with your credentials",
       "username": "Username",
@@ -233,6 +234,13 @@
       }
     },
     "forgot": {
+      "chip": "Fleet Hub",
+      "asideTitle": "Account recovery",
+      "asideLead": "Reset your password securely. You will receive a time-limited link.",
+      "benefit1": "Encrypted connection (HTTPS)",
+      "benefit2": "Only your account email",
+      "benefit3": "Automatic redirect after submit",
+      "trustNote": "We will never ask for your password by email.",
       "title": "Reset password",
       "instruction": "Enter your email and we will send you a link to reset your password.",
       "success": "Email sent! Check your inbox. Redirecting to login...",

@@ -1,3 +1,4 @@
+@if (!modoPdfOnly) {
 <app-billing-section-header
   [showBack]="true"
   [backLink]="'/billing/cotacoes'"
@@ -11,8 +12,10 @@
     'Defina a validade e o operador responsável para controlo interno.'
   ]"
 ></app-billing-section-header>
+}
 
 <div class="card" id="cotacao-pdf-content">
+@if (!modoPdfOnly) {
   <!-- Cabeçalho do documento -->
   <div class="quote-doc-header">
     <div>
@@ -192,10 +195,11 @@
       </button>
     </div>
   }
+}
 </div>
 
 <app-notification-popup
-  *ngIf="showNotification"
+  *ngIf="showNotification && !modoPdfOnly"
   [message]="notificationMessage"
   [type]="notificationType"
   [duration]="7000">
@@ -203,39 +207,41 @@
 
 <!-- Preview Modal -->
 @if (showPreview) {
-      <div class="preview-modal-overlay">
+      <div class="preview-modal-overlay" [class.auto-pdf]="modoPdfOnly && modoAutoPdf">
   <div class="preview-modal" (click)="$event.stopPropagation()">
-    <div class="preview-modal-header">
-      <h3>
-        @if (modoConfirmacaoGeracao) {
-          <span class="preview-confirm-title">
-            <svg
-              class="preview-confirm-icon"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            <span class="preview-confirm-text">Confirmar cotação</span>
-          </span>
-        } @else {
-          Preview da Cotação
-        }
-      </h3>
-      <button type="button" class="preview-modal-close" (click)="fecharPreview()" aria-label="Fechar">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
+    @if (!modoAutoPdf) {
+      <div class="preview-modal-header">
+        <h3>
+          @if (modoConfirmacaoGeracao) {
+            <span class="preview-confirm-title">
+              <svg
+                class="preview-confirm-icon"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span class="preview-confirm-text">Confirmar cotação</span>
+            </span>
+          } @else {
+            Preview da Cotação
+          }
+        </h3>
+        <button type="button" class="preview-modal-close" (click)="fecharPreview()" aria-label="Fechar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    }
     <div class="preview-modal-body">
       <div id="cotacao-preview-content" class="cotacao-preview">
         <div class="qpdf-quotation-container">
@@ -303,52 +309,35 @@
             </table>
           </div>
 
-          <div class="qpdf-valor-sem-iva">
-            <div class="qpdf-valor-sem-iva-title">Valor sem iva</div>
+          @if (ivaAtivoPreview || (cotacao.discountAmount || 0) > 0) {
+            <div class="qpdf-tax-summary">
+              <div class="qpdf-tax-title">VAT Summary</div>
+              <table class="qpdf-tax-table">
+                <thead>
+                  <tr>
+                    <th>Tax</th>
+                    <th>Base</th>
+                    <th>Value</th>
+                    <th>Exemption reason</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>VAT</td>
+                    <td>{{ ((totalGeral || 0) - (cotacao.discountAmount || 0)) | number:'1.2-2' }} MT</td>
+                    <td>{{ (vatAmountPreview || 0) | number:'1.2-2' }} MT</td>
+                    <td>{{ vatReasonPreview || 'ISENTO' }}</td>
+                  </tr>
+                </tbody>
+              </table>
 
-            <div class="qpdf-valor-sem-iva-row">
-              <span>Subtotal (Itens + Recolha)</span>
-              <span>{{ totalGeral | number:'1.2-2' }} MT</span>
+              <div class="qpdf-tax-lines">
+                <div class="qpdf-tax-line"><span>Discounts</span><span>{{ (cotacao.discountAmount || 0) | number:'1.2-2' }} MT</span></div>
+                <div class="qpdf-tax-line"><span>Total VAT</span><span>{{ (vatAmountPreview || 0) | number:'1.2-2' }} MT</span></div>
+                <div class="qpdf-tax-line qpdf-tax-grand"><span>Total (MT)</span><span>{{ ((totalGeral || 0) - (cotacao.discountAmount || 0) + (vatAmountPreview || 0)) | number:'1.2-2' }} MT</span></div>
+              </div>
             </div>
-
-            <div class="qpdf-valor-sem-iva-row">
-              <span>Desconto</span>
-              <span>{{ (cotacao.discountAmount || 0) | number:'1.2-2' }} MT</span>
-            </div>
-
-            <div class="qpdf-valor-sem-iva-row qpdf-valor-sem-iva-total">
-              <span>Valor total sem iva</span>
-              <span>{{ baseAposDescontoPreview | number:'1.2-2' }} MT</span>
-            </div>
-          </div>
-
-          <div class="qpdf-tax-summary">
-            <div class="qpdf-tax-title">VAT Summary</div>
-            <table class="qpdf-tax-table">
-              <thead>
-                <tr>
-                  <th>Tax</th>
-                  <th>Base</th>
-                  <th>Value</th>
-                  <th>Exemption reason</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>VAT</td>
-                  <td>{{ ((totalGeral || 0) - (cotacao.discountAmount || 0)) | number:'1.2-2' }} MT</td>
-                  <td>{{ (vatAmountPreview || 0) | number:'1.2-2' }} MT</td>
-                  <td>{{ vatReasonPreview || 'ISENTO' }}</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div class="qpdf-tax-lines">
-              <div class="qpdf-tax-line"><span>Discounts</span><span>{{ (cotacao.discountAmount || 0) | number:'1.2-2' }} MT</span></div>
-              <div class="qpdf-tax-line"><span>Total VAT</span><span>{{ (vatAmountPreview || 0) | number:'1.2-2' }} MT</span></div>
-              <div class="qpdf-tax-line qpdf-tax-grand"><span>Total (MT)</span><span>{{ ((totalGeral || 0) - (cotacao.discountAmount || 0) + (vatAmountPreview || 0)) | number:'1.2-2' }} MT</span></div>
-            </div>
-          </div>
+          }
 
           <div class="qpdf-validity-section">
             <strong>Note:</strong> This quotation is valid for 7 days from the issue date.
@@ -360,7 +349,8 @@
         </div>
       </div>
     </div>
-    <div class="preview-modal-footer">
+    @if (!modoAutoPdf) {
+      <div class="preview-modal-footer">
       @if (modoPdfOnly) {
         <button type="button" class="btn-secondary" (click)="fecharPreview()">Voltar</button>
         <button type="button" class="btn-primary" (click)="guardarPDF(false)">Baixar PDF</button>
@@ -371,7 +361,8 @@
         <button type="button" class="btn-secondary" (click)="fecharPreview()">Cancelar</button>
         <button type="button" class="btn-primary" (click)="guardarPDF(false)">Guardar PDF</button>
       }
-    </div>
+      </div>
+    }
     </div>
   </div>
 }

@@ -31,14 +31,13 @@
           <button type="button" (click)="setLang('en'); closeLangDropdown()">English</button>
         </div>
       </li>
-      <li><a routerLink="/area-cliente" routerLinkActive="active" (click)="closeMenu()">{{ 'nav.clientArea' | transloco }}</a></li>
-      <li class="nav-login-wrap">
-        <a routerLink="/login" routerLinkActive="active" (click)="closeMenu()" class="nav-btn nav-btn-icon" title="Login" aria-label="Login">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-        </a>
+      <li>
+        <a
+          routerLink="/login-cliente"
+          [queryParams]="{ returnUrl: '/area-cliente' }"
+          routerLinkActive="active"
+          (click)="closeMenu()"
+        >{{ 'nav.clientArea' | transloco }}</a>
       </li>
     </ul>
   </div>

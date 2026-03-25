@@ -73,9 +73,10 @@
 }
 
 .frota-gallery-track {
+  --gallery-gap: 1rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--gallery-gap);
   width: max-content;
   animation: frota-marquee 38s linear infinite;
   will-change: transform;
@@ -105,7 +106,7 @@
     transform: translateX(0);
   }
   100% {
-    transform: translateX(calc(-50% - 0.5rem));
+    transform: translateX(calc(-50% - (var(--gallery-gap) / 2)));
   }
 }
 
@@ -124,7 +125,7 @@
   }
 
   .frota-gallery-track {
-    gap: 0.75rem;
+    --gallery-gap: 0.75rem;
     animation-duration: 28s;
   }
 

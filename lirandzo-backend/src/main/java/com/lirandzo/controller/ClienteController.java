@@ -59,4 +59,11 @@ public class ClienteController {
     public ResponseEntity<List<Cliente>> getClientesComDividas() {
         return ResponseEntity.ok(clienteService.findClientesComDividas());
     }
+
+    @GetMapping("/by-email")
+    public ResponseEntity<Cliente> getClienteByEmail(@RequestParam String email) {
+        return clienteService.findByEmail(email)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

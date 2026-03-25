@@ -12,6 +12,8 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     
     Optional<Cliente> findByNif(String nif);
     
+    Optional<Cliente> findByEmailIgnoreCase(String email);
+
     List<Cliente> findByNomeContainingIgnoreCase(String nome);
     
     List<Cliente> findByTelefoneContaining(String telefone);
