@@ -1,4 +1,49 @@
-<div class="dashboard">
+<div class="dashboard" [class.assistant-open]="showAccessAssistant">
+  @if (showAccessAssistant) {
+    <div class="client-assistant-overlay" role="dialog" aria-modal="true" aria-labelledby="assistente-title">
+      <div class="client-assistant-modal">
+        <div class="assistant-badge">ASSISTENTE</div>
+        <h2 id="assistente-title">Área reservada para os nossos clientes</h2>
+        <p class="assistant-subtitle">
+          Clientes são quem já utilizou os nossos serviços, tem factura emitida ou pagamento registado.
+        </p>
+
+        <div class="assistant-step-tabs">
+          <button type="button" class="assistant-tab" [class.active]="accessStep === 'inicio'" (click)="accessStep = 'inicio'">Início</button>
+          <button type="button" class="assistant-tab" [class.active]="accessStep === 'ja-cliente'" (click)="accessStep = 'ja-cliente'">Já sou cliente</button>
+          <button type="button" class="assistant-tab" [class.active]="accessStep === 'nao-cliente'" (click)="accessStep = 'nao-cliente'">Ainda não sou cliente</button>
+        </div>
+
+        @if (accessStep === 'inicio') {
+          <div class="assistant-panel">
+            <p>Se já és cliente, inicia sessão para veres os teus pedidos, cotações e facturas.</p>
+            <p>Se ainda não és cliente, fala connosco em contacto para activar o teu acesso.</p>
+            <div class="assistant-actions">
+              <button type="button" class="btn-secondary" (click)="accessStep = 'nao-cliente'">Ainda não sou cliente</button>
+              <button type="button" class="btn-primary" (click)="accessStep = 'ja-cliente'">Já sou cliente</button>
+            </div>
+          </div>
+        }
+
+        @if (accessStep === 'ja-cliente') {
+          <div class="assistant-panel">
+            <p>Perfeito. Clica em entrar para fazer login na tua área.</p>
+            <button type="button" class="btn-primary" (click)="goToLogin()">Entrar</button>
+          </div>
+        }
+
+        @if (accessStep === 'nao-cliente') {
+          <div class="assistant-panel">
+            <p>Ainda não tens acesso. Escolhe uma opção para avançar:</p>
+            <div class="assistant-actions">
+              <a class="btn-secondary assistant-link" routerLink="/servicos">Ver serviços</a>
+              <a class="btn-primary assistant-link" routerLink="/contacto">Ir para contacto</a>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
   <!-- Sidebar -->
   <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
     <div class="sidebar-header">
@@ -85,7 +130,7 @@
   <main class="dashboard-main" [class.sidebar-collapsed]="sidebarCollapsed">
     <div class="topbar">
       <div class="topbar-left">
-        <p class="topbar-greeting">{{ greeting }}, <strong>Cliente Exemplo</strong></p>
+        <p class="topbar-greeting">{{ greeting }}, <strong>{{ client?.nome || 'Cliente' }}</strong></p>
         <h1 class="topbar-title">
           @if (activeTab === 'dashboard') { Dashboard }
           @if (activeTab === 'produtos') { Os meus pedidos }
@@ -108,7 +153,7 @@
         <div class="topbar-divider"></div>
         <div class="topbar-user">
           <div class="topbar-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-          <div class="topbar-user-info"><span class="topbar-username">Cliente Exemplo</span><span class="topbar-email">cliente&#64;exemplo.com</span></div>
+          <div class="topbar-user-info"><span class="topbar-username">{{ client?.nome || '—' }}</span><span class="topbar-email">{{ client?.email || '' }}</span></div>
         </div>
         <div class="topbar-divider"></div>
         <a routerLink="/" class="topbar-logout">
@@ -140,7 +185,7 @@
           </div>
           <div class="stat-number">{{ deliveredCount }}</div>
           <div class="stat-label">Entregas concluídas</div>
-          <div class="stat-bar"><div class="stat-bar-fill" [style.width.%]="(deliveredCount / totalOrders) * 100"></div></div>
+          <div class="stat-bar"><div class="stat-bar-fill" [style.width.%]="deliveredPct"></div></div>
           <div class="stat-sub">{{ deliveredCount }} de {{ totalOrders }} pedidos</div>
         </div>
       </div>
@@ -152,7 +197,7 @@
           </div>
           <div class="stat-number">{{ pendingOrders.length }}</div>
           <div class="stat-label">Por entregar</div>
-          <div class="stat-bar"><div class="stat-bar-fill" [style.width.%]="(pendingOrders.length / totalOrders) * 100"></div></div>
+          <div class="stat-bar"><div class="stat-bar-fill" [style.width.%]="undeliveredPct"></div></div>
           <div class="stat-sub">{{ inTransitCount }} em trânsito agora</div>
         </div>
       </div>
@@ -164,8 +209,8 @@
           </div>
           <div class="stat-number">{{ quotes.length }}</div>
           <div class="stat-label">Cotações</div>
-          <div class="stat-bar"><div class="stat-bar-fill" style="width:75%"></div></div>
-          <div class="stat-sub">2 aprovadas este mês</div>
+          <div class="stat-bar"><div class="stat-bar-fill" [style.width.%]="aprovadasProgressPct"></div></div>
+          <div class="stat-sub">{{ aprovadasCount }} aprovadas</div>
         </div>
       </div>
     </div>
@@ -192,7 +237,7 @@
           </div>
           <div class="chart-total-row">
             <span class="chart-total-label">Total do período</span>
-            <span class="chart-total-value">31 pedidos</span>
+            <span class="chart-total-value">{{ totalOrders }} pedidos</span>
           </div>
         </div>
         <div class="client-panel chart-panel">
@@ -208,10 +253,10 @@
               </div>
             </div>
             <div class="donut-legend">
-              <div class="legend-item"><span class="legend-dot" style="background:#16a34a"></span><span class="legend-label">Entregue</span><span class="legend-count">{{ deliveredCount }}</span><span class="legend-pct">{{ (deliveredCount / totalOrders * 100) | number:'1.0-0' }}%</span></div>
-              <div class="legend-item"><span class="legend-dot" style="background:#0284c7"></span><span class="legend-label">Em trânsito</span><span class="legend-count">{{ inTransitCount }}</span><span class="legend-pct">{{ (inTransitCount / totalOrders * 100) | number:'1.0-0' }}%</span></div>
-              <div class="legend-item"><span class="legend-dot" style="background:#ea580c"></span><span class="legend-label">Pendente</span><span class="legend-count">{{ pendingCount }}</span><span class="legend-pct">{{ (pendingCount / totalOrders * 100) | number:'1.0-0' }}%</span></div>
-              <div class="legend-item"><span class="legend-dot" style="background:#7c3aed"></span><span class="legend-label">Processamento</span><span class="legend-count">{{ processingCount }}</span><span class="legend-pct">{{ (processingCount / totalOrders * 100) | number:'1.0-0' }}%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#16a34a"></span><span class="legend-label">Entregue</span><span class="legend-count">{{ deliveredCount }}</span><span class="legend-pct">{{ deliveredPct | number:'1.0-0' }}%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#0284c7"></span><span class="legend-label">Em trânsito</span><span class="legend-count">{{ inTransitCount }}</span><span class="legend-pct">{{ inTransitPct | number:'1.0-0' }}%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#ea580c"></span><span class="legend-label">Pendente</span><span class="legend-count">{{ pendingCount }}</span><span class="legend-pct">{{ pendingCountPct | number:'1.0-0' }}%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#7c3aed"></span><span class="legend-label">Processamento</span><span class="legend-count">{{ processingCount }}</span><span class="legend-pct">{{ processingCountPct | number:'1.0-0' }}%</span></div>
             </div>
           </div>
         </div>
@@ -380,14 +425,14 @@
         <div class="profile-grid">
           <div class="profile-card">
             <div class="profile-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-            <h3 class="profile-name">Cliente Exemplo</h3><p class="profile-email">cliente&#64;exemplo.com</p>
+            <h3 class="profile-name">{{ client?.nome || '—' }}</h3><p class="profile-email">{{ client?.email || '' }}</p>
           </div>
           <div class="profile-details">
-            <div class="profile-field"><span class="profile-label">Nome completo</span><span class="profile-value">Cliente Exemplo Lda.</span></div>
-            <div class="profile-field"><span class="profile-label">NUIT</span><span class="profile-value">400123456</span></div>
-            <div class="profile-field"><span class="profile-label">Telefone</span><span class="profile-value">+258 84 000 0000</span></div>
-            <div class="profile-field"><span class="profile-label">Endereço</span><span class="profile-value">Av. 25 de Setembro, Maputo</span></div>
-            <div class="profile-field"><span class="profile-label">Cliente desde</span><span class="profile-value">Janeiro 2024</span></div>
+            <div class="profile-field"><span class="profile-label">Nome completo</span><span class="profile-value">{{ client?.nome || '—' }}</span></div>
+            <div class="profile-field"><span class="profile-label">NUIT</span><span class="profile-value">{{ client?.nif || '—' }}</span></div>
+            <div class="profile-field"><span class="profile-label">Telefone</span><span class="profile-value">{{ client?.telefone || '—' }}</span></div>
+            <div class="profile-field"><span class="profile-label">Endereço</span><span class="profile-value">{{ client?.endereco || '—' }}</span></div>
+            <div class="profile-field"><span class="profile-label">Cliente desde</span><span class="profile-value">—</span></div>
           </div>
         </div>
       </div>

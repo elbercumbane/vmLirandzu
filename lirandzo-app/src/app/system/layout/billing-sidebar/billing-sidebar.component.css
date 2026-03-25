@@ -34,40 +34,6 @@
   transform: translateX(0);
 }
 
-/* Header */
-.billing-sidebar-header {
-  padding: 1.1rem 1rem 1.1rem 1.25rem;
-  border-bottom: 1px solid var(--border-subtle);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.billing-sidebar-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-}
-
-.billing-sidebar-logo-mark {
-  width: 36px;
-  height: 36px;
-  border-radius: 0.55rem;
-  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 0.8rem;
-  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
-  flex-shrink: 0;
-}
-
-.billing-sidebar-logo-mark svg {
-  display: block;
-}
-
 /* Nav */
 .billing-sidebar-nav {
   flex: 1;

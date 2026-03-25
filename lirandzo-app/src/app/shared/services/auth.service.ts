@@ -4,6 +4,7 @@ import { Observable, map, of } from 'rxjs';
 import { environment } from '@environments/environment';
 
 export type UserRole = 'admin' | 'gestor' | 'tecnico' | null;
+export type AccessContext = 'sistema' | 'cliente';
 
 export interface UserProfile {
   id: number;
@@ -32,6 +33,7 @@ export class AuthService {
   private readonly http = inject(HttpClient);
 
   readonly currentUser = signal<UserProfile | null>(null);
+  readonly accessContext = signal<AccessContext>('sistema');
   private loginTime: number | null = null;
 
   get isLoggedIn(): boolean { return this.currentUser() !== null; }
@@ -61,7 +63,7 @@ export class AuthService {
   canDeactivateAccount(): boolean { return this.role === 'admin' || this.role === 'gestor'; }
   canAccessConfiguracoes(): boolean { return this.role === 'admin' || this.role === 'gestor'; }
 
-  login(username: string, password: string): Observable<UserProfile | null> {
+  login(username: string, password: string, context: AccessContext = 'sistema'): Observable<UserProfile | null> {
     // MODO DESENVOLVIMENTO: não validar credenciais, entrar sempre no dashboard
     if (!environment.production) {
       const nome = username || 'Admin Dev';
@@ -73,6 +75,7 @@ export class AuthService {
         avatar: nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
       };
       this.currentUser.set(profile);
+      this.accessContext.set(context);
       this.loginTime = Date.now();
       return of(profile);
     }
@@ -88,14 +91,24 @@ export class AuthService {
           avatar: res.nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
         };
         this.currentUser.set(profile);
+        this.accessContext.set(context);
         this.loginTime = Date.now();
         return profile;
       })
     );
   }
 
+  canAccessSistema(): boolean {
+    return this.isLoggedIn && this.accessContext() === 'sistema';
+  }
+
+  canAccessAreaCliente(): boolean {
+    return this.isLoggedIn && this.accessContext() === 'cliente';
+  }
+
   logout(): void {
     this.currentUser.set(null);
+    this.accessContext.set('sistema');
     this.loginTime = null;
   }
 }

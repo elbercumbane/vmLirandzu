@@ -34,6 +34,12 @@ export class ClienteService {
     return this.http.get<Cliente[]>(`${this.apiUrl}/clientes/search`, { params });
   }
 
+  obterClientePorEmail(email: string): Observable<Cliente> {
+    return this.http.get<Cliente>(`${this.apiUrl}/clientes/by-email`, {
+      params: { email }
+    });
+  }
+
   criarCliente(cliente: Cliente): Observable<Cliente> {
     return this.http.post<Cliente>(`${this.apiUrl}/clientes`, cliente);
   }

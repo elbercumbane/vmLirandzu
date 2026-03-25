@@ -1,7 +1,12 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
+import { AuthService } from '../../shared/services/auth.service';
+import { Cliente, ClienteService } from '../../services/cliente.service';
+import { EncomendaService, EncomendaResponse } from '../../services/encomenda.service';
+import { CotacaoService, CotacaoResponse } from '../../services/cotacao.service';
 
 interface Order {
   id: string;
@@ -48,6 +53,17 @@ export class ClientAreaComponent implements OnInit, OnDestroy {
   private clockInterval: ReturnType<typeof setInterval> | null = null;
 
   selectedOrder: Order | null = null;
+
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly clienteService = inject(ClienteService);
+  private readonly encomendaService = inject(EncomendaService);
+  private readonly cotacaoService = inject(CotacaoService);
+
+  client: Cliente | null = null;
+  isLoadingClient = true;
+  showAccessAssistant = false;
+  accessStep: 'inicio' | 'ja-cliente' | 'nao-cliente' = 'inicio';
 
   filterYear = '2026';
   filterDateFrom = '';
@@ -190,6 +206,15 @@ export class ClientAreaComponent implements OnInit, OnDestroy {
   get pendingCount(): number { return this.orders.filter(o => o.status === 'pendente').length; }
   get processingCount(): number { return this.orders.filter(o => o.status === 'em_processamento').length; }
 
+  get deliveredPct(): number { return this.totalOrders ? (this.deliveredCount / this.totalOrders) * 100 : 0; }
+  get undeliveredPct(): number { return this.totalOrders ? (this.pendingOrders.length / this.totalOrders) * 100 : 0; }
+  get inTransitPct(): number { return this.totalOrders ? (this.inTransitCount / this.totalOrders) * 100 : 0; }
+  get pendingCountPct(): number { return this.totalOrders ? (this.pendingCount / this.totalOrders) * 100 : 0; }
+  get processingCountPct(): number { return this.totalOrders ? (this.processingCount / this.totalOrders) * 100 : 0; }
+
+  get aprovadasCount(): number { return this.quotes.filter(q => q.status === 'aprovada').length; }
+  get aprovadasProgressPct(): number { return this.quotes.length ? (this.aprovadasCount / this.quotes.length) * 100 : 0; }
+
   get statusDonut(): string {
     const total = this.totalOrders;
     if (total === 0) return 'conic-gradient(#e2e8f0 0deg 360deg)';
@@ -209,6 +234,7 @@ export class ClientAreaComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.updateClock();
     this.clockInterval = setInterval(() => this.updateClock(), 1000);
+    this.bootstrapClientArea();
   }
 
   ngOnDestroy(): void {
@@ -232,6 +258,202 @@ export class ClientAreaComponent implements OnInit, OnDestroy {
     return new Date(+y, +m - 1, +d);
   }
 
+  private bootstrapClientArea(): void {
+    if (!this.auth.isLoggedIn) {
+      this.isLoadingClient = false;
+      this.showAccessAssistant = true;
+      return;
+    }
+
+    const email = this.auth.currentUser()?.email;
+    if (!email) return;
+
+    this.isLoadingClient = true;
+    this.clienteService.obterClientePorEmail(email).subscribe({
+      next: (cliente: Cliente) => {
+        this.client = cliente;
+        const clienteId = cliente.id;
+        if (!clienteId) {
+          this.isLoadingClient = false;
+          return;
+        }
+        this.loadClientData(clienteId);
+      },
+      error: () => {
+        // Mantém os dados de exemplo caso o cliente não seja encontrado.
+        this.isLoadingClient = false;
+      }
+    });
+  }
+
+  goToLogin(): void {
+    this.router.navigate(['/login-cliente'], { queryParams: { returnUrl: '/area-cliente' } });
+  }
+
+  private loadClientData(clienteId: number): void {
+    forkJoin({
+      encomendas: this.encomendaService.listarEncomendasPorCliente(clienteId),
+      cotacoes: this.cotacaoService.listarCotacoesPorCliente(clienteId)
+    }).subscribe({
+      next: ({ encomendas, cotacoes }) => {
+        this.orders = encomendas.map(e => this.mapEncomendaToOrder(e));
+        this.quotes = cotacoes.map(c => this.mapCotacaoToQuote(c));
+
+        this.rebuildYearFilters();
+        this.rebuildMonthlyOrders();
+        this.isLoadingClient = false;
+      },
+      error: () => {
+        this.isLoadingClient = false;
+      }
+    });
+  }
+
+  private mapEncomendaToOrder(encomenda: EncomendaResponse): Order {
+    const rawDate = (encomenda as any).dataEncomenda ?? encomenda.dataEncomenda ?? (encomenda as any).dataCriacao ?? '';
+    const date = this.formatBackendDate(rawDate) || '';
+    const baseDate = date ? this.parseDate(date) : new Date();
+
+    const statusRaw = String((encomenda as any).status ?? '').toUpperCase();
+    if (statusRaw === 'PAID') {
+      return {
+        id: encomenda.invoiceNumber ? String(encomenda.invoiceNumber) : `LRZ-${encomenda.numeroEncomenda}`,
+        date,
+        origin: encomenda.origem,
+        destination: encomenda.destino,
+        status: 'entregue',
+        statusLabel: 'Entregue',
+        progress: 100,
+        lastUpdate: this.formatBackendDateTime((encomenda as any).dataAtualizacao ?? (encomenda as any).dataCriacao),
+        estimatedDelivery: date ? this.formatBackendDate(this.toISODate(this.addDays(baseDate, 7))) : undefined
+      };
+    }
+
+    if (statusRaw === 'PARTIAL') {
+      return {
+        id: encomenda.invoiceNumber ? String(encomenda.invoiceNumber) : `LRZ-${encomenda.numeroEncomenda}`,
+        date,
+        origin: encomenda.origem,
+        destination: encomenda.destino,
+        status: 'em_processamento',
+        statusLabel: 'Em processamento',
+        progress: 55,
+        lastUpdate: this.formatBackendDateTime((encomenda as any).dataAtualizacao ?? (encomenda as any).dataCriacao),
+        estimatedDelivery: date ? this.formatBackendDate(this.toISODate(this.addDays(baseDate, 7))) : undefined
+      };
+    }
+
+    return {
+      id: encomenda.invoiceNumber ? String(encomenda.invoiceNumber) : `LRZ-${encomenda.numeroEncomenda}`,
+      date,
+      origin: encomenda.origem,
+      destination: encomenda.destino,
+      status: 'pendente',
+      statusLabel: 'Pendente',
+      progress: 0,
+      lastUpdate: this.formatBackendDateTime((encomenda as any).dataAtualizacao ?? (encomenda as any).dataCriacao),
+      estimatedDelivery: date ? this.formatBackendDate(this.toISODate(this.addDays(baseDate, 7))) : undefined
+    };
+  }
+
+  private mapCotacaoToQuote(cotacao: CotacaoResponse): Quote {
+    const date = this.formatBackendDate(cotacao.dataCotacao) || '';
+
+    const statusRaw = String(cotacao.status ?? '').toUpperCase();
+    let status: Quote['status'] = 'pendente';
+    let statusLabel = 'Pendente';
+
+    if (statusRaw === 'EXPIRED' || statusRaw === 'CANCELLED') {
+      status = 'expirada';
+      statusLabel = 'Expirada';
+    } else if (statusRaw === 'RESPONDED' || statusRaw === 'QUOTATION_GENERATED' || statusRaw === 'INVOICED') {
+      status = 'aprovada';
+      statusLabel = 'Aprovada';
+    }
+
+    const value = typeof cotacao.valorTotal === 'number'
+      ? `${this.formatNumberMZN(cotacao.valorTotal)} MZN`
+      : '—';
+
+    return {
+      id: cotacao.referencia ? String(cotacao.referencia) : `COT-${cotacao.id}`,
+      date,
+      description: cotacao.descricaoCarga ? cotacao.descricaoCarga : `${cotacao.origem} → ${cotacao.destino}`,
+      status,
+      statusLabel,
+      value
+    };
+  }
+
+  private rebuildYearFilters(): void {
+    const years = Array.from(new Set(this.orders.map(o => o.date.split('/')[2]).filter(Boolean))).sort();
+    this.availableYears = years.length ? years : [String(new Date().getFullYear())];
+    if (!this.filterYear || !this.availableYears.includes(this.filterYear)) {
+      this.filterYear = this.availableYears[this.availableYears.length - 1];
+    }
+  }
+
+  private rebuildMonthlyOrders(): void {
+    const monthShort = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const now = new Date();
+    const monthStarts = Array.from({ length: 6 }, (_, i) => new Date(now.getFullYear(), now.getMonth() - (5 - i), 1));
+
+    const counts = monthStarts.map(ms => {
+      return this.orders.filter(o => {
+        if (!o.date) return false;
+        const d = this.parseDate(o.date);
+        return d.getFullYear() === ms.getFullYear() && d.getMonth() === ms.getMonth();
+      }).length;
+    });
+
+    const max = Math.max(...counts, 0);
+    this.monthlyOrders = monthStarts.map((ms, idx) => ({
+      month: monthShort[ms.getMonth()],
+      count: counts[idx],
+      pct: max ? Math.round((counts[idx] / max) * 100) : 0
+    }));
+  }
+
+  private formatBackendDate(dateStr?: string): string {
+    if (!dateStr) return '';
+    const s = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+    if (m) return `${m[3]}/${m[2]}/${m[1]}`;
+
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yy = d.getFullYear();
+    return `${dd}/${mm}/${yy}`;
+  }
+
+  private formatBackendDateTime(dateTimeStr?: string): string | undefined {
+    if (!dateTimeStr) return undefined;
+    const d = new Date(dateTimeStr);
+    if (isNaN(d.getTime())) return this.formatBackendDate(dateTimeStr);
+    return d.toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+
+  private addDays(date: Date, days: number): Date {
+    const d = new Date(date);
+    d.setDate(d.getDate() + days);
+    return d;
+  }
+
+  private toISODate(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  private formatNumberMZN(value: number): string {
+    const formatted = new Intl.NumberFormat('pt-MZ', { maximumFractionDigits: 0 }).format(value);
+    // pt-MZ pode usar '.' como separador de milhares — convertemos para espaço.
+    return formatted.replace(/\./g, ' ');
+  }
+
   setTab(tab: 'dashboard' | 'produtos' | 'cotacoes' | 'rastreio' | 'perfil'): void {
     this.activeTab = tab;
     if (tab !== 'rastreio') this.selectedOrder = null;
@@ -243,7 +465,7 @@ export class ClientAreaComponent implements OnInit, OnDestroy {
   }
 
   clearFilters(): void {
-    this.filterYear = '2026';
+    this.filterYear = '';
     this.filterDateFrom = '';
     this.filterDateTo = '';
     this.filterStatus = '';

@@ -143,6 +143,23 @@
   padding: 2rem;
 }
 
+/* Modo «autoPdf»: não queremos mostrar o preview ao operador,
+   apenas garantir que o conteúdo exista no DOM para gerar o PDF. */
+.preview-modal-overlay.auto-pdf {
+  background: transparent;
+  backdrop-filter: none;
+  opacity: 0.01;
+  padding: 0;
+}
+
+.preview-modal-overlay.auto-pdf .preview-modal {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  max-width: none;
+  max-height: none;
+}
+
 .preview-modal {
   background: var(--bg-primary);
   border-radius: 0.75rem;

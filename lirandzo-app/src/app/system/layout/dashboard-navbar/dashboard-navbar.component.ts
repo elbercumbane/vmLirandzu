@@ -209,7 +209,7 @@ export class DashboardNavbarComponent implements OnInit, OnDestroy {
 
   logout(): void {
     this.auth.logout();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/login-sistema']);
     this.openDropdown = null;
   }
 }

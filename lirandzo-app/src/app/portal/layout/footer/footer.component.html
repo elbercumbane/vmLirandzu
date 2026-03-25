@@ -28,7 +28,7 @@
       <a routerLink="/orcamento">{{ 'nav.quote' | transloco }}</a>
       <a routerLink="/faq">{{ 'nav.faq' | transloco }}</a>
       <a routerLink="/noticias">{{ 'nav.news' | transloco }}</a>
-      <a routerLink="/area-cliente">{{ 'nav.clientArea' | transloco }}</a>
+      <a routerLink="/login-cliente" [queryParams]="{ returnUrl: '/area-cliente' }">{{ 'nav.clientArea' | transloco }}</a>
       <a routerLink="/contato">{{ 'nav.contact' | transloco }}</a>
       <a routerLink="/avaliacoes" class="footer-avalia">{{ 'footer.rateUs' | transloco }}</a>
     </div>

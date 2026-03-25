@@ -96,6 +96,10 @@ export class CotacaoService {
     return this.http.get<CotacaoResponse[]>(`${this.apiUrl}/cotacoes`, { params });
   }
 
+  listarCotacoesPorCliente(clienteId: number): Observable<CotacaoResponse[]> {
+    return this.http.get<CotacaoResponse[]>(`${this.apiUrl}/cotacoes/cliente/${clienteId}`);
+  }
+
   obterCotacao(id: number): Observable<CotacaoResponse> {
     return this.http.get<CotacaoResponse>(`${this.apiUrl}/cotacoes/${id}`);
   }

@@ -38,7 +38,10 @@ export class AppComponent {
     });
 
     const hideChrome = (u: string) =>
-      u.startsWith('/area-cliente') || u.startsWith('/billing') || u.startsWith('/login') || u.startsWith('/recuperar-senha');
+      u.startsWith('/area-cliente') ||
+      u.startsWith('/billing') ||
+      u.startsWith('/login') ||
+      u.startsWith('/recuperar-senha');
     this.showChrome = !hideChrome(this.router.url);
     this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))

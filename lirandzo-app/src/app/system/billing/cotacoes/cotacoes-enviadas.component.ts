@@ -31,6 +31,7 @@ interface CotacaoEnviadaDisplay {
   tempoResposta: string;
   formaEnvio: string;
   formaEnvioRaw: string;
+  ajusteInfo?: string;
 }
 
 @Component({
@@ -50,14 +51,14 @@ export class CotacoesEnviadasComponent implements OnInit {
   /** Rota `/billing/cotacoes/para-facturar`: só emissão de factura, sem duplicar lógica de comercial. */
   modoParaFacturar = false;
 
-  pageTitle = 'Cotações enviadas';
-  pageSubtitle = 'Propostas geradas: negocie, registe a aceitação do contacto e só depois facture noutro passo';
+  pageTitle = 'Cotações em negociação & ajuste';
+  pageSubtitle = 'Negocie e ajuste preços; em seguida facture após aceitação do contacto';
   helpTitle = 'Fluxo comercial';
   helpItems: string[] = [
     'Quem pede cotação é um contacto — só passa a «cliente» no sentido de facturação quando existe documento (encomenda/factura).',
     '«Proposta pronta»: ainda pode ajustar valores no ecrã de gerar cotação antes de o contacto aceitar.',
     '«Registar aceitação»: use quando o contacto confirmou a proposta (telefone, WhatsApp, e-mail). Depois vá a Facturação → Cotações para facturar.',
-    '«Anular proposta»: a negociação não segue; não gera factura.'
+    'As cotações expiram automaticamente após a validade definida no sistema.'
   ];
 
   highlightId: number | null = null;
@@ -114,14 +115,14 @@ export class CotacoesEnviadasComponent implements OnInit {
         'Emitir factura cria a encomenda e liga à cotação; aí sim o contacto entra no circuito de cliente facturado.'
       ];
     } else {
-      this.pageTitle = 'Cotações enviadas';
-      this.pageSubtitle = 'Propostas geradas: negocie, registe a aceitação do contacto e só depois facture noutro passo';
+      this.pageTitle = 'Cotações em negociação & ajuste';
+      this.pageSubtitle = 'Negocie e ajuste preços; em seguida facture após aceitação do contacto';
       this.helpTitle = 'Fluxo comercial';
       this.helpItems = [
         'Quem pede cotação é um contacto — só passa a «cliente» no sentido de facturação quando existe documento (encomenda/factura).',
         '«Proposta pronta»: ainda pode ajustar valores no ecrã de gerar cotação antes de o contacto aceitar.',
         '«Registar aceitação»: use quando o contacto confirmou a proposta. A factura emite-se em Facturação → Cotações para facturar.',
-        '«Anular proposta»: a negociação não segue.'
+        'As cotações expiram automaticamente após a validade definida no sistema.'
       ];
     }
   }
@@ -239,6 +240,14 @@ export class CotacoesEnviadasComponent implements OnInit {
         ? c.formaEnvioPreferida
         : '';
 
+    const condicoesUpper = (c.condicoes || '').toUpperCase();
+    const ajusteInfo =
+      condicoesUpper.includes('AJUSTE_APOS_ACEITE')
+        ? 'Ajuste após aceitação'
+        : condicoesUpper.includes('AJUSTE_PRECO')
+          ? 'Ajuste de preço'
+          : undefined;
+
     return {
       id: c.id,
       ref: c.referencia || `COT-${new Date().getFullYear()}-${String(c.id).padStart(3, '0')}`,
@@ -255,7 +264,8 @@ export class CotacoesEnviadasComponent implements OnInit {
       dataResposta,
       tempoResposta: tempoResposta || '—',
       formaEnvio,
-      formaEnvioRaw
+      formaEnvioRaw,
+      ajusteInfo
     };
   }
 

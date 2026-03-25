@@ -76,6 +76,10 @@ export class CotacoesCadastroComponent implements OnInit {
   private ultimaCotacaoRef: string = '';
   private clienteIdAtual: number | null = null;
   modoPortal: boolean = false;
+  /** Status vindo do backend ao abrir uma cotação existente (ajuste / PDF). */
+  private statusBackendCarregado: string | null = null;
+  /** True quando a rota tem :id (ajuste de proposta existente). */
+  edicaoCotacaoExistente = false;
 
   constructor(
     private cotacaoService: CotacaoService,
@@ -101,10 +105,87 @@ export class CotacoesCadastroComponent implements OnInit {
     // Verificar se há um ID na rota (pedido existente)
     this.route.params.subscribe(params => {
       const pedidoId = params['id'];
+      this.edicaoCotacaoExistente = !!pedidoId;
       if (pedidoId) {
         this.carregarDadosPedido(Number(pedidoId));
+      } else {
+        this.statusBackendCarregado = null;
       }
     });
+  }
+
+  get tituloPaginaCotacao(): string {
+    if (this.modoPdfOnly && this.modoAutoPdf) return 'A gerar documento';
+    if (this.modoPdfOnly) return 'Documento da cotação';
+    return this.edicaoCotacaoExistente ? 'Ajustar cotação' : 'Criar Cotação';
+  }
+
+  get subtituloPaginaCotacao(): string {
+    if (this.modoPdfOnly && this.modoAutoPdf) {
+      return 'O PDF abrirá num novo separador do browser.';
+    }
+    if (this.modoPdfOnly) {
+      return 'Pré-visualização ou descarga do PDF desta cotação.';
+    }
+    return this.edicaoCotacaoExistente
+      ? 'Carregamos os dados guardados da última proposta — altere valores e volte a finalizar ou enviar.'
+      : 'Crie e envie cotações profissionais para os clientes';
+  }
+
+  /** Mantém o estado comercial ao gravar rascunho (evita desaparecer da lista «Propostas»). */
+  private statusAoGravarRascunho(): string {
+    const s = (this.statusBackendCarregado || '').toUpperCase();
+    if (s === 'RESPONDED' || s === 'RESPONDIDO') return 'RESPONDED';
+    if (s === 'INVOICED' || s === 'FACTURADA') return 'INVOICED';
+    if (
+      s === 'QUOTATION_GENERATED' ||
+      s === 'COTACAO_GERADA' ||
+      s === 'COTACAO GERADA'
+    ) {
+      return this.STATUS_COTACAO_GERADA_BACKEND;
+    }
+    return this.STATUS_PENDENTE_BACKEND;
+  }
+
+  private sincronizarTotaisFinanceirosParaPayload(): void {
+    this.recalcularCamposFinanceiros();
+  }
+
+  private camposFinanceirosRequest(): Pick<
+    CotacaoRequest,
+    'discountAmount' | 'vatAmount' | 'vatRate' | 'vatReason' | 'tipoServico'
+  > {
+    this.sincronizarTotaisFinanceirosParaPayload();
+    return {
+      tipoServico: this.cotacao.tipoServico || undefined,
+      discountAmount: this.cotacao.discountAmount ?? undefined,
+      vatAmount: this.cotacao.vatAmount ?? undefined,
+      vatRate: this.cotacao.vatRate ?? undefined,
+      vatReason: this.cotacao.vatReason || undefined
+    };
+  }
+
+  /**
+   * Quando o backend tem valor total mas as linhas vieram só com texto (sem preços), reparte o valor pelos itens.
+   */
+  private repartirValorTotalNosItensSeNecessario(cotacao: CotacaoResponse): void {
+    const valorRef = cotacao.valorTotal;
+    if (valorRef == null || valorRef <= 0 || !this.itens.length) return;
+
+    const somaLinhas = this.itens.reduce((acc, i) => acc + (i.precoUnitario ?? 0), 0);
+    if (somaLinhas > 0.01) return;
+
+    const recolha = cotacao.custoRecolha ?? 0;
+    const baseItens = Math.max(0, valorRef - recolha);
+    if (baseItens <= 0) return;
+
+    const n = this.itens.length;
+    const porLinha = Math.round((baseItens / n) * 100) / 100;
+    let resto = baseItens - porLinha * (n - 1);
+    this.itens = this.itens.map((it, idx) => ({
+      ...it,
+      precoUnitario: idx === n - 1 ? Math.round(resto * 100) / 100 : porLinha
+    }));
   }
 
   carregarDadosPedido(pedidoId: number): void {
@@ -114,6 +195,7 @@ export class CotacoesCadastroComponent implements OnInit {
 
     this.cotacaoService.obterCotacao(pedidoId).subscribe({
       next: (cotacao: CotacaoResponse) => {
+        this.statusBackendCarregado = cotacao.status || null;
         this.modoPortal = (cotacao.fontePedido || '').toUpperCase() === 'PORTAL';
 
         // Preencher automaticamente os dados do pedido
@@ -143,6 +225,9 @@ export class CotacoesCadastroComponent implements OnInit {
         this.cotacao.vatAmount = cotacao.vatAmount ?? 0;
         this.cotacao.vatRate = cotacao.vatRate ?? 0;
         this.cotacao.vatReason = cotacao.vatReason || 'ISENTO';
+        this.cotacao.custoRecolha = cotacao.custoRecolha ?? null;
+        this.cotacao.custoTransporte = cotacao.custoTransporte ?? null;
+        this.cotacao.custoBillOfEntry = cotacao.custoBillOfEntry ?? null;
 
         // Carregar custos e operador
         this.cotacao.custoRecolha = cotacao.custoRecolha ?? null;
@@ -165,6 +250,8 @@ export class CotacoesCadastroComponent implements OnInit {
             this.itens = [{ descricao: cotacao.descricaoCarga, quantidade: 1, unidade: '', precoUnitario: null }];
           }
         }
+
+        this.repartirValorTotalNosItensSeNecessario(cotacao);
         
         // Origem automática: PORTAL ou MANUAL
         const fonte = (cotacao.fontePedido || '').toUpperCase();
@@ -188,9 +275,9 @@ export class CotacoesCadastroComponent implements OnInit {
           setTimeout(() => {
             this.showPreview = true;
             if (this.modoAutoPdf) {
-              setTimeout(() => void this.abrirPdfEmNovaAba(), 900);
+              setTimeout(() => void this.abrirPdfEmNovaAba(), 1400);
             }
-          }, 500);
+          }, 400);
         }
       },
       error: (error: unknown) => {
@@ -344,9 +431,14 @@ export class CotacoesCadastroComponent implements OnInit {
         valorTotal: this.totalGeral > 0 ? this.totalGeral : undefined,
         custoRecolha: this.cotacao.custoRecolha || undefined,
         discountAmount: this.cotacao.discountAmount ?? undefined,
+        // Se estivermos a ajustar uma cotação já existente,
+        // mantemos o estado comercial para não “sair” da fila de facturação.
+        condicoes: this.edicaoCotacaoExistente
+          ? ((this.statusBackendCarregado || '').toUpperCase().includes('RESPONDED') ? 'AJUSTE_APOS_ACEITE' : 'AJUSTE_PRECO')
+          : undefined,
         dataCotacao: this.cotacao.data || new Date().toISOString().split('T')[0],
         dataValidade: this.cotacao.validade || undefined,
-        status: this.STATUS_PENDENTE_BACKEND,
+        status: this.edicaoCotacaoExistente ? this.statusAoGravarRascunho() : this.STATUS_PENDENTE_BACKEND,
         observacoes: this.cotacao.observacoes || undefined,
         formaEnvioPreferida: this.cotacao.formaEnvioPreferida || undefined,
         operador: this.cotacao.operador || undefined
@@ -423,10 +515,22 @@ export class CotacoesCadastroComponent implements OnInit {
         discountAmount: this.cotacao.discountAmount ?? undefined,
         dataCotacao: this.cotacao.data || new Date().toISOString().split('T')[0],
         dataValidade: this.cotacao.validade || undefined,
-        status: this.STATUS_COTACAO_GERADA_BACKEND,
+        // Ao ajustar uma cotação já aceite, mantemos o estado «aceite»
+        // para que continue na página de facturação.
+        status: (() => {
+          if (!this.edicaoCotacaoExistente) return this.STATUS_COTACAO_GERADA_BACKEND;
+          const s = (this.statusBackendCarregado || '').toUpperCase();
+          if (s === 'RESPONDED' || s === 'RESPONDIDO') return 'RESPONDED';
+          return this.STATUS_COTACAO_GERADA_BACKEND;
+        })(),
         observacoes: this.cotacao.observacoes || undefined,
         formaEnvioPreferida: this.cotacao.formaEnvioPreferida || undefined,
-        operador: this.cotacao.operador || undefined
+        operador: this.cotacao.operador || undefined,
+        condicoes: this.edicaoCotacaoExistente
+          ? ((this.statusBackendCarregado || '').toUpperCase() === 'RESPONDED' || (this.statusBackendCarregado || '').toUpperCase() === 'RESPONDIDO'
+              ? 'AJUSTE_APOS_ACEITE'
+              : 'AJUSTE_PRECO')
+          : undefined
       };
 
       await new Promise<void>((resolve, reject) => {
@@ -452,7 +556,12 @@ export class CotacoesCadastroComponent implements OnInit {
 
       // Popup final para concluir.
       this.mostrarNotificacao('Cotação finalizada com sucesso!', 'success');
-      this.router.navigate(['/billing/cotacoes/enviadas']);
+      const statusFinalUpper = (payloadFinal.status || '').toUpperCase();
+      if (statusFinalUpper === 'RESPONDED') {
+        this.router.navigate(['/billing/cotacoes/para-facturar']);
+      } else {
+        this.router.navigate(['/billing/cotacoes/enviadas']);
+      }
     } catch (e) {
       this.mostrarNotificacao('Erro ao finalizar a cotação', 'error');
     }
@@ -880,9 +989,11 @@ export class CotacoesCadastroComponent implements OnInit {
       const blobUrl = (await html2pdf().set(opt).from(element).outputPdf('bloburl')) as string;
       window.open(blobUrl, '_blank', 'noopener,noreferrer');
       this.fecharPreview();
-      setTimeout(() => {
-        this.router.navigate(['/billing/cotacoes/enviadas']);
-      }, 200);
+      if (!this.modoAutoPdf) {
+        setTimeout(() => {
+          this.router.navigate(['/billing/cotacoes/enviadas']);
+        }, 200);
+      }
     } catch (error: unknown) {
       console.error('Erro ao gerar PDF:', error);
       this.mostrarNotificacao('Erro ao gerar PDF. Tente novamente.', 'error');

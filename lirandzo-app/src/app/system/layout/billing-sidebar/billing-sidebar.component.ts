@@ -28,9 +28,13 @@ export class BillingSidebarComponent implements OnInit, OnDestroy {
     this.tempoLogado = this.auth.getTempoLogado();
     // Expandir menu activo conforme rota
     const url = this.router.url;
-    if (url.includes('/cotacoes')) this.expandedMenus['cotacoes'] = true;
-    else if (url.includes('/clientes')) this.expandedMenus['clientes'] = true;
-    else if (url.includes('/encomendas') || url.includes('/baixas') || url.includes('/tesouraria') || url.includes('/para-facturar')) this.expandedMenus['facturacao'] = true;
+    if (url.includes('/encomendas') || url.includes('/baixas') || url.includes('/tesouraria') || url.includes('/para-facturar')) {
+      this.expandedMenus['facturacao'] = true;
+    } else if (url.includes('/cotacoes')) {
+      this.expandedMenus['cotacoes'] = true;
+    } else if (url.includes('/clientes')) {
+      this.expandedMenus['clientes'] = true;
+    }
     else if (url.includes('/guias')) this.expandedMenus['guias'] = true;
     else if (url.includes('/viagens')) this.expandedMenus['viagens'] = true;
     else if (url.includes('/viaturas')) this.expandedMenus['viaturas'] = true;
@@ -61,7 +65,7 @@ export class BillingSidebarComponent implements OnInit, OnDestroy {
 
   logout(): void {
     this.auth.logout();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/login-sistema']);
     this.onToggle();
   }
 }

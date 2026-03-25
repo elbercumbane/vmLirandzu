@@ -54,6 +54,10 @@ public class ClienteService {
         return findAll();
     }
 
+    public Optional<Cliente> findByEmail(String email) {
+        return clienteRepository.findByEmailIgnoreCase(email);
+    }
+
     public List<Cliente> findClientesComDividas() {
         return clienteRepository.findByValorEmDividaGreaterThan(0.0);
     }

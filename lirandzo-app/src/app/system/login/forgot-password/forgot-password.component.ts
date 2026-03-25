@@ -26,6 +26,6 @@ export class ForgotPasswordComponent {
     if (this.form.invalid) return;
     this.submitted = true;
     this.success = true;
-    setTimeout(() => this.router.navigate(['/login']), 3000);
+    setTimeout(() => this.router.navigate(['/login-sistema']), 3000);
   }
 }
