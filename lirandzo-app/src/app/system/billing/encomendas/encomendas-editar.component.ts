@@ -86,8 +86,11 @@ export class EncomendasEditarComponent implements OnInit {
           console.log('Encomenda carregada:', encomendaApi);
           
           // Preencher formulário com dados existentes
+          // Número de factura e data
+          this.encomenda.numeroFactura = encomendaApi.invoiceNumber || String(encomendaApi.numeroEncomenda || '');
           this.encomenda.clienteNome = encomendaApi.cliente?.nome || '';
           this.encomenda.clienteTelefone = encomendaApi.cliente?.telefone || '';
+          this.encomenda.clienteContacto = encomendaApi.cliente?.contacto || '';
           this.encomenda.clienteNuit = encomendaApi.cliente?.nif || '';
           
           // Separar endereço em endereço e província
@@ -118,12 +121,8 @@ export class EncomendasEditarComponent implements OnInit {
             this.encomenda.data = '';
           }
           
-          // Produto como item único
-          this.itens = [{
-            quantidade: 1,
-            descricao: encomendaApi.produto || '',
-            precoUnitario: encomendaApi.valorTotal || null
-          }];
+          // Restaurar itens do campo produto (formato: "qtd x desc [PRECO:xxx]" ou simples)
+          this.itens = this.parseProdutoParaItens(encomendaApi.produto || '', encomendaApi.valorTotal || null);
 
           // Preencher custos se disponíveis (pode não estar na API, mas tentamos)
           // Estes campos podem não existir na resposta, então mantemos null
@@ -215,10 +214,8 @@ export class EncomendasEditarComponent implements OnInit {
         return;
       }
 
-      // Preparar produto (juntar todos os itens)
-      const produto = this.itens.map(item => 
-        `${item.quantidade}x ${item.descricao}`
-      ).join(', ');
+      // Preparar produto preservando preços para restauração futura
+      const produto = this.buildProdutoStr();
 
       // Preparar dados para atualização
       const encomendaData = {
@@ -286,6 +283,39 @@ export class EncomendasEditarComponent implements OnInit {
         this.criarNovoCliente().then(resolve).catch(reject);
       }
     });
+  }
+
+  /** Constrói o campo produto com preços embutidos para restauração futura. */
+  private buildProdutoStr(): string {
+    return this.itens
+      .filter(i => i.descricao?.trim())
+      .map(i => {
+        const preco = i.precoUnitario != null ? ` [PRECO:${i.precoUnitario}]` : '';
+        return `${i.quantidade}x ${i.descricao}${preco}`.trim();
+      })
+      .join('\n');
+  }
+
+  /** Restaura itens a partir do campo produto guardado. */
+  private parseProdutoParaItens(produto: string, valorTotal: number | null): ItemEncomenda[] {
+    if (!produto) return [{ quantidade: 1, descricao: '', precoUnitario: valorTotal }];
+    const precoRegex = /\[PRECO:([\d.]+)\]/;
+    const qtdRegex = /^(\d+)x\s+/;
+    const linhas = produto.includes('\n') ? produto.split('\n') : produto.split(/,(?![^\[]*\])/);
+    const itens: ItemEncomenda[] = linhas.map(l => l.trim()).filter(l => l).map(linha => {
+      const precoMatch = linha.match(precoRegex);
+      const preco = precoMatch ? parseFloat(precoMatch[1]) : null;
+      const semPreco = linha.replace(precoRegex, '').trim();
+      const qtdMatch = semPreco.match(qtdRegex);
+      const qtd = qtdMatch ? parseInt(qtdMatch[1]) : 1;
+      const desc = semPreco.replace(qtdRegex, '').trim();
+      return { quantidade: qtd, descricao: desc, precoUnitario: preco };
+    });
+    // Se nenhum item tem preço, distribui o total pelo primeiro item
+    if (itens.length > 0 && itens.every(i => i.precoUnitario == null) && valorTotal) {
+      itens[0].precoUnitario = valorTotal;
+    }
+    return itens.length > 0 ? itens : [{ quantidade: 1, descricao: produto, precoUnitario: valorTotal }];
   }
 
   private criarNovoCliente(): Promise<number> {

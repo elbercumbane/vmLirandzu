@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import html2pdf from 'html2pdf.js';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -221,5 +222,67 @@ export class EncomendasDetalheComponent implements OnInit {
     if (this.encomendaId) {
       this.router.navigate(['/billing/encomendas', this.encomendaId, 'editar']);
     }
+  }
+
+  showPdfPreview = false;
+
+  abrirPdfPreview(): void {
+    this.showPdfPreview = true;
+  }
+
+  fecharPdfPreview(): void {
+    this.showPdfPreview = false;
+  }
+
+  async guardarPdfFactura(): Promise<void> {
+    const element = document.getElementById('factura-pdf-content');
+    if (!element) {
+      this.mostrarNotificacao('Erro ao gerar PDF: conteúdo não encontrado.', 'error');
+      return;
+    }
+    const enc = this.encomenda!;
+    const filename = `fatura_${enc.invoiceNumber || enc.numeroEncomenda}_${enc.cliente?.nome?.replace(/\s+/g, '_') || 'cliente'}.pdf`;
+    const opt = {
+      margin: [10, 10, 10, 10] as [number, number, number, number],
+      filename,
+      image: { type: 'jpeg' as const, quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const },
+      pagebreak: { mode: ['css', 'legacy'] as ('css' | 'legacy')[] }
+    };
+    try {
+      await html2pdf().set(opt).from(element).save();
+      this.mostrarNotificacao('PDF gerado com sucesso!', 'success');
+      this.fecharPdfPreview();
+    } catch (e) {
+      this.mostrarNotificacao('Erro ao gerar PDF. Tente novamente.', 'error');
+    }
+  }
+
+  /** Converte o produto salvo no formato "1x desc [PRECO:xxx]" em lista de itens. */
+  getProdutoItens(): { quantidade: number; descricao: string; precoUnitario: number | null }[] {
+    const produto = this.encomenda?.produto || '';
+    const valorTotal = this.encomenda?.valorTotal || null;
+    if (!produto) return [];
+    const precoRegex = /\[PRECO:([\d.]+)\]/;
+    const qtdRegex = /^(\d+)x\s+/;
+    const linhas = produto.includes('\n') ? produto.split('\n') : produto.split(/,(?![^\[]*\])/);
+    const itens = linhas.map(l => l.trim()).filter(l => l).map(linha => {
+      const precoMatch = linha.match(precoRegex);
+      const preco = precoMatch ? parseFloat(precoMatch[1]) : null;
+      const semPreco = linha.replace(precoRegex, '').trim();
+      const qtdMatch = semPreco.match(qtdRegex);
+      const qtd = qtdMatch ? parseInt(qtdMatch[1]) : 1;
+      const desc = semPreco.replace(qtdRegex, '').trim();
+      return { quantidade: qtd, descricao: desc, precoUnitario: preco };
+    });
+    if (itens.length > 0 && itens.every(i => i.precoUnitario == null) && valorTotal) {
+      itens[0].precoUnitario = valorTotal;
+    }
+    return itens.length > 0 ? itens : [{ quantidade: 1, descricao: produto, precoUnitario: valorTotal }];
+  }
+
+  getTotalItens(): number {
+    return this.getProdutoItens().reduce((s, i) => s + i.quantidade * (i.precoUnitario || 0), 0);
   }
 }
