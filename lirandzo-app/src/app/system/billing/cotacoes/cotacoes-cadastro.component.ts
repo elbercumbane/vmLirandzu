@@ -953,6 +953,9 @@ export class CotacoesCadastroComponent implements OnInit {
   fecharPreview(): void {
     this.showPreview = false;
     this.modoConfirmacaoGeracao = false;
+    if (this.modoPdfOnly) {
+      this.router.navigate(['/billing/cotacoes/enviadas']);
+    }
   }
 
   private getPdfExportOptions() {

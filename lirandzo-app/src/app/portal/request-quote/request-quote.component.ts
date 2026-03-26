@@ -23,11 +23,16 @@ export class RequestQuoteComponent implements AfterViewInit {
   loading = false;
   errorKey = '';
   confirmacaoOpen = false;
+  validationModalOpen = false;
   expandedSections: Record<'dados' | 'detalhes' | 'mensagem', boolean> = {
     dados: true,
     detalhes: false,
     mensagem: false
   };
+
+  itens: { quantidade: number; descricao: string }[] = [
+    { quantidade: 1, descricao: '' }
+  ];
 
   ngAfterViewInit(): void {
     const host = this.el.nativeElement as HTMLElement;
@@ -56,21 +61,23 @@ export class RequestQuoteComponent implements AfterViewInit {
     tipoServico: 'TRANSPORTE' as 'TRANSPORTE' | 'COMPRA_TRANSPORTE'
   };
 
-  /** Organiza o texto do campo mensagem em lista numerada (1. 2. 3.) para facilitar a análise. */
-  formatMessageToList(): void {
-    const raw = this.form.message?.trim() || '';
-    if (!raw) return;
-    const lines = raw
-      .split(/\r?\n/)
-      .map(l => l.replace(/^\s*\d+\.\s*/, '').trim())
-      .filter(l => l.length > 0);
-    if (lines.length === 0) return;
-    this.form.message = lines.map((line, i) => `${i + 1}. ${line}`).join('\n');
+  adicionarItem(): void {
+    this.itens.push({ quantidade: 1, descricao: '' });
+  }
+
+  removerItem(index: number): void {
+    if (this.itens.length > 1) {
+      this.itens.splice(index, 1);
+    }
   }
 
   closeSuccessModal(): void {
     this.submitted = false;
     this.resetForm();
+  }
+
+  closeValidationModal(): void {
+    this.validationModalOpen = false;
   }
 
   private resetForm(): void {
@@ -82,6 +89,15 @@ export class RequestQuoteComponent implements AfterViewInit {
     this.form.message = '';
     this.form.deliveryMethod = '';
     this.form.tipoServico = 'TRANSPORTE';
+    this.itens = [{ quantidade: 1, descricao: '' }];
+  }
+
+  private buildMensagemFromItens(): string {
+    const linhas = this.itens
+      .filter(i => i.descricao?.trim())
+      .map((i, idx) => `${idx + 1}. ${i.quantidade}x ${i.descricao.trim()}`);
+    const extra = this.form.message?.trim();
+    return extra ? [...linhas, extra].join('\n') : linhas.join('\n');
   }
 
   toggleSection(section: 'dados' | 'detalhes' | 'mensagem'): void {
@@ -97,13 +113,15 @@ export class RequestQuoteComponent implements AfterViewInit {
     const phone1 = this.form.phone1?.trim() || '';
     const deliveryMethod = this.form.deliveryMethod;
     const needsPhone = deliveryMethod === 'whatsapp' || deliveryMethod === 'chamada';
+    const temItem = this.itens.some(i => i.descricao?.trim());
     return !!(
       this.form.name?.trim() &&
       this.form.email?.trim() &&
       (!needsPhone || phone1) &&
       this.form.origin?.trim() &&
       this.form.destination?.trim() &&
-      this.form.deliveryMethod
+      this.form.deliveryMethod &&
+      temItem
     );
   }
 
@@ -119,12 +137,17 @@ export class RequestQuoteComponent implements AfterViewInit {
     if (!this.form.origin?.trim()) missing.push(t('quotePage.missingOrigin'));
     if (!this.form.destination?.trim()) missing.push(t('quotePage.missingDest'));
     if (!this.form.deliveryMethod) missing.push(t('quotePage.missingContactPref'));
+    if (!this.itens.some(i => i.descricao?.trim())) missing.push('Descrição da carga (pelo menos um item)');
     return missing;
   }
 
   onFormSubmit(e: Event): void {
     e.preventDefault();
-    if (this.isFormValid()) this.openConfirmacao();
+    if (this.isFormValid()) {
+      this.openConfirmacao();
+    } else {
+      this.validationModalOpen = true;
+    }
   }
 
   /** Abre o popup de confirmação (quando o formulário está válido). */
@@ -151,7 +174,7 @@ export class RequestQuoteComponent implements AfterViewInit {
       hasWhatsApp1: this.form.deliveryMethod === 'whatsapp',
       origem: this.form.origin,
       destino: this.form.destination,
-      mensagem: this.form.message,
+      mensagem: this.buildMensagemFromItens(),
       formaEnvioPreferida: this.form.deliveryMethod as FormaEnvio,
       tipoServico: this.form.tipoServico
     }).subscribe({

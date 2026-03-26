@@ -90,15 +90,15 @@
       </thead>
       <tbody>
         <tr *ngFor="let item of itens; let i = index">
-          <td class="col-qtd"><input type="number" class="form-control input-qtd" [(ngModel)]="item.quantidade" [name]="'itemQtd'+i" [readonly]="modoPortal" [disabled]="modoPortal" min="0" placeholder="1" step="any"></td>
+          <td class="col-qtd"><input type="number" class="form-control input-qtd" [(ngModel)]="item.quantidade" [name]="'itemQtd'+i" min="0" placeholder="1" step="any"></td>
           <td class="col-unidade">
-            <select class="form-control input-unidade" [(ngModel)]="item.unidade" [name]="'itemUnidade'+i" [disabled]="modoPortal">
+            <select class="form-control input-unidade" [(ngModel)]="item.unidade" [name]="'itemUnidade'+i">
               <option value="">—</option>
               <option value="kg">kg</option>
               <option value="toneladas">toneladas</option>
             </select>
           </td>
-          <td class="col-descricao"><input type="text" class="form-control" [(ngModel)]="item.descricao" [name]="'itemDesc'+i" placeholder="Ex: farinha de trigo" [disabled]="modoPortal"></td>
+          <td class="col-descricao"><input type="text" class="form-control" [(ngModel)]="item.descricao" [name]="'itemDesc'+i" placeholder="Ex: farinha de trigo"></td>
           <td class="col-preco"><input type="number" class="form-control input-preco" [(ngModel)]="item.precoUnitario" [name]="'itemPreco'+i" placeholder="0.00" step="0.01"></td>
           <td class="col-subtotal">{{ getSubtotalItem(item) | number:'1.2-2' }} MZN</td>
           <td class="col-actions">

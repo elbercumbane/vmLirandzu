@@ -79,32 +79,35 @@
             </div>
           </div>
 
-          <!-- Mensagem -->
+          <!-- Descrição da carga (itens) -->
           <div class="form-section form-section-message" [class.expanded]="isSectionExpanded('mensagem')">
             <button type="button" class="form-section-header" (click)="toggleSection('mensagem')" [attr.aria-expanded]="isSectionExpanded('mensagem')">
-              <span class="form-section-title">{{ 'quotePage.sectionNeed' | transloco }}</span>
+              <span class="form-section-title">{{ 'quotePage.sectionNeed' | transloco }} <span class="required">*</span></span>
               <span class="form-section-chevron" aria-hidden="true">›</span>
             </button>
             <div class="form-section-body" [class.expanded]="isSectionExpanded('mensagem')">
-            <div class="form-section-fields">
-            <div class="form-row full message-block">
-              <label for="message" class="message-label">{{ 'quotePage.messageLabel' | transloco }}</label>
-              <p class="message-hint">{{ 'quotePage.messageHint' | transloco }}</p>
-              <textarea id="message" [(ngModel)]="form.message" name="message" rows="5" [placeholder]="'quotePage.messagePh' | transloco" (blur)="formatMessageToList()" (keydown.enter)="$event.stopPropagation()"></textarea>
-            </div>
+            <div class="form-section-fields" style="grid-template-columns: 1fr;">
+              <div class="items-list">
+                <div class="item-row" *ngFor="let item of itens; let i = index">
+                  <div class="item-qty-wrap">
+                    <label [for]="'qty_' + i">Qtd</label>
+                    <input [id]="'qty_' + i" type="number" [(ngModel)]="item.quantidade" [name]="'qty_' + i" min="1" class="item-qty-input" />
+                  </div>
+                  <div class="item-desc-wrap">
+                    <label [for]="'desc_' + i">Descrição da carga <span class="required">*</span></label>
+                    <input [id]="'desc_' + i" type="text" [(ngModel)]="item.descricao" [name]="'desc_' + i" placeholder="Ex: Caixas de maquinaria industrial" class="item-desc-input" />
+                  </div>
+                  <button type="button" class="item-remove-btn" *ngIf="itens.length > 1" (click)="removerItem(i)" title="Remover item">×</button>
+                </div>
+              </div>
+              <button type="button" class="item-add-btn" (click)="adicionarItem()">+ Adicionar outro item</button>
             </div>
             </div>
           </div>
-          @if (!isFormValid() && getMissingFields().length > 0) {
-            <div class="quote-missing-fields">
-              <strong>{{ 'quotePage.missingPrefix' | transloco }}</strong>
-              {{ getMissingFields().join(', ') }}
-            </div>
-          }
           @if (errorKey) {
             <p class="quote-error">{{ errorKey | transloco }}</p>
           }
-          <button type="submit" class="quote-submit" [disabled]="loading || !isFormValid()">
+          <button type="submit" class="quote-submit" [disabled]="loading">
             {{ loading ? ('quotePage.sending' | transloco) : ('quotePage.submit' | transloco) }}
           </button>
         </form>
@@ -112,6 +115,30 @@
       </div>
     </div>
   </section>
+
+  <!-- Modal de validação: campos obrigatórios em falta -->
+  @if (validationModalOpen) {
+    <div class="quote-confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="quote-validation-title">
+      <div class="quote-confirm-backdrop" (click)="closeValidationModal()" aria-hidden="true"></div>
+      <div class="quote-confirm-modal quote-validation-modal">
+        <div class="quote-validation-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="36" height="36">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <h2 id="quote-validation-title" class="quote-confirm-title" style="color:#dc2626">Campos obrigatórios em falta</h2>
+        <p class="quote-confirm-subtitle">Por favor preencha os seguintes campos antes de enviar:</p>
+        <ul class="quote-validation-list">
+          <li *ngFor="let field of getMissingFields()">{{ field }}</li>
+        </ul>
+        <div class="quote-confirm-actions">
+          <button type="button" class="quote-confirm-btn quote-confirm-btn-send" (click)="closeValidationModal()">Corrigir</button>
+        </div>
+      </div>
+    </div>
+  }
 
   <!-- Popup de confirmação (resumo dos dados, Editar / Enviar) -->
   @if (confirmacaoOpen) {
@@ -151,10 +178,14 @@
             <span class="quote-confirm-label">{{ 'quotePage.lblWhereQuote' | transloco }}</span>
             <span class="quote-confirm-value">{{ getDeliveryLabel() }}</span>
           </div>
-          @if (form.message) {
+          @if (itens.length > 0 && itens[0].descricao) {
           <div class="quote-confirm-row quote-confirm-row-message">
-            <span class="quote-confirm-label">{{ 'quotePage.lblMessage' | transloco }}</span>
-            <span class="quote-confirm-value quote-confirm-message">{{ form.message }}</span>
+            <span class="quote-confirm-label">Carga</span>
+            <span class="quote-confirm-value quote-confirm-message">
+              <span *ngFor="let item of itens; let last = last">
+                {{ item.quantidade }}x {{ item.descricao }}<br *ngIf="!last">
+              </span>
+            </span>
           </div>
           }
         </div>
