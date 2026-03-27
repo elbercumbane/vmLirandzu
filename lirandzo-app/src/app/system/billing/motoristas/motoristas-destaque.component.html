@@ -1,0 +1,90 @@
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="'/billing/motoristas'"
+  [showHelp]="true"
+  title="Destaque &amp; Desempenho dos Motoristas"
+  subtitle="Visão consolidada de performance e avaliação da equipa"
+  helpTitle="Como usar Destaque dos Motoristas"
+  [helpItems]="[
+    'Veja a avaliação média da equipa e o desempenho individual.',
+    'O score é derivado da avaliação (0–5 estrelas convertido em 0–100).',
+    'Use estas informações para premiar, treinar ou redistribuir a frota.'
+  ]"
+></app-billing-section-header>
+
+@if (loading) {
+  <div class="loading-state">
+    <p>A carregar dados de desempenho...</p>
+  </div>
+} @else if (error) {
+  <div class="error-state">
+    <p>{{ error }}</p>
+    <button type="button" class="btn-secondary" (click)="carregarMotoristas()">Tentar Novamente</button>
+  </div>
+} @else {
+  <div class="kpi-grid" style="margin-bottom: 1.5rem;">
+    <div class="kpi-card">
+      <div class="kpi-top-line" style="background: var(--warning)"></div>
+      <div class="kpi-icon" style="color: var(--warning)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+      </div>
+      <div class="kpi-label">Avaliação Média</div>
+      <div class="kpi-value">{{ avaliacaoMediaGeral }} <small>/5</small></div>
+      <div class="kpi-sub">desempenho da equipa</div>
+    </div>
+  </div>
+
+  <div class="card drivers-performance-card">
+    <div class="drivers-performance-content">
+      <div class="drivers-score-list">
+        @for (m of motoristasDesempenho; track m.id) {
+          <div class="driver-score-item">
+            <div class="driver-score-avatar">{{ getIniciais(m.nome) }}</div>
+            <div class="driver-score-main">
+              <div class="driver-score-top">
+                <div class="driver-score-name">{{ m.nome }}</div>
+                <div class="driver-score-value">{{ m.desempenhoScore }}/100</div>
+              </div>
+              <div class="driver-score-bar-track">
+                <div
+                  class="driver-score-bar-fill"
+                  [style.width.%]="m.desempenhoScore"
+                  [ngClass]="getScoreClass(m.desempenhoScore)"
+                ></div>
+              </div>
+              <div class="driver-score-meta">
+                {{ m.avaliacaoMedia | number:'1.1-1' }} / 5 estrelas · {{ m.numeroViagens }} viagen(s)
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <p class="text-muted">Nenhum motorista registado.</p>
+        }
+      </div>
+
+      <div class="drivers-ranking">
+        <h4 style="margin: 0 0 0.75rem; font-size: 1rem;">Top 3 Desempenho</h4>
+        @for (m of top3; track m.id; let i = $index) {
+          <div class="drivers-ranking-item">
+            <div class="drivers-ranking-medal" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
+              @if (i === 0) { <span>🥇</span> }
+              @if (i === 1) { <span>🥈</span> }
+              @if (i === 2) { <span>🥉</span> }
+            </div>
+            <div class="drivers-ranking-info">
+              <div class="drivers-ranking-name">
+                {{ m.nome }}
+                @if (i === 0) { <span class="drivers-ranking-tag">Melhor motorista</span> }
+              </div>
+              <div class="drivers-ranking-score">{{ m.desempenhoScore }}/100</div>
+            </div>
+          </div>
+        } @empty {
+          <p class="text-muted">Sem dados de ranking.</p>
+        }
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,58 @@
+<app-billing-section-header [showBack]="true" [backLink]="'/billing/manutencao'" title="Editar Manutenção" subtitle="Alterar dados da manutenção"></app-billing-section-header>
+
+@if (loading) {
+  <div class="loading-state"><p>A carregar...</p></div>
+} @else if (manutencao) {
+  <div class="card">
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Data *</label>
+        <input type="date" class="form-control" [(ngModel)]="form.maintenanceDate" name="maintenanceDate" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Viatura *</label>
+        <select class="form-control" [(ngModel)]="form.vehicleId" name="vehicleId" required>
+          <option [ngValue]="null">Seleccionar...</option>
+          @for (v of viaturas; track v.id) {
+            <option [ngValue]="v.id">{{ v.matricula }} — {{ v.marca }} {{ v.modelo }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo *</label>
+        <select class="form-control" [(ngModel)]="form.type" name="type" required>
+          @for (t of tipos; track t.value) {
+            <option [value]="t.value">{{ t.label }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Custo (MZN)</label>
+        <input type="number" class="form-control" [(ngModel)]="form.cost" name="cost" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Quilometragem</label>
+        <input type="number" class="form-control" [(ngModel)]="form.kmReading" name="kmReading" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Oficina</label>
+        <input type="text" class="form-control" [(ngModel)]="form.workshop" name="workshop">
+      </div>
+      <div class="form-group full-width">
+        <label class="form-label">Descrição *</label>
+        <textarea class="form-control" [(ngModel)]="form.description" name="description" rows="3" required></textarea>
+      </div>
+      <div class="form-group full-width">
+        <label class="form-label">Peças substituídas</label>
+        <input type="text" class="form-control" [(ngModel)]="form.partsReplaced" name="partsReplaced">
+      </div>
+    </div>
+    <div class="form-actions">
+      <a routerLink="/billing/manutencao" class="btn-secondary">Cancelar</a>
+      <button type="button" class="btn-primary" (click)="guardar()" [disabled]="loadingForm">{{ loadingForm ? 'A guardar...' : 'Guardar' }}</button>
+    </div>
+  </div>
+  <app-notification-popup *ngIf="showNotification" [message]="notificationMessage" [type]="notificationType" [duration]="3000"></app-notification-popup>
+} @else {
+  <div class="error-state"><p>Manutenção não encontrada.</p><a routerLink="/billing/manutencao" class="btn-secondary">Voltar</a></div>
+}

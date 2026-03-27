@@ -1,0 +1,80 @@
+.filter-chips {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.action-btn-primary {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+.action-btn-primary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.action-btn-success {
+  background: rgba(22, 101, 52, 0.15);
+  border-color: rgba(22, 101, 52, 0.5);
+  color: var(--success, #16a34a);
+}
+
+.action-btn-success:hover {
+  background: rgba(22, 101, 52, 0.85);
+  border-color: rgba(22, 101, 52, 0.85);
+  color: #fff;
+}
+
+.action-btn-disabled {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.9;
+}
+
+.action-btn-disabled:hover {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #9ca3af;
+}
+
+.action-btn-conclua {
+  background: var(--warning-soft, rgba(245, 158, 11, 0.15)) !important;
+  border-color: var(--warning, #dc2626) !important;
+  color: var(--warning, #dc2626) !important;
+  font-weight: 800;
+  text-decoration: none !important;
+}
+
+.action-btn-disabled span,
+.action-btn-primary span {
+  margin-left: 0.5rem;
+}
+
+/* Override: evita o "quadrado" fixo do billing-page.css quando não há ícone */
+.action-btn {
+  width: auto !important;
+  height: auto !important;
+  min-width: unset !important;
+  min-height: unset !important;
+  padding: 0.45rem 0.85rem !important;
+  border-radius: 0.6rem !important;
+  justify-content: center;
+  text-decoration: none !important;
+}
+
+.actions-cell {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.action-btn:link,
+.action-btn:visited,
+.action-btn:hover,
+.action-btn:active {
+  text-decoration: none !important;
+}

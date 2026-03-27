@@ -1,0 +1,30 @@
+<section class="coverage" id="cobertura">
+  <div class="coverage-container">
+    <div class="coverage-header">
+      <span class="coverage-subtitle">{{ 'coverage.subtitle' | transloco }}</span>
+      <h2 class="coverage-title">{{ 'coverage.title' | transloco }}</h2>
+    </div>
+
+    <div class="coverage-cards">
+      @for (area of areas; track area.key; let i = $index) {
+        <article class="coverage-card">
+          <div class="coverage-card-icon" [style.--accent]="area.color">
+            <ng-container [ngSwitch]="area.icon">
+              <svg *ngSwitchCase="'map'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <svg *ngSwitchCase="'globe'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+              <svg *ngSwitchCase="'route'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="19" r="3"/><circle cx="18" cy="5" r="3"/><path d="M9 19 12 5l3 14"/></svg>
+            </ng-container>
+          </div>
+          <h3 class="coverage-card-title">{{ area.title }}</h3>
+          <p class="coverage-card-desc">{{ area.description }}</p>
+          <ul class="coverage-card-list">
+            <li><span class="coverage-dot" [style.background]="area.color"></span>{{ area.l1 }}</li>
+            <li><span class="coverage-dot" [style.background]="area.color"></span>{{ area.l2 }}</li>
+            <li><span class="coverage-dot" [style.background]="area.color"></span>{{ area.l3 }}</li>
+          </ul>
+          <div class="coverage-card-line" [style.background]="area.color"></div>
+        </article>
+      }
+    </div>
+  </div>
+</section>

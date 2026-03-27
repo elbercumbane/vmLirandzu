@@ -1,0 +1,32 @@
+<section class="services" id="nossos-servicos">
+  <div class="services-layout">
+    <div class="services-intro">
+      <h2 class="services-heading">{{ 'services.title' | transloco }}</h2>
+      <p class="services-intro-text" [innerHTML]="'services.intro' | transloco"></p>
+      <div class="services-ctas">
+        <a routerLink="/contato" class="services-cta">{{ 'services.contact' | transloco }}</a>
+        <a routerLink="/servicos" class="services-cta services-cta--secondary">{{ 'services.seeMore' | transloco }}</a>
+      </div>
+    </div>
+    <div class="services-cards">
+      @for (svc of services; track svc.title) {
+        <article class="service-card">
+          <div class="service-image-wrap">
+            <div class="service-image" [style.backgroundImage]="'url(' + svc.image + ')'"></div>
+            <div class="service-image-overlay"></div>
+          </div>
+          <div class="service-body">
+            <h3 class="service-title">{{ svc.title }}</h3>
+            <p class="service-desc">{{ svc.description }}</p>
+            <a routerLink="/servicos" class="service-more">
+              <span>{{ 'services.learnMore' | transloco }}</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>

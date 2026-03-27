@@ -1,0 +1,102 @@
+<main class="client-login-page">
+  <header class="client-login-header">
+    <a routerLink="/" class="client-login-brand">
+      <span class="client-login-logo-mark">VM</span>
+      <span class="client-login-logo-name">Lirandzo<br /><em>Transportes</em></span>
+    </a>
+    <a routerLink="/" class="client-login-portal-link">← Voltar ao portal</a>
+  </header>
+
+  <div class="client-login-container">
+    <div class="client-login-shell">
+      <aside class="client-login-left-panel" aria-labelledby="client-info-heading">
+        <div class="client-login-logo-section">
+          <div class="client-login-logo-circle">
+            <span class="client-login-logo-mark">VM</span>
+          </div>
+          <p class="client-login-eyebrow">Portal do cliente</p>
+          <h2 class="client-login-welcome">Bem-vindo ao</h2>
+          <h1 id="client-info-heading" class="client-login-brand-heading">Lirandzo</h1>
+          <p class="client-login-tagline">A sua frota e encomendas, num só sítio</p>
+          <p class="client-login-lead">
+            Consulte cotações, acompanhe entregas e mantenha os dados da empresa atualizados com segurança.
+          </p>
+          <ul class="client-login-benefits" aria-label="Vantagens do portal">
+            <li>Sessão protegida e dados confidenciais</li>
+            <li>Acesso rápido ao estado dos pedidos</li>
+            <li>Disponível quando precisar, 24/7</li>
+          </ul>
+        </div>
+      </aside>
+
+      <section class="client-login-right-panel" aria-labelledby="client-login-heading">
+        <div class="client-login-form-header">
+          <h2 id="client-login-heading">Acesso da Área do Cliente</h2>
+          <p class="client-login-subtitle">Entre com os dados da sua conta de cliente.</p>
+        </div>
+
+        <form class="client-login-form" (ngSubmit)="onSubmit()">
+          <div class="client-login-field">
+            <label for="email">E-mail</label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              [(ngModel)]="email"
+              autocomplete="username"
+              placeholder="cliente@empresa.com"
+              [disabled]="loading"
+            />
+          </div>
+
+          <div class="client-login-field">
+            <label for="password">Senha</label>
+            <div class="password-wrapper">
+              <input
+                id="password"
+                [type]="showPassword ? 'text' : 'password'"
+                name="password"
+                [(ngModel)]="password"
+                autocomplete="current-password"
+                placeholder="••••••••"
+                [disabled]="loading"
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="showPassword = !showPassword"
+                [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+                tabindex="-1"
+              >
+                @if (showPassword) {
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                } @else {
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                }
+              </button>
+            </div>
+          </div>
+
+          @if (error) {
+            <p class="client-login-error">{{ error }}</p>
+          }
+
+          <div class="client-login-actions">
+            <button type="submit" class="client-login-submit" [disabled]="loading">
+              {{ loading ? 'A entrar...' : 'Entrar na Área do Cliente' }}
+            </button>
+          </div>
+        </form>
+
+        <p class="client-login-trust">A Lirandzo nunca pede a sua palavra-passe por telefone ou email.</p>
+        <a routerLink="/contacto" class="client-login-footer-link">Ainda não tenho acesso</a>
+      </section>
+    </div>
+  </div>
+</main>

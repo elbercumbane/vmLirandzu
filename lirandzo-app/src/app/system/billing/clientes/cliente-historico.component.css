@@ -1,0 +1,65 @@
+.cliente-historico-card {
+  margin-bottom: 1.5rem;
+}
+
+.cliente-historico-top {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.cliente-historico-select {
+  max-width: 360px;
+}
+
+.cliente-historico-resumo {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cliente-historico-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cliente-nome {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cliente-subinfo {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.cliente-pill {
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.0);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cliente-kpi-grid {
+  margin-top: 0.5rem;
+}
+
+.subsection-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+  color: var(--text-primary);
+}
+
+.empty-text {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}

@@ -1,0 +1,253 @@
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="'/billing/guias'"
+  [showHelp]="true"
+  title="Gerar Guia de Remessa"
+  subtitle="Documento de transporte com cargas, clientes e rota da viagem"
+  helpTitle="Como gerar uma Guia de Remessa"
+  [helpItems]="[
+    'Preencha os dados da guia, atribuindo motorista, viatura e rota.',
+    'Registe todas as cargas (clientes e produtos) associadas a esta viagem.',
+    'Use KM de saída para futura integração com controlo de combustível.'
+  ]"
+></app-billing-section-header>
+
+<div class="card">
+  <div class="guia-doc-header">
+    <div>
+      <div class="guia-company">VM TRANSPORTES</div>
+      <div class="guia-company-sub">Logística e Transporte de Cargas</div>
+    </div>
+    <div class="guia-doc-title">GUIA DE REMESSA</div>
+  </div>
+
+  <div class="card" id="guia-pdf-content">
+    <div class="form-section-title">Dados da Guia</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" for="referencia">Referência</label>
+        <input type="text" id="referencia" class="form-control" [(ngModel)]="guia.referencia" readonly />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="data">Data</label>
+        <input type="date" id="data" class="form-control" [(ngModel)]="guia.data" name="data" />
+      </div>
+    </div>
+
+    <div class="form-section-title">Atribuição</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" for="motorista">Motorista</label>
+        <select id="motorista" class="form-control" [(ngModel)]="guia.motoristaId" name="motorista">
+          <option [ngValue]="null">Selecione o motorista</option>
+          @for (m of motoristas; track m.id) {
+            <option [ngValue]="m.id">{{ m.nome }} {{ m.telefone ? '(' + m.telefone + ')' : '' }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="viatura">Viatura</label>
+        <select id="viatura" class="form-control" [(ngModel)]="guia.viaturaId" name="viatura">
+          <option [ngValue]="null">Selecione a viatura</option>
+          @for (v of viaturas; track v.id) {
+            <option [ngValue]="v.id">{{ v.matricula }} ({{ v.marca }} {{ v.modelo }})</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="form-section-title">Rota</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" for="origem">Origem</label>
+        <input type="text" id="origem" class="form-control" placeholder="Ex: Maputo" [(ngModel)]="guia.origem" name="origem" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="destino">Destino</label>
+        <input type="text" id="destino" class="form-control" placeholder="Ex: Beira" [(ngModel)]="guia.destino" name="destino" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="kmSaida">KM Saída</label>
+        <input type="number" id="kmSaida" class="form-control" placeholder="Opcional" [(ngModel)]="guia.kmSaida" name="kmSaida" min="0" />
+      </div>
+    </div>
+
+    <div class="form-section-title">Cargas / Produtos</div>
+    @for (carga of cargas; track $index) {
+      <div class="cargo-card">
+        <div class="cargo-card-header">
+          <span class="cargo-card-title">Carga {{ $index + 1 }}</span>
+          <button type="button" class="cargo-remove-btn" (click)="removerCarga($index)" [disabled]="cargas.length <= 1" title="Remover carga">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Cliente</label>
+            <input type="text" class="form-control" placeholder="Nome do cliente" [(ngModel)]="carga.clienteNome" [name]="'cliente_' + $index" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ref. Encomenda</label>
+            <input type="text" class="form-control" placeholder="Ex: ENC-001" [(ngModel)]="carga.encomendaRef" [name]="'encomendaRef_' + $index" />
+          </div>
+          <div class="form-group full-width">
+            <label class="form-label">Descrição</label>
+            <input type="text" class="form-control" placeholder="Descrição da carga" [(ngModel)]="carga.descricao" [name]="'descricao_' + $index" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Quantidade</label>
+            <input type="number" class="form-control" [(ngModel)]="carga.quantidade" [name]="'quantidade_' + $index" min="1" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Peso Estimado</label>
+            <input type="text" class="form-control" placeholder="Ex: 500 kg" [(ngModel)]="carga.peso" [name]="'peso_' + $index" />
+          </div>
+        </div>
+      </div>
+    }
+    <button type="button" class="btn-secondary" style="margin-bottom: 1rem" (click)="adicionarCarga()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      Adicionar Carga
+    </button>
+
+    <div class="form-section-title">Observações</div>
+    <div class="form-group full-width">
+      <textarea class="form-control" placeholder="Observações gerais sobre a guia" [(ngModel)]="guia.observacoes" name="observacoes" rows="4"></textarea>
+    </div>
+
+    <div class="form-actions">
+      <a routerLink="/billing/guias" class="btn-secondary">Cancelar</a>
+      <button type="button" class="btn-secondary" (click)="gerarGuiaPDF()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
+        Gerar Guia
+      </button>
+      <button type="button" class="btn-primary" (click)="guardarGuia()" [disabled]="loading">
+        @if (loading) {
+          Guardando...
+        } @else {
+          Guardar Guia
+        }
+      </button>
+    </div>
+  </div>
+
+  <app-notification-popup
+    *ngIf="showNotification"
+    [message]="notificationMessage"
+    [type]="notificationType"
+    [duration]="7000">
+  </app-notification-popup>
+
+  <!-- Preview Modal -->
+  @if (showPreview) {
+  <div class="preview-modal-overlay" (click)="fecharPreview()">
+    <div class="preview-modal" (click)="$event.stopPropagation()">
+      <div class="preview-modal-header">
+        <h3>Preview da Guia de Remessa</h3>
+        <button type="button" class="preview-modal-close" (click)="fecharPreview()" aria-label="Fechar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="preview-modal-body">
+        <div id="guia-preview-content" class="guia-preview">
+          <div class="guia-doc-header">
+            <div>
+              <div class="guia-company">VM TRANSPORTES</div>
+              <div class="guia-company-sub">Logística e Transporte de Cargas</div>
+            </div>
+            <div class="guia-doc-title">GUIA DE REMESSA</div>
+          </div>
+
+          <div class="preview-info-grid">
+            <div class="preview-info-item">
+              <span class="preview-label">Referência:</span>
+              <span class="preview-value">{{ guia.referencia || 'N/A' }}</span>
+            </div>
+            <div class="preview-info-item">
+              <span class="preview-label">Data:</span>
+              <span class="preview-value">{{ formatarData(guia.data) }}</span>
+            </div>
+            <div class="preview-info-item">
+              <span class="preview-label">Motorista:</span>
+              <span class="preview-value">{{ getMotoristaNome() }}</span>
+            </div>
+            <div class="preview-info-item">
+              <span class="preview-label">Viatura:</span>
+              <span class="preview-value">{{ getViaturaDescricao() }}</span>
+            </div>
+            <div class="preview-info-item">
+              <span class="preview-label">Origem:</span>
+              <span class="preview-value">{{ guia.origem || 'N/A' }}</span>
+            </div>
+            <div class="preview-info-item">
+              <span class="preview-label">Destino:</span>
+              <span class="preview-value">{{ guia.destino || 'N/A' }}</span>
+            </div>
+            @if (guia.kmSaida) {
+            <div class="preview-info-item">
+              <span class="preview-label">KM Saída:</span>
+              <span class="preview-value">{{ guia.kmSaida }}</span>
+            </div>
+            }
+          </div>
+
+          <h3 class="preview-section-title">Cargas / Produtos</h3>
+          <div class="preview-table-wrapper">
+            <table class="preview-table">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Descrição</th>
+                  <th style="width: 100px">Quantidade</th>
+                  <th style="width: 120px">Peso</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (carga of cargas; track $index) {
+                  @if (carga.descricao) {
+                  <tr>
+                    <td>{{ carga.clienteNome || 'N/A' }}</td>
+                    <td>{{ carga.descricao }}</td>
+                    <td>{{ carga.quantidade }}</td>
+                    <td>{{ carga.peso || 'N/A' }}</td>
+                  </tr>
+                  }
+                }
+              </tbody>
+            </table>
+          </div>
+
+          @if (guia.observacoes) {
+          <h3 class="preview-section-title">Observações</h3>
+          <div class="preview-text-content">
+            <p>{{ guia.observacoes }}</p>
+          </div>
+          }
+        </div>
+      </div>
+      <div class="preview-modal-footer">
+        <button type="button" class="btn-secondary" (click)="fecharPreview()">Cancelar</button>
+        <button type="button" class="btn-primary" (click)="guardarPDF()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Guardar PDF
+        </button>
+      </div>
+    </div>
+  </div>
+  }

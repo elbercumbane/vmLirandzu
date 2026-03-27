@@ -1,0 +1,147 @@
+<app-billing-section-header
+  [showBack]="true"
+  [showHelp]="true"
+  [backLink]="'/billing'"
+  title="Viaturas"
+  subtitle="Gestão da frota e estado das viaturas"
+  helpTitle="Como usar Viaturas"
+  [helpItems]="[
+    'Use a pesquisa e filtros para encontrar viaturas por matrícula ou estado.',
+    'Analise os KPIs para ver quantas viaturas estão operacionais ou em manutenção.',
+    'Use o botão Nova Viatura para registar viaturas na frota.'
+  ]"
+></app-billing-section-header>
+
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--accent)"></div>
+    <div class="kpi-icon" style="color: var(--accent)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="5.5" cy="17.5" r="2.5"></circle>
+        <circle cx="18.5" cy="17.5" r="2.5"></circle>
+        <path d="M15 6H3v9h2.05"></path>
+        <path d="M15 15V6l6 4v5h-1.05"></path>
+        <path d="M8 15h7"></path>
+      </svg>
+    </div>
+    <div class="kpi-label">Total Viaturas</div>
+    <div class="kpi-value">{{ totalViaturas }}</div>
+    <div class="kpi-sub">{{ filteredViaturas.length }} na frota</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--success)"></div>
+    <div class="kpi-icon" style="color: var(--success)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+    </div>
+    <div class="kpi-label">Operacionais</div>
+    <div class="kpi-value" style="color: var(--success)">{{ operacionais }}</div>
+    <div class="kpi-sub">disponíveis</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--warning)"></div>
+    <div class="kpi-icon" style="color: var(--warning)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+      </svg>
+    </div>
+    <div class="kpi-label">Em Manutenção</div>
+    <div class="kpi-value" style="color: var(--warning)">{{ emManutencao }}</div>
+    <div class="kpi-sub">em reparação</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--info)"></div>
+    <div class="kpi-icon" style="color: var(--info)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="2" y1="22" x2="22" y2="22"></line>
+        <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"></path>
+      </svg>
+    </div>
+    <div class="kpi-label">Consumo Médio</div>
+    <div class="kpi-value">{{ consumoMedioGeral }} <small>L/100km</small></div>
+    <div class="kpi-sub">média da frota</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <div class="search-wrapper">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" class="search-input" placeholder="Pesquisar por matrícula ou marca..." [(ngModel)]="searchTerm">
+    </div>
+    <button type="button" class="filter-chip" [class.active]="activeFilter === 'TODOS'" (click)="setFilter('TODOS')">Todos</button>
+    <button type="button" class="filter-chip" [class.active]="activeFilter === 'OPERACIONAL'" (click)="setFilter('OPERACIONAL')">Operacional</button>
+    <button type="button" class="filter-chip" [class.active]="activeFilter === 'MANUTENÇÃO'" (click)="setFilter('MANUTENÇÃO')">Manutenção</button>
+    <button type="button" class="filter-chip" [class.active]="activeFilter === 'PARADO'" (click)="setFilter('PARADO')">Parado</button>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state">
+      <p>A carregar viaturas...</p>
+    </div>
+  } @else if (error) {
+    <div class="error-state">
+      <p>{{ error }}</p>
+      <button type="button" class="btn-secondary" (click)="carregarViaturas()">Tentar Novamente</button>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Matrícula</th>
+            <th>Marca/Modelo</th>
+            <th>Ano</th>
+            <th>Tipo</th>
+            <th>Capacidade</th>
+            <th>Status</th>
+            <th>Acções</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (v of filteredViaturas; track v.id) {
+            <tr>
+              <td><strong>{{ v.matricula }}</strong></td>
+              <td>{{ v.marca }} {{ v.modelo }}</td>
+              <td>{{ v.ano || '—' }}</td>
+              <td>{{ v.tipo }}</td>
+              <td>{{ formatarCapacidade(v) }}</td>
+              <td>
+                <span class="badge" [class.badge-success]="v.status === 'OPERACIONAL'" [class.badge-warning]="v.status === 'MANUTENÇÃO'" [class.badge-danger]="v.status === 'PARADO'">
+                  {{ v.status }}
+                </span>
+              </td>
+              <td>
+                <a [routerLink]="['/billing/viaturas', v.id]" class="action-btn" title="Ver">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </a>
+                <a [routerLink]="['/billing/viaturas', v.id, 'editar']" class="action-btn" title="Editar">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </a>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-state">Nenhuma viatura encontrada.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span>Mostrando {{ filteredViaturas.length }} de {{ viaturas.length }} viaturas</span>
+    </div>
+  }
+</div>

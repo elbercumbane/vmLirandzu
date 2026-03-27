@@ -1,0 +1,25 @@
+.dash-danger {
+  color: var(--danger) !important;
+}
+
+.loading-state,
+.error-state,
+.empty-state {
+  padding: 3rem 2rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.loading-state p,
+.error-state p {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+}
+
+.error-state {
+  color: var(--danger);
+}
+
+.error-state button {
+  margin-top: 0.5rem;
+}

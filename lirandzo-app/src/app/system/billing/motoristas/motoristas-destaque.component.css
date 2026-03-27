@@ -1,0 +1,165 @@
+.drivers-performance-card {
+  padding: 1.5rem;
+}
+
+.drivers-performance-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+}
+
+.drivers-score-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.driver-score-item {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.driver-score-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.driver-score-main {
+  flex: 1;
+}
+
+.driver-score-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.driver-score-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.driver-score-value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.driver-score-bar-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bg-card-inner);
+  overflow: hidden;
+}
+
+.driver-score-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.driver-score-high {
+  background: #22C55E;
+}
+
+.driver-score-medium {
+  background: #DC2626;
+}
+
+.driver-score-low {
+  background: #EF4444;
+}
+
+.driver-score-meta {
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.drivers-ranking {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.drivers-ranking-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.6rem;
+  background: var(--bg-card-inner);
+  border: 1px solid var(--border-subtle);
+}
+
+.drivers-ranking-medal {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.drivers-ranking-medal.gold {
+  background: rgba(250, 204, 21, 0.15);
+}
+
+.drivers-ranking-medal.silver {
+  background: rgba(148, 163, 184, 0.2);
+}
+
+.drivers-ranking-medal.bronze {
+  background: rgba(244, 114, 182, 0.15);
+}
+
+.drivers-ranking-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  gap: 0.5rem;
+}
+
+.drivers-ranking-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.drivers-ranking-score {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.drivers-ranking-tag {
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+@media (max-width: 1024px) {
+  .drivers-performance-content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

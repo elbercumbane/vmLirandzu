@@ -1,0 +1,135 @@
+.coverage {
+  width: 100%;
+  padding: 4rem 2rem 5rem;
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.coverage-container {
+  position: relative;
+  z-index: 1;
+}
+
+.coverage-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.coverage-subtitle {
+  display: block;
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.coverage-title {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+/* Cards */
+.coverage-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+@media (min-width: 768px) {
+  .coverage-cards {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+
+.coverage-card {
+  position: relative;
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+.coverage-card:hover {
+  box-shadow: 0 16px 48px rgba(15, 23, 42, 0.12);
+  border-color: #cbd5e1;
+}
+
+.coverage-card-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--accent, #1e293b) 15%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  transition: transform 0.4s;
+}
+
+.coverage-card-icon svg {
+  width: 40px;
+  height: 40px;
+  color: var(--accent, #1e293b);
+}
+
+.coverage-card:hover .coverage-card-icon {
+  transform: scale(1.08) rotate(3deg);
+}
+
+.coverage-card-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 1rem;
+}
+
+.coverage-card-desc {
+  font-size: 0.9375rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0 0 1.5rem;
+}
+
+.coverage-card-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.coverage-card-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.coverage-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.coverage-card-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 3px;
+  transition: width 0.4s ease;
+}
+
+.coverage-card:hover .coverage-card-line {
+  width: 100%;
+}

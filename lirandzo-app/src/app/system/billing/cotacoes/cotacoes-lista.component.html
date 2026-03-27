@@ -1,0 +1,144 @@
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="'/billing'"
+  [showHelp]="true"
+  title="Pedidos de Cotação"
+  subtitle="Pedidos de contactos (potenciais clientes) — responda e gere propostas"
+  helpTitle="Como usar Pedidos de Cotação"
+  [helpItems]="[
+    'Um pedido no portal não significa «cliente» na facturação: cliente é quem já tem documento (encomenda/factura).',
+    'Use os filtros para ver pedidos pendentes, respondidos ou com cotação gerada.',
+    'Pesquise por nome, referência ou destino. Use Criar Cotação para elaborar a proposta.'
+  ]"
+></app-billing-section-header>
+
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--accent)"></div>
+    <div class="kpi-icon" style="color: var(--accent)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+      </svg>
+    </div>
+    <div class="kpi-label">Total Pedidos</div>
+    <div class="kpi-value">{{ pedidosFiltrados.length }}</div>
+    <div class="kpi-sub">visível(is)</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--warning)"></div>
+    <div class="kpi-icon" style="color: var(--warning)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12 6 12 12 16 14"></polyline>
+      </svg>
+    </div>
+    <div class="kpi-label">Pendentes</div>
+    <div class="kpi-value" style="color: var(--warning)">{{ totalPendentes }}</div>
+    <div class="kpi-sub">aguardam resposta</div>
+  </div>
+  <!-- Respondidos removido: esta página mostra apenas pedidos não respondidos -->
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--success)"></div>
+    <div class="kpi-icon" style="color: var(--success)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+    </div>
+    <div class="kpi-label">Cotações Geradas</div>
+    <div class="kpi-value" style="color: var(--success)">{{ totalGerados }}</div>
+    <div class="kpi-sub">prontas para envio</div>
+  </div>
+</div>
+
+<div class="card">
+  @if (loading) {
+    <div class="loading-state">
+      <p>A carregar cotações...</p>
+    </div>
+  } @else if (error) {
+    <div class="error-state">
+      <p>{{ error }}</p>
+      <button type="button" class="btn-secondary" (click)="carregarCotacoes()">Tentar Novamente</button>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Ref.</th>
+            <th>Cliente</th>
+            <th>Rota</th>
+            <th>Carga</th>
+            <th>Entrada</th>
+            <th>Estado</th>
+            <th>Operador</th>
+            <th>Tempo Resposta</th>
+            <th>Acções</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of pedidosFiltrados; track p.id) {
+          <tr>
+            <td style="font-weight: 600; color: var(--accent)">{{ p.ref }}</td>
+            <td>
+              <div style="font-weight: 600; color: var(--text-primary)">{{ p.cliente }}</div>
+              @if (p.telefone) {
+              <div style="font-size: 0.75rem; color: var(--text-muted)">{{ p.telefone }}</div>
+              }
+            </td>
+            <td>{{ p.origem }} → {{ p.destino }}</td>
+            <td style="max-width: 200px">{{ p.descricaoCarga }}</td>
+            <td>
+              <div>{{ p.dataEntrada }}</div>
+              @if (p.horaEntrada) {
+              <div style="font-size: 0.75rem; color: var(--text-muted)">{{ p.horaEntrada }}</div>
+              }
+            </td>
+            <td><span [class]="getBadgeClass(p.estado)">{{ p.estado }}</span></td>
+            <td>{{ p.operador || '—' }}</td>
+            <td>{{ p.tempoResposta || '—' }}</td>
+            <td class="actions-cell">
+              @if (p.estado === 'COTAÇÃO GERADA') {
+                <a
+                  [routerLink]="['/billing/cotacoes/enviadas']"
+                  [queryParams]="{ highlightId: p.id }"
+                  class="action-btn action-btn-conclua"
+                  title="Concluir operação em Cotações Enviadas"
+                >
+                  Conclua a operação
+                </a>
+              } @else if (p.estado === 'CANCELADA') {
+                <a
+                  [routerLink]="['/billing/cotacoes/gerar', p.id]"
+                  class="action-btn action-btn-primary"
+                  title="Reabrir cotação"
+                >
+                  Reabrir cotação
+                </a>
+              } @else {
+                <a
+                  [routerLink]="['/billing/cotacoes/gerar', p.id]"
+                  class="action-btn action-btn-success"
+                  title="Responder"
+                >
+                  Responder
+                </a>
+              }
+            </td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="9" class="empty-state">
+              <p>Nenhum pedido de cotação encontrado</p>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

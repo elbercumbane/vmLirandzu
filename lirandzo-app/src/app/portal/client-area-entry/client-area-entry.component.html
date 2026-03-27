@@ -1,0 +1,70 @@
+<main class="client-entry-page">
+  <section class="client-entry-hero">
+    <div class="client-entry-content">
+      <h1>Área do Cliente</h1>
+      <p>
+        Espaço reservado para acompanhamento de pedidos, cotações e dados do cliente.
+      </p>
+      <button type="button" class="client-entry-open-btn" (click)="openAssistant()">
+        Abrir assistente
+      </button>
+    </div>
+  </section>
+
+  @if (showPopup) {
+    <div class="client-popup-overlay" role="dialog" aria-modal="true" aria-labelledby="client-popup-title">
+      <div class="client-popup-backdrop" (click)="closeAssistant()" aria-hidden="true"></div>
+      <div class="client-popup">
+        <button type="button" class="client-popup-close" (click)="closeAssistant()" aria-label="Fechar">×</button>
+
+        <div class="assistant-badge">ASSISTENTE</div>
+        <h2 id="client-popup-title">Área reservada para os nossos clientes</h2>
+        <p class="assistant-subtitle">
+          Vou guiar-te rapidamente para o caminho certo.
+        </p>
+
+        <div class="assistant-steps">
+          <button type="button" class="assistant-step-btn" [class.active]="step === 'inicio'" (click)="setStep('inicio')">
+            1. Início
+          </button>
+          <button type="button" class="assistant-step-btn" [class.active]="step === 'ja-cliente'" (click)="setStep('ja-cliente')">
+            2. Já sou cliente
+          </button>
+          <button type="button" class="assistant-step-btn" [class.active]="step === 'nao-cliente'" (click)="setStep('nao-cliente')">
+            3. Ainda não sou cliente
+          </button>
+        </div>
+
+        @if (step === 'inicio') {
+          <div class="assistant-panel">
+            <p>Se já és cliente, entra na tua conta para ver os teus dados e pedidos.</p>
+            <p>Se ainda não és cliente, contacta-nos para activarmos o teu acesso.</p>
+            <div class="assistant-actions">
+              <button type="button" class="btn-secondary" (click)="setStep('nao-cliente')">Ainda não sou cliente</button>
+              <button type="button" class="btn-primary" (click)="setStep('ja-cliente')">Já sou cliente</button>
+            </div>
+          </div>
+        }
+
+        @if (step === 'ja-cliente') {
+          <div class="assistant-panel">
+            <p>Perfeito. Clica no botão abaixo para fazer login na tua área.</p>
+            <a class="btn-primary assistant-link" [routerLink]="['/login']" [queryParams]="{ returnUrl: '/area-cliente/dashboard' }">
+              Ir para login
+            </a>
+          </div>
+        }
+
+        @if (step === 'nao-cliente') {
+          <div class="assistant-panel">
+            <p>A tua área ainda não está activa. Fala com a nossa equipa para criar o teu acesso.</p>
+            <div class="assistant-actions">
+              <a class="btn-secondary assistant-link" routerLink="/servicos">Ver serviços</a>
+              <a class="btn-primary assistant-link" routerLink="/contato">Contactar equipa</a>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</main>

@@ -1,0 +1,84 @@
+/* Viaturas Cadastro - estilos específicos */
+
+.capacity-input-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.capacity-input-group .form-control:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.capacity-input-group .capacity-unit {
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.foto-upload-area {
+  margin-bottom: 1rem;
+}
+
+.foto-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  border: 2px dashed var(--border-primary);
+  background: var(--bg-card-inner);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.foto-upload-label:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.foto-upload-label span {
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.foto-upload-label small {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.foto-preview {
+  position: relative;
+  display: inline-block;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--border-primary);
+}
+
+.foto-preview img {
+  display: block;
+  max-width: 300px;
+  max-height: 200px;
+  object-fit: cover;
+}
+
+.foto-remove-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

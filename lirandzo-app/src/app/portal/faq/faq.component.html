@@ -1,0 +1,129 @@
+<main class="faq-page">
+  <!-- Hero com imagem de fundo -->
+  <section class="faq-hero">
+    <div class="faq-hero-bg">
+      <img src="/images/hero-truck-1.jpg" [alt]="'faqPage.heroImgAlt' | transloco" class="faq-hero-img" loading="eager">
+      <div class="faq-hero-overlay"></div>
+    </div>
+    <div class="faq-hero-content">
+      <div class="faq-hero-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="badge-icon">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        <span>{{ 'faqPage.badge' | transloco }}</span>
+      </div>
+      <h1 class="faq-hero-title">{{ 'faqPage.heroTitle' | transloco }}</h1>
+      <p class="faq-hero-desc">
+        {{ 'faqPage.heroDesc' | transloco }}
+      </p>
+    </div>
+  </section>
+
+  <!-- FAQ com layout dividido -->
+  <section class="faq-main">
+    <div class="faq-wrapper">
+      <!-- Sidebar -->
+      <aside class="faq-sidebar">
+        <div class="faq-info-card">
+          <div class="info-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 16v-4"></path>
+              <path d="M12 8h.01"></path>
+            </svg>
+          </div>
+          <h3>{{ 'faqPage.sidebarTitle' | transloco }}</h3>
+          <p>{{ 'faqPage.sidebarText' | transloco }}</p>
+          <div class="contact-info">
+            <a href="mailto:contato&#64;lirandzo.com" class="contact-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              contato&#64;lirandzo.com
+            </a>
+            <a href="tel:+258840000000" class="contact-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+              +258 84 000 0000
+            </a>
+          </div>
+        </div>
+        <div class="sidebar-image">
+          <img src="/images/about-warehouse.jpg" [alt]="'about.alt.warehouse' | transloco" loading="lazy">
+          <div class="sidebar-image-overlay">
+            <span>{{ 'faqPage.sidebarOverlay' | transloco }}</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Lista de FAQ -->
+      <div class="faq-content">
+        <div class="faq-search">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input type="text" [placeholder]="'faqPage.searchPlaceholder' | transloco" class="search-input" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)">
+          </div>
+        </div>
+
+        <div class="faq-list">
+          @for (faq of filteredFaqs(); track $index) {
+            <div class="faq-item" [class.open]="faq.open">
+              <button class="faq-question" type="button" (click)="toggle(faq)">
+                <div class="faq-q-icon">
+                  <span class="q-badge">Q</span>
+                </div>
+                <span class="faq-q-text">{{ faq.question }}</span>
+                <span class="faq-chevron">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </span>
+              </button>
+              <div class="faq-answer-wrap">
+                <div class="faq-answer-content">
+                  <span class="a-badge">A</span>
+                  <p class="faq-answer">{{ faq.answer }}</p>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (filteredFaqs().length === 0) {
+          <p class="faq-no-results">{{ 'faqPage.noResults' | transloco: { query: searchQuery() } }}</p>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="faq-cta">
+    <div class="faq-cta-wrapper">
+      <div class="faq-cta-visual">
+        <div class="cta-shape cta-shape-1"></div>
+        <div class="cta-shape cta-shape-2"></div>
+      </div>
+      <div class="faq-cta-content">
+        <h2 class="faq-cta-title">{{ 'faqPage.ctaTitle' | transloco }}</h2>
+        <p class="faq-cta-text">{{ 'faqPage.ctaText' | transloco }}</p>
+        <div class="faq-cta-actions">
+          <a routerLink="/orcamento" class="faq-cta-btn faq-cta-btn--primary">
+            <span>{{ 'faqPage.ctaQuote' | transloco }}</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+          <a routerLink="/" fragment="contato" class="faq-cta-btn faq-cta-btn--outline">
+            <span>{{ 'faqPage.ctaContact' | transloco }}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

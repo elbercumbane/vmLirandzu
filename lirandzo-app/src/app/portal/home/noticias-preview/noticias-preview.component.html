@@ -1,0 +1,32 @@
+<section class="noticias-preview" id="noticias">
+  <div class="noticias-preview-container">
+    <header class="noticias-preview-header">
+      <span class="noticias-preview-badge">Blog & Avisos</span>
+      <h2 class="noticias-preview-title">Notícias e Avisos</h2>
+      <p class="noticias-preview-subtitle">
+        Actualizações sobre a operação, avisos de tempo e novidades que afectam as suas entregas.
+      </p>
+    </header>
+    <div class="noticias-preview-grid">
+      @for (noticia of noticias; track noticia.id) {
+        <a [routerLink]="['/noticias', noticia.id]" class="noticia-preview-card">
+          <div class="noticia-preview-image">
+            <img [src]="noticia.imagem" [alt]="noticia.titulo" loading="lazy">
+            <span class="noticia-preview-badge">{{ noticia.categoria }}</span>
+          </div>
+          <div class="noticia-preview-body">
+            <time class="noticia-preview-data">{{ formatarData(noticia.data) }}</time>
+            <h3 class="noticia-preview-titulo">{{ noticia.titulo }}</h3>
+            <p class="noticia-preview-resumo">{{ noticia.resumo }}</p>
+          </div>
+        </a>
+      }
+    </div>
+    <div class="noticias-preview-footer">
+      <a routerLink="/noticias" class="noticias-preview-link">
+        Ver todas as notícias
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>

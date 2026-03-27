@@ -1,0 +1,176 @@
+/* Tab styling — active tabs use badge-success/badge-danger/badge-warning via shared */
+.filter-chip.badge-success {
+  background: rgba(22, 101, 52, 0.85) !important;
+  border-color: transparent !important;
+  color: #bbf7d0 !important;
+}
+
+.filter-chip.badge-danger {
+  background: rgba(127, 29, 29, 0.85) !important;
+  border-color: transparent !important;
+  color: #fecaca !important;
+}
+
+.filter-chip.badge-warning {
+  background: rgba(113, 63, 18, 0.85) !important;
+  border-color: transparent !important;
+  color: #facc15 !important;
+}
+
+.tesouraria-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.tesouraria-tabs .spacer {
+  flex: 1;
+  min-width: 0.5rem;
+}
+
+.register-form {
+  margin-bottom: 1.25rem;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  background: var(--bg-card-inner);
+  border: 1px solid var(--accent-border);
+  animation: slideDown 0.2s ease;
+}
+
+.register-form h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cat-summary {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  background: var(--bg-card-inner);
+  border: 1px solid var(--border-subtle);
+}
+
+.cat-summary h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.cat-summary-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.cat-summary-item:last-child {
+  border-bottom: none;
+}
+
+.cat-summary-name {
+  color: var(--text-secondary);
+}
+
+.cat-summary-value {
+  font-weight: 600;
+  color: var(--danger);
+}
+
+.divida-dias {
+  display: inline-flex;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.valor-despesa {
+  font-weight: 600;
+  color: var(--danger);
+}
+
+.valor-divida {
+  font-weight: 700;
+  color: var(--danger);
+}
+
+.fluxo-baixas-card {
+  margin-bottom: 1rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--accent-border);
+  background: linear-gradient(135deg, var(--bg-card-inner) 0%, var(--bg-card) 100%);
+}
+
+.fluxo-baixas-heading {
+  margin: 0 0 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.fluxo-baixas-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+@media (min-width: 768px) {
+  .fluxo-baixas-steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.fluxo-baixas-step {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+}
+
+.fluxo-baixas-step p {
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.fluxo-baixas-n {
+  flex-shrink: 0;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fluxo-perfil-aviso {
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: var(--text-primary);
+}

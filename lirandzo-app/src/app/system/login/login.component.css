@@ -1,0 +1,481 @@
+/* Layout inspirado no painel duplo (desktop + mobile) — campos e lógica inalterados */
+
+.login-page {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  padding-top: 72px;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background:
+    linear-gradient(135deg, rgba(12, 21, 36, 0.55) 0%, rgba(40, 12, 14, 0.5) 100%),
+    url('/motorista-camiao.jpg') no-repeat center / cover;
+  position: relative;
+}
+
+.login-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 1.25rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 2;
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: #fff;
+}
+
+.login-header .login-logo-mark {
+  width: 40px;
+  height: 40px;
+  font-size: 0.75rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.login-logo-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+
+.login-logo-name em {
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-style: normal;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.04em;
+}
+
+.login-portal-link {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+.login-portal-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 900px;
+  position: relative;
+  z-index: 1;
+  animation: loginFadeIn 0.6s ease-out;
+}
+
+.login-shell {
+  display: flex;
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  min-height: 500px;
+}
+
+/* Painel esquerdo — gradiente vermelho (marca) */
+.login-left-panel {
+  background: linear-gradient(180deg, var(--brand-red-hover, #991b1b) 0%, var(--brand-red-light, #dc2626) 50%, var(--brand-red, #b91c1c) 100%);
+  flex: 1;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-left-panel::before {
+  content: '';
+  position: absolute;
+  right: -50px;
+  top: 0;
+  bottom: 0;
+  width: 100px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 500' preserveAspectRatio='none'%3E%3Cpath d='M0,0 Q50,50 0,100 Q50,150 0,200 Q50,250 0,300 Q50,350 0,400 Q50,450 0,500 L100,500 L100,0 Z' fill='white'/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.logo-section {
+  text-align: center;
+  z-index: 1;
+  max-width: 280px;
+}
+
+.login-logo-circle {
+  width: 80px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.login-logo-circle .login-logo-mark {
+  width: auto;
+  height: auto;
+  border: none;
+  background: transparent;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.login-welcome {
+  font-size: 28px;
+  margin: 0 0 10px;
+  font-weight: 300;
+}
+
+.login-brand-heading {
+  font-size: 32px;
+  margin: 0 0 20px;
+  font-weight: 600;
+}
+
+.login-panel-lead {
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Painel direito — formulário */
+.login-right-panel {
+  flex: 1.2;
+  padding: 48px 50px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.form-header {
+  margin-bottom: 32px;
+}
+
+.form-header h2 {
+  color: #333;
+  font-size: 26px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.form-header-note {
+  color: #888;
+  font-size: 14px;
+  margin: 0;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.login-field {
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.login-field label {
+  display: block;
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.input-with-icon,
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid #e0e0e0;
+  transition: border-color 0.3s;
+}
+
+.field-icon {
+  position: absolute;
+  left: 0;
+  color: #888;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.login-field input {
+  width: 100%;
+  padding: 12px 0 12px 30px;
+  border: none;
+  font-size: 16px;
+  transition: border-color 0.3s;
+  outline: none;
+  background: transparent;
+  color: #333;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.login-field input:focus {
+  border-bottom-color: transparent;
+}
+
+.login-field input::placeholder {
+  color: #bbb;
+  font-size: 14px;
+}
+
+.login-field input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.input-with-icon:focus-within,
+.password-wrapper:focus-within {
+  border-bottom-color: var(--brand-red-light, #dc2626);
+}
+
+.password-wrapper input {
+  padding-left: 30px;
+  padding-right: 2.75rem;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.password-toggle:hover {
+  color: var(--brand-red-light, #dc2626);
+}
+
+.login-error {
+  font-size: 0.85rem;
+  color: #f44336;
+  margin: -12px 0 16px;
+}
+
+.login-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--brand-red-light, #dc2626) 0%, var(--brand-red-hover, #991b1b) 100%);
+  color: #fff;
+  border: none;
+  padding: 14px 35px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s, opacity 0.2s;
+  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.45);
+  font-family: inherit;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.55);
+}
+
+.btn-primary:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.login-forgot-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: var(--brand-red-light, #dc2626);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.login-forgot-link:hover {
+  text-decoration: underline;
+  color: var(--brand-red-hover, #991b1b);
+}
+
+.login-hint {
+  font-size: 12px;
+  color: #999;
+  margin: 24px 0 0;
+  line-height: 1.5;
+}
+
+.login-info {
+  margin-top: 1rem;
+}
+
+.login-sim-note {
+  font-size: 11px;
+  color: #aaa;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.login-toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 30;
+  max-width: 360px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #b91c1c;
+  color: #fff;
+  font-size: 0.9rem;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+}
+
+.login-toast--success {
+  background: #15803d;
+}
+
+@keyframes loginFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile: coluna única, topo vermelho com onda */
+@media (max-width: 768px) {
+  .login-page {
+    background:
+      linear-gradient(135deg, rgba(12, 21, 36, 0.6) 0%, rgba(40, 12, 14, 0.55) 100%),
+      url('/motorista-camiao.jpg') no-repeat center / cover;
+    justify-content: flex-start;
+    padding: 16px;
+    padding-top: 64px;
+  }
+
+  .login-header {
+    background: transparent;
+  }
+
+  .login-shell {
+    flex-direction: column;
+    max-width: 380px;
+    margin: 0 auto;
+    min-height: auto;
+    border-radius: 20px;
+  }
+
+  .login-left-panel {
+    padding: 40px 30px 48px;
+    flex: none;
+  }
+
+  .login-left-panel::before {
+    display: none;
+  }
+
+  .login-left-panel::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'%3E%3Cpath d='M0,40 Q100,0 200,20 Q300,40 400,10 L400,40 Z' fill='white'/%3E%3C/svg%3E");
+    background-size: cover;
+  }
+
+  .login-logo-circle {
+    width: 60px;
+    height: 60px;
+  }
+
+  .login-logo-circle .login-logo-mark {
+    font-size: 1.1rem;
+  }
+
+  .login-welcome {
+    font-size: 24px;
+  }
+
+  .login-brand-heading {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+
+  .login-panel-lead {
+    font-size: 13px;
+    opacity: 0.9;
+  }
+
+  .login-right-panel {
+    padding: 36px 28px 32px;
+  }
+
+  .form-header {
+    text-align: center;
+  }
+
+  .form-header h2 {
+    font-size: 22px;
+  }
+
+  .login-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+}

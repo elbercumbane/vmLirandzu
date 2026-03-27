@@ -1,0 +1,44 @@
+@if (noticia) {
+  <main class="noticia-detalhe-page">
+    <article class="noticia-detalhe">
+      <header class="noticia-detalhe-hero">
+        <div class="noticia-detalhe-hero-bg">
+          <img [src]="noticia.imagem" [alt]="noticia.titulo" loading="eager">
+          <div class="noticia-detalhe-hero-overlay"></div>
+        </div>
+        <div class="noticia-detalhe-hero-content">
+          <a routerLink="/noticias" class="noticia-detalhe-back">← Voltar às notícias</a>
+          <span class="noticia-detalhe-badge">{{ noticia.categoria }}</span>
+          <h1 class="noticia-detalhe-titulo">{{ noticia.titulo }}</h1>
+          <time class="noticia-detalhe-data">{{ formatarData(noticia.data) }}</time>
+        </div>
+      </header>
+
+      <div class="noticia-detalhe-body">
+        <div class="noticia-detalhe-content">
+          @for (paragrafo of paragrafos; track $index) {
+            <p class="noticia-detalhe-paragrafo">{{ paragrafo }}</p>
+          }
+          @if (!noticia.conteudo) {
+            <p class="noticia-detalhe-paragrafo">{{ noticia.resumo }}</p>
+          }
+        </div>
+      </div>
+    </article>
+
+    <section class="noticia-detalhe-cta">
+      <div class="noticia-detalhe-cta-inner">
+        <h2 class="noticia-detalhe-cta-title">Precisa de uma cotação?</h2>
+        <p class="noticia-detalhe-cta-text">A nossa equipa está disponível para ajudar.</p>
+        <a routerLink="/orcamento" class="noticia-detalhe-cta-btn">Solicitar Cotação</a>
+      </div>
+    </section>
+  </main>
+} @else {
+  <main class="noticia-detalhe-page">
+    <div class="noticia-not-found">
+      <h1>Notícia não encontrada</h1>
+      <a routerLink="/noticias" class="noticia-detalhe-cta-btn">Voltar às notícias</a>
+    </div>
+  </main>
+}

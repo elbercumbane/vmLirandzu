@@ -1,5 +1,0 @@
-/* Motoristas Lista — estilos locais mínimos */
-.avaliacao-stars { display: inline-flex; gap: 1px; align-items: center; }
-.avaliacao-stars svg { color: var(--border-subtle, #e5e7eb); }
-.avaliacao-stars svg.filled { color: #f59e0b; fill: #f59e0b; }
-.avaliacao-num { margin-left: 0.35rem; font-size: 0.8rem; color: var(--text-muted); }

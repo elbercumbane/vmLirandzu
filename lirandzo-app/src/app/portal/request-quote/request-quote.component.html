@@ -1,0 +1,208 @@
+<main class="quote-page">
+  <!-- Hero logo abaixo do navbar -->
+  <header class="quote-hero">
+    <div class="quote-hero-bg" aria-hidden="true"></div>
+    <div class="quote-hero-inner">
+      <h1 class="quote-title">{{ 'quotePage.title' | transloco }}</h1>
+      <p class="quote-subtitle">{{ 'quotePage.subtitle' | transloco }}</p>
+    </div>
+  </header>
+  <section class="quote-form-section">
+    <div class="quote-form-inner">
+      <div class="quote-form-card">
+        <div class="quote-form-card-accent" aria-hidden="true"></div>
+        <div class="quote-form-card-body">
+        <form class="quote-form" (ngSubmit)="onFormSubmit($event)" #f="ngForm">
+          <!-- Dados pessoais -->
+          <div class="form-section" [class.expanded]="isSectionExpanded('dados')">
+            <button type="button" class="form-section-header" (click)="toggleSection('dados')" [attr.aria-expanded]="isSectionExpanded('dados')">
+              <span class="form-section-title">{{ 'quotePage.sectionPersonal' | transloco }}</span>
+              <span class="form-section-chevron" aria-hidden="true">›</span>
+            </button>
+            <div class="form-section-body" [class.expanded]="isSectionExpanded('dados')">
+            <div class="form-section-fields">
+              <div class="form-row">
+                <label for="name">{{ 'quotePage.name' | transloco }} <span class="required">*</span></label>
+                <input id="name" type="text" [(ngModel)]="form.name" name="name" [placeholder]="'quotePage.phFullName' | transloco" required />
+              </div>
+              <div class="form-row">
+                <label for="email">{{ 'quotePage.email' | transloco }} <span class="required">*</span></label>
+                <input id="email" type="email" [(ngModel)]="form.email" name="email" [placeholder]="'quotePage.phEmail' | transloco" required />
+              </div>
+              <div class="form-row form-row-contact">
+                <label>{{ 'quotePage.contacts' | transloco }} <span class="required">*</span></label>
+                <div class="contact-group">
+                  <div class="contact-row">
+                    <input id="phone1" type="tel" [(ngModel)]="form.phone1" name="phone1" [placeholder]="'quotePage.phonePh' | transloco" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            </div>
+          </div>
+
+          <!-- Detalhes da cotação -->
+          <div class="form-section" [class.expanded]="isSectionExpanded('detalhes')">
+            <button type="button" class="form-section-header" (click)="toggleSection('detalhes')" [attr.aria-expanded]="isSectionExpanded('detalhes')">
+              <span class="form-section-title">{{ 'quotePage.sectionQuote' | transloco }}</span>
+              <span class="form-section-chevron" aria-hidden="true">›</span>
+            </button>
+            <div class="form-section-body" [class.expanded]="isSectionExpanded('detalhes')">
+            <div class="form-section-fields">
+              <div class="form-row">
+                <label for="origin">{{ 'quotePage.origin' | transloco }} <span class="required">*</span></label>
+                <input id="origin" type="text" [(ngModel)]="form.origin" name="origin" [placeholder]="'quotePage.originPh' | transloco" required />
+              </div>
+              <div class="form-row">
+                <label for="destination">{{ 'quotePage.destination' | transloco }} <span class="required">*</span></label>
+                <input id="destination" type="text" [(ngModel)]="form.destination" name="destination" [placeholder]="'quotePage.destPh' | transloco" required />
+              </div>
+              <div class="form-row form-row-split">
+                <div class="form-cell">
+                  <label for="tipoServico">{{ 'quotePage.serviceType' | transloco }} <span class="required">*</span></label>
+                  <select id="tipoServico" [(ngModel)]="form.tipoServico" name="tipoServico" required>
+                    <option value="TRANSPORTE">{{ 'quotePage.serviceTransport' | transloco }}</option>
+                    <option value="COMPRA_TRANSPORTE">{{ 'quotePage.serviceBuyTransport' | transloco }}</option>
+                  </select>
+                </div>
+                <div class="form-cell">
+                  <label for="deliveryMethod">{{ 'quotePage.quoteDelivery' | transloco }} <span class="required">*</span></label>
+                  <select id="deliveryMethod" [(ngModel)]="form.deliveryMethod" name="deliveryMethod" required>
+                    <option [ngValue]="''">{{ 'quotePage.selectOption' | transloco }}</option>
+                    <option [ngValue]="'whatsapp'">{{ 'quotePage.whatsapp' | transloco }}</option>
+                    <option [ngValue]="'email'">{{ 'quotePage.emailOpt' | transloco }}</option>
+                    <option [ngValue]="'chamada'">{{ 'quotePage.call' | transloco }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            </div>
+          </div>
+
+          <!-- Mensagem -->
+          <div class="form-section form-section-message" [class.expanded]="isSectionExpanded('mensagem')">
+            <button type="button" class="form-section-header" (click)="toggleSection('mensagem')" [attr.aria-expanded]="isSectionExpanded('mensagem')">
+              <span class="form-section-title">{{ 'quotePage.sectionNeed' | transloco }}</span>
+              <span class="form-section-chevron" aria-hidden="true">›</span>
+            </button>
+            <div class="form-section-body" [class.expanded]="isSectionExpanded('mensagem')">
+            <div class="form-section-fields">
+            <div class="form-row full message-block">
+              <label for="message" class="message-label">{{ 'quotePage.messageLabel' | transloco }}</label>
+              <p class="message-hint">{{ 'quotePage.messageHint' | transloco }}</p>
+              <textarea id="message" [(ngModel)]="form.message" name="message" rows="5" [placeholder]="'quotePage.messagePh' | transloco" (keydown.enter)="$event.stopPropagation()"></textarea>
+            </div>
+            </div>
+            </div>
+          </div>
+          @if (errorKey) {
+            <p class="quote-error">{{ errorKey | transloco }}</p>
+          }
+          <button type="submit" class="quote-submit" [disabled]="loading">
+            {{ loading ? ('quotePage.sending' | transloco) : ('quotePage.submit' | transloco) }}
+          </button>
+        </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal de validação: campos obrigatórios em falta -->
+  @if (validationModalOpen) {
+    <div class="quote-confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="quote-validation-title">
+      <div class="quote-confirm-backdrop" (click)="closeValidationModal()" aria-hidden="true"></div>
+      <div class="quote-confirm-modal quote-validation-modal">
+        <div class="quote-validation-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="36" height="36">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <h2 id="quote-validation-title" class="quote-confirm-title" style="color:#dc2626">Campos obrigatórios em falta</h2>
+        <p class="quote-confirm-subtitle">Por favor preencha os seguintes campos antes de enviar:</p>
+        <ul class="quote-validation-list">
+          <li *ngFor="let field of getMissingFields()">{{ field }}</li>
+        </ul>
+        <div class="quote-confirm-actions">
+          <button type="button" class="quote-confirm-btn quote-confirm-btn-send" (click)="closeValidationModal()">Corrigir</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Popup de confirmação (resumo dos dados, Editar / Enviar) -->
+  @if (confirmacaoOpen) {
+    <div class="quote-confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="quote-confirm-title">
+      <div class="quote-confirm-backdrop" aria-hidden="true"></div>
+      <div class="quote-confirm-modal">
+        <h2 id="quote-confirm-title" class="quote-confirm-title">{{ 'quotePage.confirmTitle' | transloco }}</h2>
+        <p class="quote-confirm-subtitle">{{ 'quotePage.confirmSubtitle' | transloco }}</p>
+        <div class="quote-confirm-summary">
+          <div class="quote-confirm-row">
+            <span class="quote-confirm-label">{{ 'quotePage.lblName' | transloco }}</span>
+            <span class="quote-confirm-value">{{ form.name }}</span>
+          </div>
+          <div class="quote-confirm-row">
+            <span class="quote-confirm-label">{{ 'quotePage.lblEmail' | transloco }}</span>
+            <span class="quote-confirm-value">{{ form.email }}</span>
+          </div>
+          @if (form.phone1) {
+            <div class="quote-confirm-row">
+              <span class="quote-confirm-label">{{ 'quotePage.lblPhone' | transloco }}</span>
+              <span class="quote-confirm-value">{{ form.phone1 }}</span>
+            </div>
+          }
+          <div class="quote-confirm-row">
+            <span class="quote-confirm-label">{{ 'quotePage.lblOrigin' | transloco }}</span>
+            <span class="quote-confirm-value">{{ form.origin }}</span>
+          </div>
+          <div class="quote-confirm-row">
+            <span class="quote-confirm-label">{{ 'quotePage.lblDest' | transloco }}</span>
+            <span class="quote-confirm-value">{{ form.destination }}</span>
+          </div>
+          <div class="quote-confirm-row">
+            <span class="quote-confirm-label">{{ 'quotePage.lblService' | transloco }}</span>
+            <span class="quote-confirm-value">{{ getTipoServicoLabel() }}</span>
+          </div>
+          <div class="quote-confirm-row">
+            <span class="quote-confirm-label">{{ 'quotePage.lblWhereQuote' | transloco }}</span>
+            <span class="quote-confirm-value">{{ getDeliveryLabel() }}</span>
+          </div>
+          @if (form.message) {
+          <div class="quote-confirm-row quote-confirm-row-message">
+            <span class="quote-confirm-label">{{ 'quotePage.lblMessage' | transloco }}</span>
+            <span class="quote-confirm-value quote-confirm-message">{{ form.message }}</span>
+          </div>
+          }
+        </div>
+        <div class="quote-confirm-actions">
+          <button type="button" class="quote-confirm-btn quote-confirm-btn-edit" (click)="closeConfirmacao()">{{ 'quotePage.edit' | transloco }}</button>
+          <button type="button" class="quote-confirm-btn quote-confirm-btn-send" (click)="doSubmit()">{{ 'quotePage.send' | transloco }}</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Popup de sucesso flutuante (backdrop blur, só fecha manualmente) -->
+  @if (submitted) {
+    <div class="quote-success-overlay" role="dialog" aria-modal="true" aria-labelledby="quote-success-title">
+      <div class="quote-success-backdrop" aria-hidden="true"></div>
+      <div class="quote-success-modal">
+        <button type="button" class="quote-success-close" (click)="closeSuccessModal()" [attr.aria-label]="'quotePage.closeAria' | transloco">×</button>
+        <div class="quote-success-content">
+          <span class="quote-success-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </span>
+          <h2 id="quote-success-title">{{ 'quotePage.successTitle' | transloco }}</h2>
+          <p>{{ 'quotePage.successText' | transloco }}</p>
+          <p class="quote-success-hint">{{ 'quotePage.successHint' | transloco }}</p>
+          <button type="button" class="quote-success-btn" (click)="closeSuccessModal()">{{ 'quotePage.closeBtn' | transloco }}</button>
+        </div>
+      </div>
+    </div>
+  }
+</main>

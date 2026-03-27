@@ -1,0 +1,122 @@
+<app-billing-section-header
+  [showBack]="true"
+  [showHelp]="false"
+  [backLink]="'/billing/motoristas'"
+  title="Detalhes do Motorista"
+  subtitle="Visualização completa do motorista"
+></app-billing-section-header>
+
+@if (loading) {
+  <div class="loading-state">
+    <p>A carregar dados do motorista...</p>
+  </div>
+} @else if (error) {
+  <div class="error-state">
+    <p>{{ error }}</p>
+    <button type="button" class="btn-secondary" (click)="carregarMotorista()">Tentar Novamente</button>
+    <a routerLink="/billing/motoristas" class="btn-secondary" style="margin-left: 0.5rem;">Voltar</a>
+  </div>
+} @else if (motorista) {
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h3>{{ motorista.nome }}</h3>
+        <p class="text-muted">ID: {{ motorista.id }}</p>
+      </div>
+      <div>
+        <span [class]="'badge ' + getStatusClass(motorista.status)">
+          {{ formatarStatus(motorista.status) }}
+        </span>
+        <button type="button" class="btn-primary" (click)="editar()" style="margin-left: 1rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="margin-right: 0.5rem;">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Editar
+        </button>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-section">
+        <h4>Identificação</h4>
+        <div class="detail-item">
+          <span class="detail-label">Nome:</span>
+          <span class="detail-value">{{ motorista.nome }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Data de nascimento:</span>
+          <span class="detail-value">{{ formatarData(motorista.dataNascimento) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Morada:</span>
+          <span class="detail-value">{{ motorista.morada || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Filiação:</span>
+          <span class="detail-value">{{ formatarFiliacao(motorista) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">NUIT:</span>
+          <span class="detail-value">{{ motorista.nuit || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Nº BI / Documento:</span>
+          <span class="detail-value">{{ motorista.numeroBI || 'N/A' }}</span>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h4>Carta de Condução</h4>
+        <div class="detail-item">
+          <span class="detail-label">Nº Carta:</span>
+          <span class="detail-value">{{ motorista.numeroCarta || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Categoria:</span>
+          <span class="detail-value">{{ motorista.categoriaCarta || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Data de emissão:</span>
+          <span class="detail-value">{{ formatarData(motorista.dataEmissaoCarta) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Data de validade:</span>
+          <span class="detail-value">{{ formatarData(motorista.dataValidadeCarta) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Avaliação Média:</span>
+          <span class="detail-value highlight">{{ (motorista.avaliacaoMedia || 0) | number:'1.1-1' }} / 5.0</span>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h4>Contactos</h4>
+        <div class="detail-item">
+          <span class="detail-label">Telefone:</span>
+          <span class="detail-value">{{ motorista.telefone || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Telefone alternativo:</span>
+          <span class="detail-value">{{ motorista.telefone2 || 'N/A' }}</span>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h4>Contacto de Emergência</h4>
+        <div class="detail-item">
+          <span class="detail-label">Nome do parente:</span>
+          <span class="detail-value">{{ motorista.nomeParenteEmergencia || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Parentesco:</span>
+          <span class="detail-value">{{ motorista.parentesco || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Telefone:</span>
+          <span class="detail-value">{{ motorista.telefoneParenteEmergencia || 'N/A' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,145 @@
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="getBackLink()"
+  [showHelp]="true"
+  title="Editar Motorista"
+  subtitle="Actualize os dados do motorista conforme necessário"
+  helpTitle="Como editar um Motorista"
+  [helpItems]="[
+    'Pode actualizar todos os dados de identificação, carta de condução e contactos.',
+    'Após guardar, o motorista será actualizado na base de dados.',
+    'As alterações serão reflectidas imediatamente.'
+  ]"
+></app-billing-section-header>
+
+@if (loading) {
+  <div class="loading-state">
+    <p>A carregar dados do motorista...</p>
+  </div>
+} @else if (error) {
+  <div class="error-state">
+    <p>{{ error }}</p>
+    <button type="button" class="btn-secondary" (click)="carregarMotorista()">Tentar Novamente</button>
+    <a routerLink="/billing/motoristas" class="btn-secondary" style="margin-left: 0.5rem;">Voltar</a>
+  </div>
+} @else {
+  <div class="card">
+    <form (ngSubmit)="salvar()">
+      <div class="form-section-title">Identificação</div>
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label class="form-label" for="nome">Nome completo *</label>
+          <input type="text" id="nome" class="form-control" placeholder="Nome completo" [(ngModel)]="motorista.nome" name="nome" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dataNascimento">Data de nascimento</label>
+          <input type="date" id="dataNascimento" class="form-control" [(ngModel)]="motorista.dataNascimento" name="dataNascimento" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="morada">Morada</label>
+          <input type="text" id="morada" class="form-control" placeholder="Endereço completo" [(ngModel)]="motorista.morada" name="morada" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="nomePai">Nome do pai</label>
+          <input type="text" id="nomePai" class="form-control" placeholder="Nome do pai" [(ngModel)]="motorista.nomePai" name="nomePai" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="nomeMae">Nome da mãe</label>
+          <input type="text" id="nomeMae" class="form-control" placeholder="Nome da mãe" [(ngModel)]="motorista.nomeMae" name="nomeMae" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="nuit">NUIT</label>
+          <input type="text" id="nuit" class="form-control" placeholder="Número de identificação fiscal" [(ngModel)]="motorista.nuit" name="nuit" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="numeroBI">Nº BI / Documento</label>
+          <input type="text" id="numeroBI" class="form-control" placeholder="Número do Bilhete de Identidade" [(ngModel)]="motorista.numeroBI" name="numeroBI" />
+        </div>
+      </div>
+
+      <div class="form-section-title">Carta de condução</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="numeroCarta">Número da carta</label>
+          <input type="text" id="numeroCarta" class="form-control" placeholder="Número da carta" [(ngModel)]="motorista.numeroCarta" name="numeroCarta" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="categoriaCarta">Categoria</label>
+          <select id="categoriaCarta" class="form-control" [(ngModel)]="motorista.categoriaCarta" name="categoriaCarta">
+            <option value="">-- Selecione --</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dataEmissaoCarta">Data de emissão</label>
+          <input type="date" id="dataEmissaoCarta" class="form-control" [(ngModel)]="motorista.dataEmissaoCarta" name="dataEmissaoCarta" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dataValidadeCarta">Data de validade</label>
+          <input type="date" id="dataValidadeCarta" class="form-control" [(ngModel)]="motorista.dataValidadeCarta" name="dataValidadeCarta" />
+        </div>
+      </div>
+
+      <div class="form-section-title">Contactos (máx. 2)</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="telefone">Telefone do motorista</label>
+          <input type="text" id="telefone" class="form-control" placeholder="Ex: 84 123 4567" [(ngModel)]="motorista.telefone" name="telefone" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="telefone2">Telefone alternativo</label>
+          <input type="text" id="telefone2" class="form-control" placeholder="Ex: 87 654 3210" [(ngModel)]="motorista.telefone2" name="telefone2" />
+        </div>
+      </div>
+
+      <div class="form-section-title">Contacto de emergência</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="nomeParenteEmergencia">Nome do parente</label>
+          <input type="text" id="nomeParenteEmergencia" class="form-control" placeholder="Nome do contacto de emergência" [(ngModel)]="motorista.nomeParenteEmergencia" name="nomeParenteEmergencia" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="parentesco">Parentesco</label>
+          <input type="text" id="parentesco" class="form-control" placeholder="Ex: Pai, Mãe, Cônjuge..." [(ngModel)]="motorista.parentesco" name="parentesco" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="telefoneParenteEmergencia">Telefone do parente</label>
+          <input type="text" id="telefoneParenteEmergencia" class="form-control" placeholder="Ex: 84 999 8888" [(ngModel)]="motorista.telefoneParenteEmergencia" name="telefoneParenteEmergencia" />
+        </div>
+      </div>
+
+      <div class="form-section-title">Status</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="status">Status</label>
+          <select id="status" class="form-control" [(ngModel)]="motorista.status" name="status">
+            <option value="ACTIVE">Ativo</option>
+            <option value="INACTIVE">Inactivo</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a [routerLink]="getBackLink()" class="btn-secondary">Cancelar</a>
+        <button type="submit" class="btn-primary" [disabled]="loading">
+          @if (loading) {
+            Guardando...
+          } @else {
+            Actualizar
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+}
+
+<app-notification-popup
+  *ngIf="showNotification"
+  [message]="notificationMessage"
+  [type]="notificationType"
+  [duration]="7000">
+</app-notification-popup>

@@ -1,0 +1,148 @@
+<main class="about-page">
+  <!-- Hero -->
+  <section class="hero-section">
+    <div class="hero-background">
+      <div class="hero-overlay"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="pulse-dot"></span>
+        {{ 'about.hero.badge' | transloco }}
+      </div>
+      <h1 class="hero-title">{{ 'about.hero.titleLine1' | transloco }}<br><span class="gradient-text">{{ 'about.hero.titleGradient' | transloco }}</span></h1>
+      <p class="hero-description">
+        {{ 'about.hero.description' | transloco }}
+      </p>
+      <div class="hero-stats">
+        <div class="stat-item" *ngFor="let stat of stats">
+          <div class="stat-value">{{ stat.value }}<span class="stat-suffix">{{ stat.suffix }}</span></div>
+          <div class="stat-label">{{ stat.label }}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quem Somos -->
+  <section class="content-section reveal">
+    <div class="container">
+      <div class="section-grid">
+        <div class="section-content">
+          <span class="section-eyebrow">{{ 'about.who.eyebrow' | transloco }}</span>
+          <h2 class="section-title">{{ 'about.who.title1' | transloco }}<br><span class="highlight">{{ 'about.who.titleHighlight' | transloco }}</span></h2>
+          <p class="section-text">
+            {{ 'about.who.text' | transloco }}
+          </p>
+          <div class="features-row">
+            <div class="feature-badge" *ngFor="let f of introFeatures">
+              <span class="feature-icon">{{ f.icon }}</span>
+              <span>{{ f.label }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="section-visual">
+          <div class="image-stack">
+            <div class="image-card primary">
+              <img src="/images/hero-truck-1.jpg" [alt]="'about.alt.truckFleet' | transloco" loading="lazy">
+              <div class="floating-badge"><strong>{{ 'about.floating.value' | transloco }}</strong><span>{{ 'about.floating.label' | transloco }}</span></div>
+            </div>
+            <div class="image-card secondary">
+              <img src="/images/about-warehouse.jpg" [alt]="'about.alt.warehouse' | transloco" loading="lazy">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- História -->
+  <section class="content-section alt-bg reveal">
+    <div class="container">
+      <header class="section-header">
+        <span class="section-eyebrow">{{ 'about.history.eyebrow' | transloco }}</span>
+        <h2 class="section-title">{{ 'about.history.title' | transloco }}</h2>
+        <p class="section-text">
+          {{ 'about.history.text' | transloco }}
+        </p>
+      </header>
+      <div class="history-grid">
+        <img src="/images/hero-truck-1.jpg" [alt]="'about.alt.truckRoad' | transloco" loading="lazy">
+        <img src="/images/about-warehouse.jpg" [alt]="'about.alt.warehouse' | transloco" loading="lazy">
+        <img src="/images/hero-warehouse-3.jpg" [alt]="'about.alt.terminal' | transloco" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <!-- Frota -->
+  <section class="content-section reveal">
+    <div class="container">
+      <div class="section-grid">
+        <div class="section-content">
+          <span class="section-eyebrow">{{ 'about.fleet.eyebrow' | transloco }}</span>
+          <h2 class="section-title">{{ 'about.fleet.title' | transloco }}</h2>
+          <p class="section-text">
+            {{ 'about.fleet.text' | transloco }}
+          </p>
+          <a routerLink="/orcamento" class="btn-primary">{{ 'about.fleet.cta' | transloco }}</a>
+        </div>
+        <div class="section-visual">
+          <div class="fleet-showcase">
+            <img src="/frota-camioes.jpg" [alt]="'about.alt.truckFleet' | transloco" loading="lazy">
+            <div class="fleet-stats">
+              <div class="fleet-stat"><span class="value">50+</span><span class="label">{{ 'about.fleet.fs1' | transloco }}</span></div>
+              <div class="fleet-stat"><span class="value">100%</span><span class="label">{{ 'about.fleet.fs2' | transloco }}</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Equipa -->
+  <section class="content-section alt-bg team-section reveal">
+    <div class="container">
+      <header class="section-header center">
+        <span class="section-eyebrow">{{ 'about.team.eyebrow' | transloco }}</span>
+        <h2 class="section-title">{{ 'about.team.title' | transloco }}</h2>
+      </header>
+      <div class="card-grid">
+        <article class="info-card" *ngFor="let member of team">
+          <div class="card-image" [style.background-image]="'url(' + member.image + ')'"></div>
+          <div class="card-body">
+            <h3 class="card-title">{{ member.name }}</h3>
+            <span class="card-subtitle">{{ member.role }}</span>
+            <p class="card-text">{{ member.description }}</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Conformidade -->
+  <section class="content-section reveal">
+    <div class="container">
+      <header class="section-header center">
+        <span class="section-eyebrow">{{ 'about.compliance.eyebrow' | transloco }}</span>
+        <h2 class="section-title">{{ 'about.compliance.title' | transloco }}</h2>
+        <p class="section-text">{{ 'about.compliance.text' | transloco }}</p>
+      </header>
+      <div class="card-grid certs">
+        <article class="info-card cert" *ngFor="let cert of certifications">
+          <span class="cert-icon">{{ cert.icon }}</span>
+          <h3 class="card-title">{{ cert.title }}</h3>
+          <p class="card-text">{{ cert.desc }}</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section reveal">
+    <div class="container">
+      <h2 class="cta-title">{{ 'about.cta.title' | transloco }}</h2>
+      <div class="cta-buttons">
+        <a routerLink="/orcamento" class="btn-primary large">{{ 'about.cta.quote' | transloco }}</a>
+        <a routerLink="/contato" class="btn-outline large">{{ 'about.cta.contact' | transloco }}</a>
+      </div>
+    </div>
+  </section>
+</main>

@@ -1,0 +1,460 @@
+{
+  "about": {
+    "hero": {
+      "badge": "Lirandzo Transportes",
+      "titleLine1": "Sobre nós",
+      "titleGradient": "A nossa história",
+      "description": "Mais de uma década a conectar negócios e pessoas através de soluções logísticas no corredor Joanesburgo–Maputo."
+    },
+    "stats": {
+      "s1": "anos de experiência",
+      "s2": "rastreamento GPS",
+      "s3": "entregas no prazo",
+      "s4": "veículos"
+    },
+    "who": {
+      "eyebrow": "Quem Somos",
+      "title1": "Logística moderna,",
+      "titleHighlight": "movida por pessoas reais",
+      "text": "A Lirandzo é parceira estratégica na cadeia de suprimentos dos clientes, unindo tecnologia, frota própria rastreada e equipa especializada. Operamos no corredor Joanesburgo–Maputo e em todo o território nacional, com entregas seguras e 100% rastreáveis.",
+      "f1": "Cobertura Nacional",
+      "f2": "Rastreamento GPS 24/7"
+    },
+    "floating": {
+      "value": "+50",
+      "label": "Veículos"
+    },
+    "history": {
+      "eyebrow": "Nossa História",
+      "title": "De um camião a uma operação integrada",
+      "text": "A Lirandzo nasceu da visão de oferecer transporte que combina proximidade com o cliente, rigor operacional e tecnologia. Evoluímos de uma frota reduzida para uma operação com cobertura nacional e rotas internacionais no corredor África do Sul–Moçambique."
+    },
+    "fleet": {
+      "eyebrow": "Frota & Infraestrutura",
+      "title": "Preparados para qualquer escala",
+      "text": "Frota própria rastreada GPS, manutenção preventiva e condutores formados. Armazéns equipados com segurança 24h.",
+      "cta": "Solicitar orçamento",
+      "fs1": "Veículos",
+      "fs2": "Rastreados"
+    },
+    "team": {
+      "eyebrow": "A Nossa Equipa",
+      "title": "Pessoas no centro de cada entrega",
+      "m1": {
+        "name": "Operações & Motoristas",
+        "role": "Equipa de campo",
+        "desc": "Condutores experientes e técnicos de logística que garantem cada entrega."
+      },
+      "m2": {
+        "name": "Suporte ao Cliente",
+        "role": "Atendimento 24/7",
+        "desc": "Equipa dedicada a informação clara e resolução imediata de questões."
+      },
+      "m3": {
+        "name": "Gestão & Planeamento",
+        "role": "Estratégia",
+        "desc": "Profissionais que otimizam rotas e garantem eficiência operacional."
+      }
+    },
+    "compliance": {
+      "eyebrow": "Conformidade",
+      "title": "Licenças e certificações",
+      "text": "Comprometidos com os mais altos padrões de qualidade e conformidade regulamentar."
+    },
+    "certs": {
+      "c1": {
+        "title": "Licenciamento INATTER",
+        "desc": "Transporte rodoviário nacional e internacional certificado."
+      },
+      "c2": {
+        "title": "Segurança e boas práticas",
+        "desc": "Protocolos rigorosos de segurança e condutores formados."
+      },
+      "c3": {
+        "title": "Parceiros auditados",
+        "desc": "Cadeia de fornecedores verificada e auditada."
+      }
+    },
+    "cta": {
+      "title": "Pronto para otimizar a sua logística?",
+      "quote": "Solicitar orçamento",
+      "contact": "Contactar equipa"
+    },
+    "alt": {
+      "truckFleet": "Frota Lirandzo",
+      "warehouse": "Armazém Lirandzo",
+      "truckRoad": "Camião Lirandzo",
+      "terminal": "Terminal de carga"
+    }
+  },
+  "contactPage": {
+    "eyebrow": "VM Lirandzo Transportes",
+    "title": "Contato",
+    "desc": "Entre em contacto connosco. A nossa equipa está disponível para esclarecer dúvidas e ajudar com os seus envios.",
+    "infoTitle": "Informações de contacto",
+    "labelEmail": "E-mail",
+    "labelPhone": "Telefone",
+    "labelWhatsapp": "WhatsApp",
+    "form": {
+      "name": "Nome",
+      "email": "E-mail",
+      "phone": "Telefone",
+      "subject": "Assunto",
+      "message": "Mensagem",
+      "phName": "O seu nome",
+      "phEmail": "exemplo@email.com",
+      "phPhone": "Ex: 84 123 4567",
+      "phSubject": "Ex: Solicitar cotação",
+      "phMessage": "Escreva a sua mensagem...",
+      "submit": "Enviar mensagem",
+      "successTitle": "Mensagem enviada",
+      "successText": "Obrigado pelo contacto. A nossa equipa responderá em breve.",
+      "backHome": "Voltar ao início"
+    }
+  },
+  "noticiasPage": {
+    "badge": "Blog & Avisos",
+    "title": "Notícias e Avisos",
+    "desc": "Actualizações sobre a nossa operação, avisos de tempo, novas rotas e tudo o que precisa saber sobre a Lirandzo.",
+    "altHero": "Logística Lirandzo",
+    "sidebarAboutTitle": "Sobre este espaço",
+    "sidebarAboutText": "Aqui partilhamos avisos importantes (como condições meteorológicas), novidades da operação e actualizações que afectam as suas entregas.",
+    "sidebarHint": "Avisos de tempo são actualizados consoante as condições.",
+    "categoriesTitle": "Categorias",
+    "catAviso": "Aviso",
+    "catOperacoes": "Operações",
+    "catTecnologia": "Tecnologia",
+    "catRotas": "Rotas",
+    "catInfra": "Infraestrutura",
+    "catQualidade": "Qualidade",
+    "ctaTitle": "Precisa de uma cotação?",
+    "ctaText": "Solicite uma cotação e a nossa equipa responderá em até 24 horas.",
+    "ctaQuote": "Solicitar Cotação",
+    "ctaContact": "Contactar-nos"
+  },
+  "avaliacoesPage": {
+    "eyebrow": "Avalie o nosso serviço",
+    "title": "Avalie-nos",
+    "desc": "A sua opinião é importante. Partilhe elogios, sugestões ou reclamações — ajudamos a melhorar.",
+    "feedbackType": "Tipo de feedback",
+    "sugestao": "Sugestão",
+    "sugestaoDesc": "Ideias para melhorar",
+    "reclamacao": "Reclamação",
+    "reclamacaoDesc": "Problemas a resolver",
+    "elogio": "Elogio",
+    "elogioDesc": "O que correu bem",
+    "ratingLabel": "Avaliação geral (1–5 estrelas)",
+    "starAria": "estrela(s)",
+    "nome": "Nome",
+    "email": "E-mail",
+    "telefone": "Telefone",
+    "mensagem": "Mensagem",
+    "phNome": "O seu nome",
+    "phEmail": "exemplo@email.com",
+    "phTel": "Ex: 912 345 678",
+    "phMsg": "Descreva o seu feedback, reclamação ou sugestão...",
+    "submit": "Enviar",
+    "successTitle": "Obrigado pelo seu feedback",
+    "successText": "A sua mensagem foi recebida. A nossa equipa entrará em contacto se necessário.",
+    "backHome": "Voltar ao início"
+  },
+  "frotaAccao": {
+    "badge": "Corredor Joanesburgo–Maputo",
+    "title": "A nossa frota em acção",
+    "desc": "Camiões da Lirandzo nas estradas de Moçambique e África do Sul. Especialistas em transporte de mercadorias de Joanesburgo (e região) para Moçambique. Transporte rodoviário, procurement e logística integrada no mesmo parceiro.",
+    "alt": "Frota Lirandzo"
+  },
+  "servicesPage": {
+    "hero": {
+      "badge": "Lirandzo Transportes",
+      "title1": "Soluções Logísticas",
+      "title2": "Integradas",
+      "subtitle": "Excelência em Transporte",
+      "description": "Mais de 10 anos conectando Joanesburgo e Maputo com serviços de transporte rodoviário, logística e despacho aduaneiro."
+    },
+    "showcase": {
+      "alt": "Camiões Lirandzo na estrada",
+      "kmValue": "545km",
+      "kmLabel": "Corredor Principal",
+      "countriesValue": "2 Países",
+      "countriesLabel": "ZA ↔ MZ",
+      "clientsValue": "500+",
+      "clientsLabel": "Clientes Atendidos"
+    },
+    "section": {
+      "eyebrow": "NOSSOS SERVIÇOS",
+      "title": "Soluções Completas em Logística",
+      "subtitle": "Do transporte ao despacho aduaneiro, tudo num único parceiro"
+    },
+    "statusAvailable": "DISPONÍVEL",
+    "corridor": {
+      "alt": "Estrada Joanesburgo Maputo",
+      "jnb": "JNB",
+      "jnbCity": "Joanesburgo",
+      "midLabel": "Ressano Garcia",
+      "midCity": "Fronteira ZA-MZ",
+      "mpm": "MPM",
+      "mpmCity": "Maputo",
+      "distLabel": "Distância",
+      "distValue": "545 KM",
+      "timeLabel": "Tempo Médio",
+      "timeValue": "18-24 HORAS",
+      "freqLabel": "Frequência",
+      "freqValue": "DIÁRIA"
+    },
+    "portfolio": {
+      "title": "Conheça Nosso Portfólio",
+      "desc": "Explore nossos case studies, projetos realizados e histórias de sucesso com clientes em Moçambique e África do Sul.",
+      "btn": "Ver Portfólio Completo"
+    },
+    "cta": {
+      "title": "Pronto para otimizar a sua logística?",
+      "subtitle": "Fale connosco e descubra como podemos ajudar o seu negócio a crescer com soluções de transporte fiáveis e eficientes.",
+      "quote": "Solicitar orçamento",
+      "contact": "Contactar equipa",
+      "labelResponse": "Resposta",
+      "valueResponse": "< 2h",
+      "labelSupport": "Suporte",
+      "valueSupport": "24/7"
+    },
+    "metrics": {
+      "m1": { "value": "+10", "label": "Anos de Experiência", "trend": "Desde 2014", "fill": 100 },
+      "m2": { "value": "50+", "label": "Veículos na Frota", "trend": "Rastreados 24/7", "fill": 85 },
+      "m3": { "value": "99%", "label": "Entregas no Prazo", "trend": "Confiabilidade", "fill": 99 },
+      "m4": { "value": "24/7", "label": "Monitoramento", "trend": "GPS em tempo real", "fill": 100 }
+    },
+    "marquee": {
+      "t1": "Rastreamento GPS",
+      "t2": "Gestão de Frota",
+      "t3": "Logística Integrada",
+      "t4": "Despacho Aduaneiro",
+      "t5": "Armazenagem",
+      "t6": "Transporte Rodoviário",
+      "t7": "Procurement",
+      "t8": "Cross-Border"
+    },
+    "services": {
+      "truck": {
+        "badge": "Frota Própria",
+        "title": "Transporte Rodoviário",
+        "description": "Frota própria rastreada GPS 24 horas nos corredores Joanesburgo–Maputo e rotas nacionais.",
+        "f1": "Cargas completas e fraccionadas",
+        "f2": "Rastreamento em tempo real",
+        "f3": "Motoristas certificados"
+      },
+      "procurement": {
+        "badge": "ZA → MZ",
+        "title": "Procurement & Sourcing",
+        "description": "Compra de mercadorias na África do Sul com entrega directa em Moçambique.",
+        "f1": "Negociação com fornecedores",
+        "f2": "Consolidação de cargas",
+        "f3": "Documentação incluída"
+      },
+      "tracking": {
+        "badge": "GPS 24/7",
+        "title": "Rastreamento GPS",
+        "description": "Acompanhe sua carga em tempo real através do painel web ou app móvel.",
+        "f1": "Localização precisa",
+        "f2": "Notificações automáticas",
+        "f3": "Histórico de viagens"
+      },
+      "logistics": {
+        "badge": "End-to-End",
+        "title": "Logística Integrada",
+        "description": "Armazenagem, picking, expedição e entrega porta a porta na ZA e MZ.",
+        "f1": "Armazéns estratégicos",
+        "f2": "Cross-docking",
+        "f3": "Distribuição last-mile"
+      },
+      "warehouse": {
+        "badge": "Maputo",
+        "title": "Armazenagem & Stock",
+        "description": "Espaços seguros para consolidação, stockagem temporária ou distribuição.",
+        "f1": "Armazéns cobertos",
+        "f2": "Controlo digital",
+        "f3": "Segurança 24h"
+      },
+      "customs": {
+        "badge": "< 2h",
+        "title": "Despacho Aduaneiro",
+        "description": "Documentação e formalidades aduaneiras para importações e exportações.",
+        "f1": "Desalfandegamento ágil",
+        "f2": "Assessoria fiscal",
+        "f3": "4 fronteiras"
+      }
+    }
+  },
+  "faqPage": {
+    "heroImgAlt": "Logística e transporte",
+    "badge": "Apoio ao cliente",
+    "heroTitle": "Perguntas Frequentes",
+    "heroDesc": "Encontre respostas rápidas sobre os nossos serviços, prazos, rastreio e muito mais. Estamos aqui para ajudar no seu caminho.",
+    "sidebarTitle": "Precisa de ajuda?",
+    "sidebarText": "A nossa equipa está disponível 24/7 para responder às suas questões.",
+    "sidebarOverlay": "Logística de Excelência",
+    "searchPlaceholder": "Pesquisar perguntas...",
+    "noResults": "Nenhuma pergunta encontrada para \"{{query}}\".",
+    "ctaTitle": "Não encontrou o que procurava?",
+    "ctaText": "A nossa equipa de especialistas está pronta para ajudar com qualquer questão adicional.",
+    "ctaQuote": "Solicitar Cotação",
+    "ctaContact": "Contactar-nos",
+    "q1": {
+      "question": "Quais tipos de carga a Lirandzo transporta?",
+      "answer": "Transportamos cargas gerais, fraccionadas, contentorizadas e volumes especiais. A nossa frota é adaptada para diferentes tipos de mercadoria, desde produtos industriais a bens de consumo."
+    },
+    "q2": {
+      "question": "Como posso rastrear o meu envio?",
+      "answer": "Através da nossa plataforma online, basta aceder à página \"Rastrear Pedido\" e introduzir o código de rastreio fornecido no momento da expedição. O sistema mostra a localização em tempo real."
+    },
+    "q3": {
+      "question": "Qual é o prazo de entrega?",
+      "answer": "O prazo depende da origem, destino e tipo de serviço escolhido. Entregas nacionais demoram entre 1 a 5 dias úteis. Para rotas internacionais, o prazo pode variar entre 5 a 15 dias úteis."
+    },
+    "q4": {
+      "question": "Como solicito uma cotação?",
+      "answer": "Pode solicitar uma cotação directamente na nossa página \"Solicitar Cotação\", preenchendo o formulário com os detalhes da carga. A nossa equipa responde em até 24 horas úteis."
+    },
+    "q5": {
+      "question": "A Lirandzo faz transporte internacional?",
+      "answer": "Sim. Operamos rotas internacionais estratégicas, incluindo corredores entre Moçambique e África do Sul, com toda a documentação aduaneira tratada pela nossa equipa."
+    },
+    "q6": {
+      "question": "A carga está segurada durante o transporte?",
+      "answer": "Sim, todas as cargas transportadas pela Lirandzo estão cobertas por seguro de transporte. Em caso de incidente, o processo de reclamação é acompanhado pela nossa equipa de suporte."
+    },
+    "q7": {
+      "question": "Como posso tornar-me parceiro da Lirandzo?",
+      "answer": "Estamos sempre abertos a novas parcerias. Entre em contacto connosco através do formulário de contacto ou envie um e-mail para contato@lirandzo.com com a sua proposta."
+    },
+    "q8": {
+      "question": "A Lirandzo oferece serviço de armazenagem?",
+      "answer": "Sim. Dispomos de armazéns estratégicos que funcionam como hubs logísticos para consolidação, armazenamento temporário e distribuição de mercadorias."
+    },
+    "q9": {
+      "question": "Como funciona o pagamento?",
+      "answer": "Aceitamos transferência bancária, pagamento móvel e acordos de facturação mensal para clientes regulares. Os detalhes de pagamento são enviados junto com a confirmação do pedido."
+    },
+    "q10": {
+      "question": "Posso agendar uma recolha de carga?",
+      "answer": "Sim. Oferecemos serviço de recolha no local. Basta indicar o endereço e horário pretendido ao solicitar a cotação ou contactar a nossa equipa de operações."
+    }
+  },
+  "orderTracking": {
+    "today": "Hoje",
+    "dash": "—",
+    "heroTitle": "Onde está a sua carga?",
+    "heroDesc": "Consulte o status da sua entrega em tempo real. Insira o número da fatura e acompanhe cada etapa, do armazém até à sua porta.",
+    "placeholder": "Número da fatura (ex: 001)",
+    "track": "Rastrear",
+    "hint": "Ex.: 001, 002 ou 003",
+    "resultAria": "Resultado do rastreio",
+    "deliveryStatus": "Status da entrega",
+    "invoiceNo": "Nº da fatura:",
+    "packageNo": "Nº do pedido / embalagem:",
+    "route": "Rota:",
+    "timeline": "Etapas da entrega",
+    "idleStatus": "Digite ou escolha um código para ver os detalhes do rastreio.",
+    "unknownStatus": "Rastreio simulado em andamento.",
+    "examples": {
+      "001": {
+        "status": "Saiu da África do Sul e está a caminho de Maputo.",
+        "route": "Pagamento em Maputo → Joanesburgo → Entrega em Maputo",
+        "steps": [
+          { "label": "Pagamento confirmado", "location": "Maputo, Moçambique" },
+          { "label": "Produto recebido no armazém", "location": "Maputo, Moçambique" },
+          { "label": "Em trânsito para a África do Sul", "location": "Posto Fronteira Ressano Garcia" },
+          { "label": "Compra consolidada na loja", "location": "Joanesburgo, África do Sul" },
+          { "label": "Em trânsito para Maputo", "location": "Joanesburgo, África do Sul" },
+          { "label": "Saiu para entrega ao cliente", "location": "Maputo, Moçambique" }
+        ]
+      },
+      "002": {
+        "status": "Carga em consolidação na África do Sul.",
+        "route": "Maputo → Joanesburgo → Matola",
+        "steps": [
+          { "label": "Pagamento confirmado", "location": "Maputo, Moçambique" },
+          { "label": "Carga em preparação", "location": "Maputo, Moçambique" },
+          { "label": "Em trânsito para a África do Sul", "location": "Estrada N4, Moçambique" },
+          { "label": "Compra efetuada na loja parceira", "location": "Pretória, África do Sul" },
+          { "label": "Em consolidação para retorno", "location": "Pretória, África do Sul" }
+        ]
+      },
+      "003": {
+        "status": "Entregue ao cliente em mãos.",
+        "route": "Pagamento em Maputo → Entrega final ao cliente",
+        "steps": [
+          { "label": "Pagamento confirmado", "location": "Maputo, Moçambique" },
+          { "label": "Produto comprado na África do Sul", "location": "Sandton, Joanesburgo" },
+          { "label": "Em trânsito para Maputo", "location": "Rodovia N4" },
+          { "label": "Chegada ao centro de distribuição", "location": "Maputo, Moçambique" },
+          { "label": "Saiu para entrega", "location": "Maputo, Moçambique" },
+          { "label": "Entregue ao cliente", "location": "Cliente, Maputo" }
+        ]
+      }
+    },
+    "unknownSteps": [
+      { "label": "Código recebido no sistema", "location": "Maputo, Moçambique" },
+      { "label": "Aguardando atualização da transportadora", "location": "—" }
+    ]
+  },
+  "quotePage": {
+    "title": "Solicitar Cotação",
+    "subtitle": "Preencha os dados e nossa equipe retornará em até 24 horas.",
+    "sectionPersonal": "Dados pessoais",
+    "sectionQuote": "Detalhes da cotação",
+    "sectionNeed": "O que precisa?",
+    "name": "Nome completo",
+    "phFullName": "O seu nome completo",
+    "email": "E-mail",
+    "phEmail": "exemplo@email.com",
+    "contacts": "Contactos",
+    "phonePh": "Telefone — Ex: 912 345 678",
+    "origin": "Origem",
+    "destination": "Destino",
+    "originPh": "Ex: Maputo, Moçambique",
+    "destPh": "Ex: Johannesburg, África do Sul",
+    "serviceType": "Tipo de serviço",
+    "serviceTransport": "Apenas transporte",
+    "serviceBuyTransport": "Compra + transporte",
+    "quoteDelivery": "Onde receber a cotação?",
+    "selectOption": "Selecione",
+    "whatsapp": "WhatsApp",
+    "emailOpt": "E-mail",
+    "call": "Chamada telefónica",
+    "messageLabel": "Descreva os detalhes (origem, destino, prazos, quantidades em kg ou toneladas, carga, etc.)",
+    "messageHint": "Indique quantidades manualmente (ex: 100 kg, 2 toneladas). Use Enter para nova linha. Ao sair do campo, o texto será organizado em lista numerada.",
+    "messagePh": "Descreva o que precisa...",
+    "missingPrefix": "Campos obrigatórios em falta:",
+    "missingName": "Nome",
+    "missingEmail": "E-mail",
+    "missingPhone": "Telefone",
+    "missingOrigin": "Origem",
+    "missingDest": "Destino",
+    "missingContactPref": "Preferência de contacto",
+    "sending": "A enviar...",
+    "submit": "Enviar solicitação",
+    "errorSend": "Não foi possível enviar o pedido de cotação. Tente novamente mais tarde.",
+    "confirmTitle": "Confirmar dados",
+    "confirmSubtitle": "Verifique as informações antes de enviar.",
+    "lblName": "Nome",
+    "lblEmail": "E-mail",
+    "lblPhone": "Telefone",
+    "lblOrigin": "Origem",
+    "lblDest": "Destino",
+    "lblService": "Tipo de serviço",
+    "lblWhereQuote": "Onde receber a cotação",
+    "lblMessage": "Mensagem",
+    "edit": "Editar",
+    "send": "Enviar",
+    "closeAria": "Fechar",
+    "successTitle": "Solicitação enviada com sucesso",
+    "successText": "A sua cotação foi registada. A nossa equipa entrará em contacto consigo em até 24 horas com a proposta.",
+    "successHint": "Pode fechar esta janela ou voltar ao site principal.",
+    "closeBtn": "Fechar",
+    "labelTransportOnly": "Apenas transporte",
+    "labelBuyTransport": "Compra + transporte",
+    "labelWhatsapp": "WhatsApp",
+    "labelEmail": "E-mail",
+    "labelCall": "Chamada telefónica"
+  }
+}

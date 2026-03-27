@@ -1,0 +1,120 @@
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="getBackLink()"
+  [showHelp]="true"
+  title="Editar Viagem"
+  subtitle="Actualize os dados da viagem conforme necessário"
+  helpTitle="Como editar uma Viagem"
+  [helpItems]="[
+    'Pode actualizar motorista, viatura, rota e datas.',
+    'Após guardar, a viagem será actualizada na base de dados.',
+    'Pode actualizar o status e dados de combustível quando a viagem terminar.'
+  ]"
+></app-billing-section-header>
+
+@if (loading) {
+  <div class="loading-state">
+    <p>A carregar dados da viagem...</p>
+  </div>
+} @else if (error) {
+  <div class="error-state">
+    <p>{{ error }}</p>
+    <button type="button" class="btn-secondary" (click)="carregarViagem()">Tentar Novamente</button>
+    <a routerLink="/billing/viagens" class="btn-secondary" style="margin-left: 0.5rem;">Voltar</a>
+  </div>
+} @else {
+  <div class="card">
+    <!-- Atribuição -->
+    <h3 class="form-section-title">Atribuição</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Motorista</label>
+        <select class="form-control" [(ngModel)]="viagem.motoristaId">
+          <option [value]="null">Seleccionar...</option>
+          <option *ngFor="let m of motoristas" [value]="m.id">{{ m.nome }} {{ m.telefone ? '(' + m.telefone + ')' : '' }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Viatura</label>
+        <select class="form-control" [(ngModel)]="viagem.viaturaId">
+          <option [value]="null">Seleccionar...</option>
+          <option *ngFor="let v of viaturas" [value]="v.id">{{ v.matricula }} ({{ v.marca }} {{ v.modelo }})</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Rota -->
+    <h3 class="form-section-title">Rota</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Origem</label>
+        <input type="text" class="form-control" [(ngModel)]="viagem.origem" placeholder="Ex: Maputo">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Destino</label>
+        <input type="text" class="form-control" [(ngModel)]="viagem.destino" placeholder="Ex: Tete">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data de Saída</label>
+        <input type="date" class="form-control" [(ngModel)]="viagem.dataSaida">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data Chegada Prevista</label>
+        <input type="date" class="form-control" [(ngModel)]="viagem.dataChegadaPrevista">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data Chegada Real</label>
+        <input type="date" class="form-control" [(ngModel)]="viagem.dataChegadaReal">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-control" [(ngModel)]="viagem.status">
+          <option value="PLANEADA">Agendada</option>
+          <option value="EM_CURSO">Em Curso</option>
+          <option value="CONCLUIDA">Concluída</option>
+          <option value="CANCELADA">Cancelada</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Estatísticas -->
+    <h3 class="form-section-title">Estatísticas</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Combustível Consumido (L)</label>
+        <input type="number" class="form-control" [(ngModel)]="viagem.combustivelConsumido" placeholder="0" min="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Custo Combustível (MZN)</label>
+        <input type="number" class="form-control" [(ngModel)]="viagem.custoCombustivel" placeholder="0.00" min="0" step="0.01">
+      </div>
+    </div>
+
+    <!-- Observações -->
+    <h3 class="form-section-title">Observações</h3>
+    <div class="form-grid">
+      <div class="form-group full-width">
+        <label class="form-label">Observações da Viagem</label>
+        <textarea class="form-control" [(ngModel)]="viagem.observacoes" placeholder="Notas gerais sobre a viagem..." rows="3"></textarea>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a [routerLink]="getBackLink()" class="btn-secondary">Cancelar</a>
+      <button type="button" class="btn-primary" (click)="salvar()" [disabled]="loading">
+        @if (loading) {
+          Guardando...
+        } @else {
+          Guardar Alterações
+        }
+      </button>
+    </div>
+  </div>
+}
+
+<app-notification-popup
+  *ngIf="showNotification"
+  [message]="notificationMessage"
+  [type]="notificationType"
+  [duration]="7000">
+</app-notification-popup>

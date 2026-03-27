@@ -1,0 +1,205 @@
+<app-billing-section-header
+  [showBack]="false"
+  [showHelp]="true"
+  title="Dashboard"
+  subtitle="Visão geral das operações — Janeiro 2025"
+  helpTitle="Como usar o Dashboard"
+  [helpItems]="[
+    'Veja a visão geral de encomendas, receitas, viagens e combustível no topo.',
+    'Use os gráficos para comparar receitas vs despesas ao longo dos meses.',
+    'Analise o desempenho por viatura, clientes em dívida e motoristas destaque.'
+  ]"
+></app-billing-section-header>
+
+<!-- KPIs -->
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--accent)"></div>
+    <div class="kpi-icon" style="color: var(--accent)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+      </svg>
+    </div>
+    <div class="kpi-label">Total Encomendas</div>
+    <div class="kpi-value">47</div>
+    <div class="kpi-sub">encomendas este mês</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--success)"></div>
+    <div class="kpi-icon" style="color: var(--success)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="1" x2="12" y2="23"></line>
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+      </svg>
+    </div>
+    <div class="kpi-label">Receita do Mês</div>
+    <div class="kpi-value">285.400 <small>MZN</small></div>
+    <div class="kpi-sub">+33% vs mês anterior</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--info)"></div>
+    <div class="kpi-icon" style="color: var(--info)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="5.5" cy="17.5" r="2.5"></circle>
+        <circle cx="18.5" cy="17.5" r="2.5"></circle>
+        <path d="M15 6H3v9h2.05"></path>
+        <path d="M15 15V6l6 4v5h-1.05"></path>
+        <path d="M8 15h7"></path>
+      </svg>
+    </div>
+    <div class="kpi-label">Total de Viagens</div>
+    <div class="kpi-value">39</div>
+    <div class="kpi-sub">5 em curso</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--warning)"></div>
+    <div class="kpi-icon" style="color: var(--warning)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+      </svg>
+    </div>
+    <div class="kpi-label">Gasto Combustível</div>
+    <div class="kpi-value">102.500 <small>MZN</small></div>
+    <div class="kpi-sub">1.345 litros consumidos</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: #8B5CF6"></div>
+    <div class="kpi-icon" style="color: #8B5CF6">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    </div>
+    <div class="kpi-label">Motorista Destaque</div>
+    <div class="kpi-value dash-highlight">Mário Tembe</div>
+    <div class="kpi-sub">51 viagens · 4.9
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align: -1px; color: var(--warning)"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--danger)"></div>
+    <div class="kpi-icon" style="color: var(--danger)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+    </div>
+    <div class="kpi-label">Clientes em Dívida</div>
+    <div class="kpi-value dash-danger">3</div>
+    <div class="kpi-sub">{{ totalDebt | number:'1.0-0' }} MZN total</div>
+  </div>
+</div>
+
+<!-- Charts Row -->
+<div class="dash-charts-row">
+  <!-- Revenue vs Expenses chart -->
+  <div class="card dash-chart-card">
+    <div class="dash-chart-header">
+      <h3>
+        <svg class="dash-chart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        Receitas vs Despesas
+      </h3>
+      <p>Últimos 4 meses</p>
+    </div>
+    <div class="dash-chart-body">
+      <div class="dash-bar-group" *ngFor="let m of monthlyRevenue">
+        <div class="dash-bar-label">{{ m.month }}</div>
+        <div class="dash-bar-pair">
+          <div class="dash-bar dash-bar-revenue" [style.height.px]="getRevenueBarHeight(m.receita)">
+            <span class="dash-bar-tooltip">{{ m.receita | number:'1.0-0' }}</span>
+          </div>
+          <div class="dash-bar dash-bar-expense" [style.height.px]="getRevenueBarHeight(m.despesa)">
+            <span class="dash-bar-tooltip">{{ m.despesa | number:'1.0-0' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dash-chart-legend">
+      <span class="dash-legend-item"><span class="dash-legend-dot" style="background: var(--success)"></span> Receita</span>
+      <span class="dash-legend-item"><span class="dash-legend-dot" style="background: var(--danger)"></span> Despesa</span>
+    </div>
+  </div>
+
+  <!-- Trips by vehicle -->
+  <div class="card dash-chart-card">
+    <div class="dash-chart-header">
+      <h3>
+        <svg class="dash-chart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="2.5"></circle><circle cx="18.5" cy="17.5" r="2.5"></circle><path d="M15 6H3v9h2.05"></path><path d="M15 15V6l6 4v5h-1.05"></path><path d="M8 15h7"></path></svg>
+        Viagens por Viatura
+      </h3>
+      <p>Este mês</p>
+    </div>
+    <div class="dash-horizontal-bars">
+      <div class="dash-hbar" *ngFor="let v of tripsByVehicle">
+        <div class="dash-hbar-label">{{ v.viatura }}</div>
+        <div class="dash-hbar-track">
+          <div class="dash-hbar-fill" [style.width.%]="getBarWidth(v.viagens)" [style.background]="v.cor"></div>
+        </div>
+        <div class="dash-hbar-value">{{ v.viagens }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Row -->
+<div class="dash-bottom-row">
+  <!-- Debt Alerts -->
+  <div class="card dash-alerts-card">
+    <div class="dash-chart-header">
+      <h3>
+        <svg class="dash-chart-icon dash-chart-icon-danger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        Clientes em Dívida
+      </h3>
+      <p>Requer atenção</p>
+    </div>
+    <div class="dash-alert-list">
+      <div class="dash-alert-item" *ngFor="let a of debtAlerts">
+        <div class="dash-alert-info">
+          <div class="dash-alert-name">{{ a.cliente }}</div>
+          <div class="dash-alert-phone">{{ a.telefone }} · {{ a.dias }} dias</div>
+        </div>
+        <div class="dash-alert-amount">{{ a.valor | number:'1.0-0' }} MZN</div>
+      </div>
+    </div>
+    <div class="dash-alert-footer">
+      Total: <strong>{{ totalDebt | number:'1.0-0' }} MZN</strong>
+    </div>
+  </div>
+
+  <!-- Top Drivers -->
+  <div class="card dash-drivers-card">
+    <div class="dash-chart-header">
+      <h3>
+        <svg class="dash-chart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        Motoristas Destaque
+      </h3>
+      <p>Top 3 desempenho</p>
+    </div>
+    <div class="dash-driver-list">
+      <div class="dash-driver-item" *ngFor="let d of topDrivers; let i = index">
+        <div class="dash-driver-rank">{{ i + 1 }}º</div>
+        <div class="dash-driver-info">
+          <div class="dash-driver-name">{{ d.nome }}</div>
+          <div class="dash-driver-stats">{{ d.viagens }} viagens · {{ d.avaliacao }}
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align: -1px; color: var(--warning)"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

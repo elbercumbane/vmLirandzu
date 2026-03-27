@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sc query:*)",
+      "Bash(netstat -ano)",
+      "Read(//c/Program Files/PostgreSQL//**)",
+      "Read(//c/Program Files \\(x86\\)/PostgreSQL//**)",
+      "Bash(net start:*)",
+      "Bash(docker compose:*)",
+      "Bash(Start-Process \"C:\\\\Program Files\\\\Docker\\\\Docker\\\\Docker Desktop.exe\")",
+      "Bash(start \"\" \"C:\\\\Program Files\\\\Docker\\\\Docker\\\\Docker Desktop.exe\")",
+      "Bash(xargs -I{} taskkill //PID {} //F)",
+      "Bash(mvn spring-boot:run)",
+      "Bash(while read:*)",
+      "Bash(do echo:*)",
+      "Bash(tasklist //FI 'PID eq $pid')",
+      "Bash(grep -v \"^$\\\\|INFO\\\\|===\")",
+      "Bash(done)",
+      "Bash(npx ng:*)",
+      "Bash(vercel --prod --yes)",
+      "Bash(npm run:*)",
+      "Bash(xargs grep:*)"
+    ]
+  }
+}

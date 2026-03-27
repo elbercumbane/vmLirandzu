@@ -1,0 +1,166 @@
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="'/billing'"
+  [showHelp]="true"
+  [title]="pageTitle"
+  [subtitle]="pageSubtitle"
+  [helpTitle]="helpTitle"
+  [helpItems]="helpItems"
+></app-billing-section-header>
+
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--accent)"></div>
+    <div class="kpi-icon" style="color: var(--accent)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+      </svg>
+    </div>
+    <div class="kpi-label">{{ modoParaFacturar ? 'Na fila de facturação' : 'No pipeline' }}</div>
+    <div class="kpi-value">{{ cotacoes.length }}</div>
+    <div class="kpi-sub">{{ cotacoesFiltradas.length }} visível(is)</div>
+  </div>
+  @if (!modoParaFacturar) {
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: #d97706"></div>
+    <div class="kpi-icon" style="color: #d97706">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12 6 12 12 16 14"></polyline>
+      </svg>
+    </div>
+    <div class="kpi-label">Propostas prontas</div>
+    <div class="kpi-value" style="color: #d97706">{{ totalPropostasProntas }}</div>
+    <div class="kpi-sub">aguardam aceitação do contacto</div>
+  </div>
+  }
+  @if (modoParaFacturar) {
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--success)"></div>
+    <div class="kpi-icon" style="color: var(--success)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+    </div>
+    <div class="kpi-label">Aceites (facturáveis)</div>
+    <div class="kpi-value" style="color: var(--success)">{{ totalAceitesFacturaveis }}</div>
+    <div class="kpi-sub">prontos para emitir factura</div>
+  </div>
+  }
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <input type="text" class="search-input" [(ngModel)]="filtro" placeholder="Pesquisar por contacto, referência, destino, forma de envio...">
+    <div class="filter-chips">
+      <button type="button" class="filter-chip" [class.active]="filtroEstado === 'TODOS'" (click)="filtroEstado = 'TODOS'">Todos</button>
+      @if (!modoParaFacturar) {
+        <button type="button" class="filter-chip" [class.active]="filtroEstado === estados.propostaPronta" (click)="filtroEstado = estados.propostaPronta">Proposta pronta</button>
+      }
+      <button type="button" class="filter-chip" [class.active]="filtroEstado === estados.aceite" (click)="filtroEstado = estados.aceite">Aceite pelo contacto</button>
+      <button type="button" class="filter-chip" [class.active]="filtroEstado === estados.facturada" (click)="filtroEstado = estados.facturada">Facturadas</button>
+      @if (!modoParaFacturar) {
+        <button type="button" class="filter-chip" [class.active]="filtroEstado === estados.cancelada" (click)="filtroEstado = estados.cancelada">Anuladas</button>
+      }
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state">
+      <p>A carregar cotações...</p>
+    </div>
+  } @else if (error) {
+    <div class="error-state">
+      <p>{{ error }}</p>
+      <button type="button" class="btn-secondary" (click)="carregarCotacoes()">Tentar Novamente</button>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Ref.</th>
+            <th>Contacto (pedido)</th>
+            <th>Rota</th>
+            <th>Carga</th>
+            <th>Entrada</th>
+            <th>Estado</th>
+            <th>Ajuste</th>
+            <th>Forma de Envio</th>
+            <th>Operador</th>
+            <th>Tempo até aceitação</th>
+            <th style="min-width: 140px;">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of cotacoesFiltradas; track c.id) {
+          <tr [attr.data-cotacao-id]="c.id" [class.cotacao-highlight]="c.id === highlightId">
+            <td style="font-weight: 600; color: var(--accent)">{{ c.ref }}</td>
+            <td>
+              <div style="font-weight: 600; color: var(--text-primary)">{{ c.cliente }}</div>
+              @if (c.telefone) {
+              <div style="font-size: 0.75rem; color: var(--text-muted)">{{ c.telefone }}</div>
+              }
+            </td>
+            <td>{{ c.origem }} → {{ c.destino }}</td>
+            <td style="max-width: 200px">{{ c.descricaoCarga }}</td>
+            <td>
+              <div>{{ c.dataEntrada }}</div>
+              @if (c.horaEntrada) {
+              <div style="font-size: 0.75rem; color: var(--text-muted)">{{ c.horaEntrada }}</div>
+              }
+            </td>
+            <td><span [class]="getBadgeClass(c.estado)">{{ c.estado }}</span></td>
+            <td>{{ c.ajusteInfo || '—' }}</td>
+            <td>
+              <span class="badge badge-info" style="font-size: 0.75rem;">{{ c.formaEnvio }}</span>
+            </td>
+            <td>{{ c.operador || '—' }}</td>
+            <td>{{ c.tempoResposta || '—' }}</td>
+            <td>
+              <div class="cotacao-acoes">
+                <button type="button" class="btn-secondary btn-sm" (click)="visualizarPdfNovaAba(c)" title="Abre a cotação num separador novo">
+                  Visualizar Cotação
+                </button>
+                @if (!modoParaFacturar && c.estado === estados.propostaPronta) {
+                  <a [routerLink]="['/billing/cotacoes/gerar', c.id]" class="btn-secondary btn-sm cotacao-acoes-link">Ajustar proposta</a>
+                  <button type="button" class="btn-primary btn-sm" (click)="registarAceitacaoCliente(c)">
+                    Registar aceitação
+                  </button>
+                }
+                @if (podeEmitirFactura(c.estado)) {
+                  <button
+                    type="button"
+                    class="btn-primary btn-sm"
+                    [disabled]="emitindoCotacaoId === c.id"
+                    (click)="emitirFactura(c)"
+                  >
+                    {{ emitindoCotacaoId === c.id ? 'A emitir…' : 'Emitir factura' }}
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
+          } @empty {
+            <tr>
+              <td colspan="11" class="empty-state">
+                <p>{{ modoParaFacturar ? 'Nenhuma cotação aceite pendente de facturação.' : 'Nenhuma cotação neste filtro.' }}</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+<app-notification-popup
+  *ngIf="showNotification"
+  [message]="notificationMessage"
+  [type]="notificationType"
+  [duration]="7000">
+</app-notification-popup>

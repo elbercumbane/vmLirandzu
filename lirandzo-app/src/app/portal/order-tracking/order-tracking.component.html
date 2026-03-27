@@ -1,0 +1,65 @@
+<main class="tracking-page">
+  <section class="tracking-hero">
+    <div class="tracking-hero-content" #heroContent>
+      <h1 class="tracking-hero-title">{{ 'orderTracking.heroTitle' | transloco }}</h1>
+      <p class="tracking-hero-description">
+        {{ 'orderTracking.heroDesc' | transloco }}
+      </p>
+      <form class="tracking-hero-form" (ngSubmit)="search()">
+        <div class="tracking-input-group">
+          <input
+            type="text"
+            [(ngModel)]="trackingCode"
+            name="trackingCode"
+            class="tracking-input-large"
+            [placeholder]="'orderTracking.placeholder' | transloco"
+            maxlength="30"
+          />
+          <button type="submit" class="tracking-btn-large">{{ 'orderTracking.track' | transloco }}</button>
+        </div>
+        <p class="tracking-hint">{{ 'orderTracking.hint' | transloco }}</p>
+      </form>
+    </div>
+  </section>
+
+  @if (searched) {
+    <section class="tracking-result" role="region" [attr.aria-label]="'orderTracking.resultAria' | transloco">
+      <div class="tracking-result-inner">
+        <div class="result-header">
+          <span class="result-title">{{ 'orderTracking.deliveryStatus' | transloco }}</span>
+          <div class="result-details">
+            <span class="result-detail"><strong>{{ 'orderTracking.invoiceNo' | transloco }}</strong> {{ currentFatura }}</span>
+            @if (currentPackageId) {
+              <span class="result-detail"><strong>{{ 'orderTracking.packageNo' | transloco }}</strong> {{ currentPackageId }}</span>
+            }
+            @if (currentRoute) {
+              <span class="result-detail result-route"><strong>{{ 'orderTracking.route' | transloco }}</strong> {{ currentRoute }}</span>
+            }
+          </div>
+          <p class="result-status">{{ mockStatus }}</p>
+        </div>
+        <p class="result-timeline-label">{{ 'orderTracking.timeline' | transloco }}</p>
+        <div class="tracking-timeline">
+          @for (step of mockSteps; track $index; let i = $index) {
+            <div
+              class="timeline-item"
+              [class.done]="step.done"
+              [class.long-step]="step.longDuration"
+              [style.animation-delay]="(i * 90) + 'ms'"
+            >
+              <div class="timeline-marker">
+                @if (step.done) {
+                  <span class="timeline-check" aria-hidden="true">✓</span>
+                }
+              </div>
+              <div class="timeline-content">
+                <strong>{{ step.label }}</strong>
+                <span class="timeline-meta">{{ step.date }}<ng-container *ngIf="step.location"> · {{ step.location }}</ng-container></span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+</main>

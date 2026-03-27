@@ -1,0 +1,62 @@
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="'/billing/combustivel'"
+  [showHelp]="true"
+  title="Novo Abastecimento"
+  subtitle="Registar abastecimento de combustível"
+  helpTitle="Abastecimento"
+  [helpItems]="['Indique viatura, data, litros e custo. A quilometragem e posto são opcionais.']"
+></app-billing-section-header>
+
+<div class="card">
+  <form (ngSubmit)="salvar()">
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Data *</label>
+        <input type="date" class="form-control" [(ngModel)]="form.refuelDate" name="refuelDate" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Viatura *</label>
+        <select class="form-control" [(ngModel)]="form.vehicleId" name="vehicleId" required>
+          <option [ngValue]="null">Seleccionar...</option>
+          @for (v of viaturas; track v.id) {
+            <option [ngValue]="v.id">{{ v.matricula }} — {{ v.marca }} {{ v.modelo }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Litros *</label>
+        <input type="number" class="form-control" [(ngModel)]="form.liters" name="liters" placeholder="Ex: 150" min="0.01" step="0.01" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Custo (MZN) *</label>
+        <input type="number" class="form-control" [(ngModel)]="form.cost" name="cost" placeholder="Ex: 12500" min="0" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Quilometragem</label>
+        <input type="number" class="form-control" [(ngModel)]="form.kmReading" name="kmReading" placeholder="Ex: 45000" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Posto / Local</label>
+        <input type="text" class="form-control" [(ngModel)]="form.station" name="station" placeholder="Ex: Puma Matola">
+      </div>
+      <div class="form-group full-width">
+        <label class="form-label">Notas</label>
+        <textarea class="form-control" [(ngModel)]="form.notes" name="notes" rows="2" placeholder="Observações"></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <a routerLink="/billing/combustivel" class="btn-secondary">Cancelar</a>
+      <button type="submit" class="btn-primary" [disabled]="loadingForm">
+        {{ loadingForm ? 'A guardar...' : 'Registar' }}
+      </button>
+    </div>
+  </form>
+</div>
+
+<app-notification-popup
+  *ngIf="showNotification"
+  [message]="notificationMessage"
+  [type]="notificationType"
+  [duration]="3000">
+</app-notification-popup>

@@ -1,0 +1,197 @@
+<app-billing-section-header
+  [showBack]="true"
+  [showHelp]="true"
+  [backLink]="'/billing'"
+  [title]="pageTitle"
+  [subtitle]="pageSubtitle"
+  [helpTitle]="helpTitle"
+  [helpItems]="helpItems"
+></app-billing-section-header>
+
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--accent)"></div>
+    <div class="kpi-icon" style="color: var(--accent)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+      </svg>
+    </div>
+    <div class="kpi-label">Total Encomendas</div>
+    <div class="kpi-value">{{ encomendas.length }}</div>
+    <div class="kpi-sub">{{ filteredEncomendas.length }} visível(is)</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--success)"></div>
+    <div class="kpi-icon" style="color: var(--success)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="1" x2="12" y2="23"></line>
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+      </svg>
+    </div>
+    <div class="kpi-label">Valor Facturado</div>
+    <div class="kpi-value">{{ totalValor | number:'1.0-0' }} <small>MZN</small></div>
+    <div class="kpi-sub">este período</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--danger)"></div>
+    <div class="kpi-icon" style="color: var(--danger)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+    </div>
+    <div class="kpi-label">Total em Dívida</div>
+    <div class="kpi-value dash-danger">{{ totalDivida | number:'1.0-0' }} <small>MZN</small></div>
+    <div class="kpi-sub">{{ clientesEmDivida }} cliente(s) em falta</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-top-line" style="background: var(--success)"></div>
+    <div class="kpi-icon" style="color: var(--success)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+    </div>
+    <div class="kpi-label">Taxa de Pagamento</div>
+    <div class="kpi-value" style="color: var(--success)">{{ pagoPercent }}%</div>
+    <div class="kpi-sub">{{ encomendasPagas }} de {{ encomendas.length }} pagas</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <div class="search-wrapper">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Pesquisar por nº, factura, cliente ou produto..."
+        [(ngModel)]="searchTerm"
+      />
+    </div>
+    <button
+      type="button"
+      class="filter-chip"
+      [class.active]="activeFilter === 'TODOS'"
+      (click)="setFilter('TODOS')"
+    >
+      Todos
+    </button>
+    <button
+      type="button"
+      class="filter-chip"
+      [class.active]="activeFilter === 'PAGO'"
+      (click)="setFilter('PAGO')"
+    >
+      Pago
+    </button>
+    <button
+      type="button"
+      class="filter-chip"
+      [class.active]="activeFilter === 'PARCIAL'"
+      (click)="setFilter('PARCIAL')"
+    >
+      Parcial
+    </button>
+    <button
+      type="button"
+      class="filter-chip"
+      [class.active]="activeFilter === 'NÃO PAGO'"
+      (click)="setFilter('NÃO PAGO')"
+    >
+      Não Pago
+    </button>
+  </div>
+
+  <div class="table-wrapper">
+    @if (loading) {
+      <div class="loading-state">
+        <p>A carregar encomendas da base de dados...</p>
+      </div>
+    } @else if (error) {
+      <div class="error-state">
+        <p>{{ error }}</p>
+        <button type="button" class="btn-secondary" (click)="carregarEncomendas()">Tentar Novamente</button>
+      </div>
+    } @else {
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nº Encomenda</th>
+            <th>Factura</th>
+            <th>Cliente</th>
+            <th>Produto</th>
+            <th>Origem→Destino</th>
+            <th>Total</th>
+            <th>Pago</th>
+            <th>Dívida</th>
+            <th>Status</th>
+            <th>Data</th>
+            <th>Acções</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (e of filteredEncomendas; track e.id) {
+            <tr>
+              <td>{{ e.numero }}</td>
+              <td style="font-weight:600;color:var(--accent)">{{ e.factura }}</td>
+              <td>{{ e.cliente }}</td>
+              <td>{{ e.produto }}</td>
+              <td>{{ e.origem }} → {{ e.destino }}</td>
+              <td>{{ e.total | number:'1.0-0' }} MZN</td>
+              <td>{{ e.pago | number:'1.0-0' }} MZN</td>
+              <td>{{ e.divida | number:'1.0-0' }} MZN</td>
+              <td>
+                @switch (e.status) {
+                  @case ('PAGO') {
+                    <span class="badge badge-success">{{ e.status }}</span>
+                  }
+                  @case ('PARCIAL') {
+                    <span class="badge badge-warning">{{ e.status }}</span>
+                  }
+                  @case ('NÃO PAGO') {
+                    <span class="badge badge-danger">{{ e.status }}</span>
+                  }
+                  @default {
+                    <span class="badge badge-neutral">{{ e.status }}</span>
+                  }
+                }
+              </td>
+              <td>{{ e.data }}</td>
+              <td>
+                <a [routerLink]="['/billing/encomendas', e.id]" class="action-btn" title="Ver">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </a>
+                <a [routerLink]="['/billing/encomendas', e.id, 'editar']" class="action-btn" title="Editar">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </a>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="11" class="empty-state">
+                <p>Nenhuma encomenda encontrada na base de dados.</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  <div class="table-footer">
+    <span>{{ filteredEncomendas.length }} encomenda(s) listada(s)</span>
+  </div>
+</div>

@@ -1,0 +1,150 @@
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="'/billing/encomendas'"
+  [showHelp]="true"
+  title="Nova Encomenda / Factura"
+  subtitle="Preencha os dados da encomenda conforme a factura"
+  helpTitle="Como registar uma Encomenda"
+  [helpItems]="[
+    'Comece pelos dados do cliente (destinatário) e número de factura.',
+    'Adicione os itens da carga e custos adicionais (transporte, recolha, bill of entry).',
+    'Revise o total geral antes de gravar ou integrar com o módulo de tesouraria.'
+  ]"
+></app-billing-section-header>
+
+<div class="card">
+  <!-- Invoice header -->
+  <div class="invoice-header">
+    <div class="invoice-from">
+      <div class="invoice-company">VM TRANSPORTES</div>
+      <div class="invoice-company-sub">Lirandzo — Transporte de Cargas</div>
+    </div>
+    <div class="form-grid" style="max-width: 300px">
+      <div class="form-group">
+        <label class="form-label">Nº Factura</label>
+        <input type="text" class="form-control" [(ngModel)]="encomenda.numeroFactura" placeholder="Ex: 108D">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data</label>
+        <input type="date" class="form-control" [(ngModel)]="encomenda.data">
+      </div>
+    </div>
+  </div>
+
+  <!-- Client info section -->
+  <h3 class="form-section-title">Dados do Cliente (Destinatário)</h3>
+  <div class="form-grid">
+    <div class="form-group">
+      <label class="form-label">Nome / Empresa</label>
+      <input type="text" class="form-control" [(ngModel)]="encomenda.clienteNome" placeholder="Ex: SLR Mining, Lda">
+    </div>
+    <div class="form-group">
+      <label class="form-label">NUIT</label>
+      <input type="text" class="form-control" [(ngModel)]="encomenda.clienteNuit" placeholder="Nº contribuinte">
+    </div>
+    <div class="form-group full-width">
+      <label class="form-label">Endereço</label>
+      <input type="text" class="form-control" [(ngModel)]="encomenda.clienteEndereco" placeholder="Ex: Aldeia Napaco Mpupene">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Província</label>
+      <select class="form-control" [(ngModel)]="encomenda.clienteProvincia">
+        <option value="">Seleccionar...</option>
+        <option *ngFor="let p of provincias" [value]="p">{{ p }}</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">ATT (Pessoa de Contacto)</label>
+      <input type="text" class="form-control" [(ngModel)]="encomenda.clienteContacto" placeholder="Ex: Sr. Euclides">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Telefone</label>
+      <input type="text" class="form-control" [(ngModel)]="encomenda.clienteTelefone" placeholder="Ex: 847983277">
+    </div>
+  </div>
+
+  <!-- Items table -->
+  <h3 class="form-section-title">Itens / Produtos</h3>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width: 80px">Qtd</th>
+          <th>Descrição</th>
+          <th style="width: 150px">Preço Unitário</th>
+          <th style="width: 150px">Subtotal</th>
+          <th style="width: 50px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of itens; let i = index">
+          <td><input type="number" class="form-control" [(ngModel)]="item.quantidade" min="1" style="width: 70px"></td>
+          <td><input type="text" class="form-control" [(ngModel)]="item.descricao" placeholder="Ex: Full load" style="width: 100%"></td>
+          <td><input type="number" class="form-control" [(ngModel)]="item.precoUnitario" placeholder="0.00" style="width: 130px"></td>
+          <td style="font-weight: 600; color: var(--text-primary)">{{ getSubtotalItem(item) | number:'1.2-2' }} MZN</td>
+          <td>
+            <button type="button" class="action-btn action-btn-danger" (click)="removerItem(i)" *ngIf="itens.length > 1" title="Remover">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <button type="button" class="btn-secondary" (click)="adicionarItem()" style="margin-top: 0.75rem">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    Adicionar Item
+  </button>
+
+  <!-- Costs section -->
+  <h3 class="form-section-title">Custos Adicionais</h3>
+  <div class="form-grid">
+    <div class="form-group">
+      <label class="form-label">Transporte (MZN)</label>
+      <input type="number" class="form-control" [(ngModel)]="encomenda.custoTransporte" placeholder="0.00">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Recolha (MZN)</label>
+      <input type="number" class="form-control" [(ngModel)]="encomenda.custoRecolha" placeholder="0.00">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Bill of Entry (MZN)</label>
+      <input type="number" class="form-control" [(ngModel)]="encomenda.custoBillOfEntry" placeholder="0.00">
+    </div>
+  </div>
+
+  <!-- Totals -->
+  <div class="invoice-totals">
+    <div class="invoice-total-row"><span>Subtotal Itens</span><span>{{ subtotalItens | number:'1.2-2' }} MZN</span></div>
+    <div class="invoice-total-row"><span>Transporte</span><span>{{ (encomenda.custoTransporte || 0) | number:'1.2-2' }} MZN</span></div>
+    <div class="invoice-total-row"><span>Recolha</span><span>{{ (encomenda.custoRecolha || 0) | number:'1.2-2' }} MZN</span></div>
+    <div class="invoice-total-row"><span>Bill of Entry</span><span>{{ (encomenda.custoBillOfEntry || 0) | number:'1.2-2' }} MZN</span></div>
+    <div class="invoice-total-row invoice-total-final"><span>TOTAL</span><span>{{ totalGeral | number:'1.2-2' }} MZN</span></div>
+  </div>
+
+  <!-- Terms -->
+  <h3 class="form-section-title">Termos e Observações</h3>
+  <div class="form-grid">
+    <div class="form-group">
+      <label class="form-label">Termos de Pagamento</label>
+      <input type="text" class="form-control" [(ngModel)]="encomenda.termos" placeholder="Ex: M60, Pagamento imediato...">
+    </div>
+    <div class="form-group full-width">
+      <label class="form-label">Observações</label>
+      <textarea class="form-control" [(ngModel)]="encomenda.observacoes" placeholder="Ex: Entrega condicionada a Pagamento" rows="3"></textarea>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <a routerLink="/billing/encomendas" class="btn-secondary">Cancelar</a>
+    <button type="button" class="btn-primary" (click)="salvar()">Guardar Factura</button>
+  </div>
+</div>
+
+<!-- Popup de Notificação -->
+<app-notification-popup 
+  *ngIf="showNotification"
+  [message]="notificationMessage"
+  [type]="notificationType"
+  [duration]="7000">
+</app-notification-popup>

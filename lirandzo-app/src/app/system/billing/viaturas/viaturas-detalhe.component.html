@@ -1,0 +1,141 @@
+<app-billing-section-header
+  [showBack]="true"
+  [showHelp]="false"
+  [backLink]="'/billing/viaturas'"
+  title="Detalhes da Viatura"
+  subtitle="Visualização completa da viatura"
+></app-billing-section-header>
+
+@if (loading) {
+  <div class="loading-state">
+    <p>A carregar dados da viatura...</p>
+  </div>
+} @else if (error) {
+  <div class="error-state">
+    <p>{{ error }}</p>
+    <button type="button" class="btn-secondary" (click)="carregarViatura()">Tentar Novamente</button>
+    <a routerLink="/billing/viaturas" class="btn-secondary" style="margin-left: 0.5rem;">Voltar</a>
+  </div>
+} @else if (viatura) {
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h3>{{ viatura.matricula }}</h3>
+        <p class="text-muted">{{ viatura.marca }} {{ viatura.modelo }}{{ viatura.ano ? ' (' + viatura.ano + ')' : '' }}</p>
+      </div>
+      <div>
+        <span [class]="'badge ' + getStatusClass(viatura.status)">
+          {{ formatarStatus(viatura.status) }}
+        </span>
+        <button type="button" class="btn-secondary" (click)="registarOcorrencia()" style="margin-left: 0.5rem;" title="Registar acidente, avaria ou manutenção">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="margin-right: 0.4rem;">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          Registar Ocorrência
+        </button>
+        <button type="button" class="btn-primary" (click)="editar()" style="margin-left: 0.5rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="margin-right: 0.5rem;">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Editar
+        </button>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-section">
+        <h4>Identificação</h4>
+        <div class="detail-item">
+          <span class="detail-label">Matrícula:</span>
+          <span class="detail-value highlight">{{ viatura.matricula }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Marca:</span>
+          <span class="detail-value">{{ viatura.marca }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Modelo:</span>
+          <span class="detail-value">{{ viatura.modelo }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Ano:</span>
+          <span class="detail-value">{{ viatura.ano || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Cor:</span>
+          <span class="detail-value">{{ viatura.cor || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Tipo:</span>
+          <span class="detail-value">{{ viatura.tipo || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Nº Chassis:</span>
+          <span class="detail-value">{{ viatura.numeroChassis || 'N/A' }}</span>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h4>Especificações</h4>
+        <div class="detail-item">
+          <span class="detail-label">Capacidade:</span>
+          <span class="detail-value">{{ formatarCapacidade(viatura) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Combustível:</span>
+          <span class="detail-value">{{ viatura.combustivel || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Status:</span>
+          <span class="detail-value">{{ formatarStatus(viatura.status) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Histórico de Ocorrências -->
+  <div class="card" style="margin-top: 1.5rem;">
+    <div class="card-header" style="flex-wrap: wrap; gap: 0.5rem;">
+      <h3 class="form-section-title" style="margin: 0;">Histórico de Ocorrências</h3>
+      <a [routerLink]="['/billing/ocorrencias']" [queryParams]="{ viatura: viaturaId }" class="btn-secondary" style="text-decoration: none;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="margin-right: 0.4rem;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Registar
+      </a>
+    </div>
+    @if (loadingOcorrencias) {
+      <p class="text-muted" style="padding: 1rem;">A carregar ocorrências...</p>
+    } @else if (ocorrencias.length === 0) {
+      <p class="text-muted" style="padding: 1rem;">Nenhuma ocorrência registada para esta viatura.</p>
+    } @else {
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th>Descrição</th>
+              <th>Motorista</th>
+              <th>Custo (MZN)</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (o of ocorrencias; track o.id) {
+              <tr>
+                <td>{{ formatarData(o.occurrenceDate) }}</td>
+                <td><span [class]="getTipoBadge(o.type)">{{ formatarTipo(o.type) }}</span></td>
+                <td><span [class]="getEstadoBadge(o.status)">{{ formatarEstado(o.status) }}</span></td>
+                <td style="max-width: 280px; font-size: 0.86rem">{{ o.description }}</td>
+                <td>{{ o.driverName || '—' }}</td>
+                <td style="font-weight: 600">{{ (o.estimatedCost || 0) | number:'1.0-0' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+}

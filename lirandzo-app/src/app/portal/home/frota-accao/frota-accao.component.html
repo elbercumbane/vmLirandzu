@@ -1,0 +1,28 @@
+<section class="frota-accao" id="frota">
+  <div class="frota-accao-bg">
+    <img src="/camiao-terminal-carga.jpeg" [alt]="'frotaAccao.alt' | transloco" class="frota-accao-img" loading="lazy">
+    <div class="frota-accao-overlay"></div>
+  </div>
+  <div class="frota-accao-content">
+    <span class="frota-accao-badge">{{ 'frotaAccao.badge' | transloco }}</span>
+    <h2 class="frota-accao-title">{{ 'frotaAccao.title' | transloco }}</h2>
+    <p class="frota-accao-desc">
+      {{ 'frotaAccao.desc' | transloco }}
+    </p>
+  </div>
+
+  <div class="frota-gallery" aria-label="Galeria da frota em movimento">
+    <div class="frota-gallery-track">
+      @for (img of fleetImages; track $index) {
+        <figure class="frota-gallery-card">
+          <img [src]="img" [alt]="'frotaAccao.alt' | transloco" loading="lazy">
+        </figure>
+      }
+      @for (img of fleetImages; track 'dup-' + $index) {
+        <figure class="frota-gallery-card" aria-hidden="true">
+          <img [src]="img" [alt]="'frotaAccao.alt' | transloco" loading="lazy">
+        </figure>
+      }
+    </div>
+  </div>
+</section>

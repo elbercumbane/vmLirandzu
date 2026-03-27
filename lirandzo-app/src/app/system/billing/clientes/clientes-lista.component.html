@@ -1,0 +1,110 @@
+<app-billing-section-header
+  [showBack]="true"
+  [showHelp]="true"
+  [backLink]="'/billing'"
+  title="Clientes"
+  subtitle="Dados reais da API — clientes com registo na base (encomendas ou cadastro manual)"
+  helpTitle="Como usar Clientes"
+  [helpItems]="[
+    'A lista vem da base de dados. Se estiver vazia, ainda não há clientes registados ou a API não está acessível.',
+    'Pode registar um cliente manualmente com «Novo cliente» ou ao criar uma encomenda/factura.',
+    'Totais e totais em dívida reflectem os campos actualizados pelo sistema quando há encomendas.'
+  ]"
+></app-billing-section-header>
+
+<div class="toolbar" style="margin-bottom: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+  <a routerLink="/billing/clientes/novo" class="btn-primary">Novo cliente</a>
+  <a routerLink="/billing/clientes/historico" class="btn-secondary">Ver Histórico por Cliente</a>
+</div>
+
+<div class="kpi-grid">
+  <div class="card kpi-card">
+    <div class="kpi-value">{{ totalClientes }}</div>
+    <div class="kpi-label">Total Clientes</div>
+  </div>
+  <div class="card kpi-card">
+    <div class="kpi-value" style="color: var(--success)">{{ totalFaturado | number:'1.0-0' }} MZN</div>
+    <div class="kpi-label">Total Facturado</div>
+  </div>
+  <div class="card kpi-card">
+    <div class="kpi-value" style="color: var(--danger)">{{ totalEmDivida | number:'1.0-0' }} MZN</div>
+    <div class="kpi-label">Total em Dívida</div>
+  </div>
+  <div class="card kpi-card">
+    <div class="kpi-value" style="color: var(--warning)">{{ clientesComDivida }}</div>
+    <div class="kpi-label">Clientes com Dívida</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <input type="text" class="search-input" [(ngModel)]="filtro" placeholder="Pesquisar por nome, local, contacto ou telefone..." [disabled]="loading || !!error">
+  </div>
+
+  @if (loading) {
+    <div class="loading-state"><p>A carregar clientes…</p></div>
+  } @else if (error) {
+    <div class="error-state">
+      <p>{{ error }}</p>
+      <button type="button" class="btn-secondary" (click)="carregar()">Tentar novamente</button>
+    </div>
+  } @else if (clientes.length === 0) {
+    <div class="empty-state" style="padding: 2rem 1rem;">
+      <p>Nenhum cliente na base de dados.</p>
+      <p class="text-muted" style="font-size: 0.9rem; margin-top: 0.5rem;">
+        Registe um cliente com o botão «Novo cliente» ou ao criar uma encomenda em <strong>Facturação → Nova factura</strong>.
+      </p>
+      <a routerLink="/billing/clientes/novo" class="btn-primary" style="margin-top: 1rem; display: inline-block;">Novo cliente</a>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Local / endereço</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>Encomendas</th>
+            <th>Total Facturado</th>
+            <th>Saldo Devedor</th>
+            <th>Última Encomenda</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of clientesFiltrados; track c.id) {
+            <tr>
+              <td style="font-weight: 600; color: var(--text-primary)">{{ c.nome }}</td>
+              <td>{{ c.provincia }}</td>
+              <td>{{ c.contacto }}</td>
+              <td>{{ c.telefone }}</td>
+              <td><span class="badge badge-info">{{ c.totalEncomendas }}</span></td>
+              <td style="font-weight: 600">{{ c.valorTotal | number:'1.0-0' }} MZN</td>
+              <td>
+                <span [style.color]="c.saldoDevedor > 0 ? 'var(--danger)' : 'var(--success)'" style="font-weight: 600">
+                  {{ c.saldoDevedor | number:'1.0-0' }} MZN
+                </span>
+              </td>
+              <td>{{ c.ultimaEncomenda }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="empty-state">Nenhum resultado com este filtro.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+@if (!loading && !error && clientes.length > 0) {
+  <div class="info-note">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="16" x2="12" y2="12"></line>
+      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+    </svg>
+    <span>Os totais são actualizados automaticamente quando há encomendas. Para novo registo manual use <strong>Novo cliente</strong> ou <strong>Nova factura</strong> (escolhendo ou criando o contacto).</span>
+  </div>
+}
