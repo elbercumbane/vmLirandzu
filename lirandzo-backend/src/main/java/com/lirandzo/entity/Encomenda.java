@@ -83,7 +83,8 @@ public class Encomenda {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "quotation_id")
-    @JsonIgnoreProperties({"cliente", "revisaoDe"})
+    // Evita erro de serialização do proxy do Hibernate (ByteBuddyInterceptor)
+    @JsonIgnoreProperties({"cliente", "revisaoDe", "hibernateLazyInitializer", "handler"})
     private Cotacao cotacao;
 
     @PrePersist

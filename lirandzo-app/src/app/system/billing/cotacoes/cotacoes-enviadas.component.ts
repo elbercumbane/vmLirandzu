@@ -371,11 +371,9 @@ export class CotacoesEnviadasComponent implements OnInit {
   }
 
   visualizarPdfNovaAba(c: CotacaoEnviadaDisplay): void {
-    const tree = this.router.createUrlTree(['/billing/cotacoes/gerar', c.id], {
-      queryParams: { pdfOnly: '1', autoPdf: '1' }
+    this.router.navigate(['/billing/cotacoes/gerar', c.id], {
+      queryParams: { pdfOnly: '1' }
     });
-    const url = this.router.serializeUrl(tree);
-    window.open(`${window.location.origin}${url}`, '_blank', 'noopener,noreferrer');
   }
 
   registarAceitacaoCliente(c: CotacaoEnviadaDisplay): void {

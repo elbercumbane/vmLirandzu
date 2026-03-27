@@ -229,6 +229,12 @@ export class CotacoesCadastroComponent implements OnInit {
         this.cotacao.custoTransporte = cotacao.custoTransporte ?? null;
         this.cotacao.custoBillOfEntry = cotacao.custoBillOfEntry ?? null;
 
+        // Carregar custos e operador
+        this.cotacao.custoRecolha = cotacao.custoRecolha ?? null;
+        this.cotacao.custoTransporte = cotacao.custoTransporte ?? null;
+        this.cotacao.custoBillOfEntry = cotacao.custoBillOfEntry ?? null;
+        this.cotacao.operador = cotacao.operador || '';
+
         // Garantir coerência no preview quando o operador alterar desconto.
         this.recalcularCamposFinanceiros();
         
@@ -281,6 +287,19 @@ export class CotacoesCadastroComponent implements OnInit {
     });
   }
 
+  /** Constrói o texto de descricaoCarga incluindo os preços para restauração futura. */
+  private buildDescricaoCarga(): string {
+    return this.itens
+      .filter(i => i.descricao?.trim())
+      .map(i => {
+        const qtd = i.quantidade || 1;
+        const un = i.unidade ? ` ${i.unidade}` : '';
+        const preco = i.precoUnitario != null ? ` [PRECO:${i.precoUnitario}]` : '';
+        return `${qtd}${un} ${i.descricao}${preco}`.trim();
+      })
+      .join('\n');
+  }
+
   adicionarItem(): void {
     this.itens.push({ descricao: '', quantidade: 1, unidade: '', precoUnitario: null });
   }
@@ -292,11 +311,19 @@ export class CotacoesCadastroComponent implements OnInit {
    */
   private parseDescricaoCarga(texto: string): ItemCotacao[] {
     const itens: ItemCotacao[] = [];
-    const linhas = texto.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+    // Suporte a separador por vírgula (formato antigo) e por nova linha (formato novo)
+    const linhas = texto.includes('\n')
+      ? texto.split(/\r?\n/)
+      : texto.split(/,(?![^\[]*\])/).map(s => s.trim()); // split por vírgula fora de [...]
+
+    const linhasFiltradas = linhas.map(l => l.trim()).filter(l => l.length > 0);
+
     // Padrão 1: número + unidade + descrição (ex: 50 kg porco, 3 toneldas de ferramentas)
     const numUnidadeRegex = /^([\d.,]+)\s*(kgs?|kilos?|quilos?|toneladas?|toneldas?|tonneladas?|t)\b\s*(?:de\s+)?(.*)$/i;
     // Padrão 2: unidade + descrição sem número (ex: kg porco, toneladas feijao)
     const unidadeDescricaoRegex = /^(kgs?|kilos?|quilos?|toneladas?|toneldas?|tonneladas?|t)\b\s+(.+)$/i;
+    // Padrão de preço embutido: [PRECO:12345.67]
+    const precoRegex = /\[PRECO:([\d.]+)\]/;
 
     const normalizarUnidade = (raw: string): 'kg' | 'toneladas' | '' => {
       const r = raw.toLowerCase();
@@ -305,8 +332,17 @@ export class CotacoesCadastroComponent implements OnInit {
       return '';
     };
 
-    for (const linha of linhas) {
-      const limpa = linha.replace(/^\s*\d+[.)]\s*/, '').trim();
+    const extrairPreco = (linha: string): { texto: string; preco: number | null } => {
+      const m = linha.match(precoRegex);
+      if (m) {
+        return { texto: linha.replace(precoRegex, '').trim(), preco: parseFloat(m[1]) };
+      }
+      return { texto: linha, preco: null };
+    };
+
+    for (const linha of linhasFiltradas) {
+      const { texto: linhaLimpa, preco } = extrairPreco(linha);
+      const limpa = linhaLimpa.replace(/^\s*\d+[.)]\s*/, '').trim();
       const matchNum = limpa.match(numUnidadeRegex);
       const matchUnidade = limpa.match(unidadeDescricaoRegex);
 
@@ -319,7 +355,7 @@ export class CotacoesCadastroComponent implements OnInit {
           descricao: descResto || limpa,
           quantidade: Math.round(quantidade) === quantidade ? quantidade : Math.round(quantidade * 100) / 100,
           unidade,
-          precoUnitario: null
+          precoUnitario: preco
         });
       } else if (matchUnidade) {
         const unidade = normalizarUnidade(matchUnidade[1] || '');
@@ -328,10 +364,10 @@ export class CotacoesCadastroComponent implements OnInit {
           descricao: descResto || limpa,
           quantidade: 1,
           unidade,
-          precoUnitario: null
+          precoUnitario: preco
         });
       } else {
-        itens.push({ descricao: limpa || linha, quantidade: 1, unidade: '', precoUnitario: null });
+        itens.push({ descricao: limpa || linhaLimpa, quantidade: 1, unidade: '', precoUnitario: preco });
       }
     }
     return itens;
@@ -383,14 +419,7 @@ export class CotacoesCadastroComponent implements OnInit {
         return;
       }
 
-      const descricaoCarga = this.itens
-        .filter(i => i.descricao?.trim())
-        .map(i => {
-          const qtd = i.quantidade || 1;
-          const un = i.unidade ? ` ${i.unidade}` : '';
-          return `${qtd}${un} ${i.descricao}`.trim();
-        })
-        .join(', ');
+      const descricaoCarga = this.buildDescricaoCarga();
 
       const payload: CotacaoRequest = {
         cliente: { id: clienteId },
@@ -472,14 +501,7 @@ export class CotacoesCadastroComponent implements OnInit {
         return;
       }
 
-      const descricaoCarga = this.itens
-        .filter(i => i.descricao?.trim())
-        .map(i => {
-          const qtd = i.quantidade || 1;
-          const un = i.unidade ? ` ${i.unidade}` : '';
-          return `${qtd}${un} ${i.descricao}`.trim();
-        })
-        .join(', ');
+      const descricaoCarga = this.buildDescricaoCarga();
 
       const payloadFinal: CotacaoRequest = {
         cliente: { id: clienteId },
@@ -576,14 +598,7 @@ export class CotacoesCadastroComponent implements OnInit {
         return;
       }
 
-      const descricaoCarga = this.itens
-        .filter(i => i.descricao?.trim())
-        .map(i => {
-          const qtd = i.quantidade || 1;
-          const un = i.unidade ? ` ${i.unidade}` : '';
-          return `${qtd}${un} ${i.descricao}`.trim();
-        })
-        .join(', ');
+      const descricaoCarga = this.buildDescricaoCarga();
 
       const payload: CotacaoRequest = {
         cliente: { id: clienteId },
@@ -672,14 +687,7 @@ export class CotacoesCadastroComponent implements OnInit {
           return;
         }
 
-        const descricaoCarga = this.itens
-          .filter(i => i.descricao?.trim())
-          .map(i => {
-            const qtd = i.quantidade || 1;
-            const un = i.unidade ? ` ${i.unidade}` : '';
-            return `${qtd}${un} ${i.descricao}`.trim();
-          })
-          .join(', ');
+        const descricaoCarga = this.buildDescricaoCarga();
 
         const payload: CotacaoRequest = {
           cliente: { id: clienteId },
@@ -737,14 +745,7 @@ export class CotacoesCadastroComponent implements OnInit {
       }
 
       // Usar os dados atuais do formulário, não os da BD
-      const descricaoCarga = this.itens
-        .filter(i => i.descricao?.trim())
-        .map(i => {
-          const qtd = i.quantidade || 1;
-          const un = i.unidade ? ` ${i.unidade}` : '';
-          return `${qtd}${un} ${i.descricao}`.trim();
-        })
-        .join(', ');
+      const descricaoCarga = this.buildDescricaoCarga();
 
       const atualizacao: CotacaoRequest = {
         cliente: { id: clienteId },
@@ -952,6 +953,9 @@ export class CotacoesCadastroComponent implements OnInit {
   fecharPreview(): void {
     this.showPreview = false;
     this.modoConfirmacaoGeracao = false;
+    if (this.modoPdfOnly) {
+      this.router.navigate(['/billing/cotacoes/enviadas']);
+    }
   }
 
   private getPdfExportOptions() {
