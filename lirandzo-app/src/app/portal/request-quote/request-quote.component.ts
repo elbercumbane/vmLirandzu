@@ -30,10 +30,6 @@ export class RequestQuoteComponent implements AfterViewInit {
     mensagem: false
   };
 
-  itens: { quantidade: number; descricao: string }[] = [
-    { quantidade: 1, descricao: '' }
-  ];
-
   ngAfterViewInit(): void {
     const host = this.el.nativeElement as HTMLElement;
     const heroInner = host.querySelector('.quote-hero-inner') as HTMLElement | null;
@@ -61,16 +57,6 @@ export class RequestQuoteComponent implements AfterViewInit {
     tipoServico: 'TRANSPORTE' as 'TRANSPORTE' | 'COMPRA_TRANSPORTE'
   };
 
-  adicionarItem(): void {
-    this.itens.push({ quantidade: 1, descricao: '' });
-  }
-
-  removerItem(index: number): void {
-    if (this.itens.length > 1) {
-      this.itens.splice(index, 1);
-    }
-  }
-
   closeSuccessModal(): void {
     this.submitted = false;
     this.resetForm();
@@ -89,15 +75,6 @@ export class RequestQuoteComponent implements AfterViewInit {
     this.form.message = '';
     this.form.deliveryMethod = '';
     this.form.tipoServico = 'TRANSPORTE';
-    this.itens = [{ quantidade: 1, descricao: '' }];
-  }
-
-  private buildMensagemFromItens(): string {
-    const linhas = this.itens
-      .filter(i => i.descricao?.trim())
-      .map((i, idx) => `${idx + 1}. ${i.quantidade}x ${i.descricao.trim()}`);
-    const extra = this.form.message?.trim();
-    return extra ? [...linhas, extra].join('\n') : linhas.join('\n');
   }
 
   toggleSection(section: 'dados' | 'detalhes' | 'mensagem'): void {
@@ -113,7 +90,6 @@ export class RequestQuoteComponent implements AfterViewInit {
     const phone1 = this.form.phone1?.trim() || '';
     const deliveryMethod = this.form.deliveryMethod;
     const needsPhone = deliveryMethod === 'whatsapp' || deliveryMethod === 'chamada';
-    const temItem = this.itens.some(i => i.descricao?.trim());
     return !!(
       this.form.name?.trim() &&
       this.form.email?.trim() &&
@@ -121,7 +97,7 @@ export class RequestQuoteComponent implements AfterViewInit {
       this.form.origin?.trim() &&
       this.form.destination?.trim() &&
       this.form.deliveryMethod &&
-      temItem
+      this.form.message?.trim()
     );
   }
 
@@ -137,7 +113,7 @@ export class RequestQuoteComponent implements AfterViewInit {
     if (!this.form.origin?.trim()) missing.push(t('quotePage.missingOrigin'));
     if (!this.form.destination?.trim()) missing.push(t('quotePage.missingDest'));
     if (!this.form.deliveryMethod) missing.push(t('quotePage.missingContactPref'));
-    if (!this.itens.some(i => i.descricao?.trim())) missing.push('Descrição da carga (pelo menos um item)');
+    if (!this.form.message?.trim()) missing.push(t('quotePage.missingMessage') || 'Descrição da carga');
     return missing;
   }
 
@@ -174,7 +150,7 @@ export class RequestQuoteComponent implements AfterViewInit {
       hasWhatsApp1: this.form.deliveryMethod === 'whatsapp',
       origem: this.form.origin,
       destino: this.form.destination,
-      mensagem: this.buildMensagemFromItens(),
+      mensagem: this.form.message,
       formaEnvioPreferida: this.form.deliveryMethod as FormaEnvio,
       tipoServico: this.form.tipoServico
     }).subscribe({
