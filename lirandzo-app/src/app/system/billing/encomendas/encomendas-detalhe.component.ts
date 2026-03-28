@@ -7,9 +7,9 @@ import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
 import { EncomendaService, EncomendaResponse } from '../../../services/encomenda.service';
-import { PagamentoService, PagamentoResponse } from '../../../services/pagamento.service';
-import { RastreamentoService, RastreamentoTimeline } from '../../../services/rastreamento.service';
+import { PagamentoService, PagamentoResponse, VerificationStatusApi } from '../../../services/pagamento.service';
 import { NotificationPopupComponent } from '../../../shared/components/notification-popup/notification-popup.component';
+import { AuthService } from '../../../shared/services/auth.service';
 
 @Component({
   selector: 'app-encomendas-detalhe',
@@ -21,7 +21,6 @@ import { NotificationPopupComponent } from '../../../shared/components/notificat
 export class EncomendasDetalheComponent implements OnInit {
   encomenda: EncomendaResponse | null = null;
   pagamentos: PagamentoResponse[] = [];
-  timeline: RastreamentoTimeline | null = null;
   loading = true;
   error: string | null = null;
   encomendaId: number | null = null;
@@ -42,14 +41,24 @@ export class EncomendasDetalheComponent implements OnInit {
   notificationType: 'success' | 'error' = 'success';
   aGuardarPagamento = false;
   confirmandoId: number | null = null;
+  /** Aprovação / recusa de pagamento PENDING_APPROVAL (gestor/admin) */
+  processandoAprovacaoId: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private encomendaService: EncomendaService,
     private pagamentoService: PagamentoService,
-    private rastreamentoService: RastreamentoService
+    private auth: AuthService
   ) {}
+
+  get podeAprovarPagamentos(): boolean {
+    return this.auth.isAdmin || this.auth.isGestor;
+  }
+
+  get podeEditarFactura(): boolean {
+    return this.auth.canEditFacturas();
+  }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -76,18 +85,11 @@ export class EncomendasDetalheComponent implements OnInit {
           console.warn('Pagamentos não carregados (continuação sem lista):', e);
           return of([] as PagamentoResponse[]);
         })
-      ),
-      timeline: this.rastreamentoService.obterTimelinePorEncomenda(this.encomendaId).pipe(
-        catchError((e) => {
-          console.warn('Timeline de rastreio não disponível:', e);
-          return of(null as RastreamentoTimeline | null);
-        })
       )
     }).subscribe({
-      next: ({ encomenda, pagamentos, timeline }) => {
+      next: ({ encomenda, pagamentos }) => {
         this.encomenda = encomenda;
         this.pagamentos = pagamentos;
-        this.timeline = timeline;
         this.loading = false;
       },
       error: (err: unknown) => {
@@ -111,6 +113,12 @@ export class EncomendasDetalheComponent implements OnInit {
       .reduce((s, p) => s + (p.valor || 0), 0);
   }
 
+  get valorPendenteAprovacao(): number {
+    return this.pagamentos
+      .filter((p) => p.verificationStatus === 'PENDING_APPROVAL')
+      .reduce((s, p) => s + (p.valor || 0), 0);
+  }
+
   registarPagamento(): void {
     if (!this.encomendaId || !this.novoPagamento.valor || this.novoPagamento.valor <= 0) {
       this.mostrarNotificacao('Indique um valor válido.', 'error');
@@ -118,6 +126,15 @@ export class EncomendasDetalheComponent implements OnInit {
     }
 
     this.aGuardarPagamento = true;
+    let verificationStatus: VerificationStatusApi;
+    if (this.novoPagamento.aguardaExtrato) {
+      verificationStatus = 'PENDING_BANK';
+    } else if (this.auth.isAdmin || this.auth.isGestor) {
+      verificationStatus = 'CONFIRMED';
+    } else {
+      verificationStatus = 'PENDING_APPROVAL';
+    }
+
     const payload = {
       encomenda: { numeroEncomenda: this.encomendaId },
       valor: this.novoPagamento.valor,
@@ -125,7 +142,7 @@ export class EncomendasDetalheComponent implements OnInit {
       referencia: this.novoPagamento.referencia?.trim() || undefined,
       observacoes: this.novoPagamento.observacoes?.trim() || undefined,
       metodoPagamento: this.novoPagamento.metodoPagamento || undefined,
-      verificationStatus: this.novoPagamento.aguardaExtrato ? ('PENDING_BANK' as const) : ('CONFIRMED' as const)
+      verificationStatus
     };
 
     this.pagamentoService.criar(payload).subscribe({
@@ -139,12 +156,16 @@ export class EncomendasDetalheComponent implements OnInit {
           observacoes: '',
           aguardaExtrato: false
         };
-        this.mostrarNotificacao(
-          payload.verificationStatus === 'PENDING_BANK'
-            ? 'Pagamento registado. Confirme no extrato quando verificar o valor.'
-            : 'Pagamento registado e contabilizado na dívida.',
-          'success'
-        );
+        let msg = 'Pagamento registado.';
+        if (payload.verificationStatus === 'PENDING_BANK') {
+          msg = 'Pagamento registado. Confirme no extrato quando verificar o valor.';
+        } else if (payload.verificationStatus === 'PENDING_APPROVAL') {
+          msg =
+            'Pedido de pagamento enviado. Um gestor ou administrador deve aprovar antes de contabilizar na dívida.';
+        } else {
+          msg = 'Pagamento registado e contabilizado na dívida.';
+        }
+        this.mostrarNotificacao(msg, 'success');
         this.carregarTudo();
       },
       error: (err: unknown) => {
@@ -177,6 +198,51 @@ export class EncomendasDetalheComponent implements OnInit {
     });
   }
 
+  aprovarPagamentoGestor(p: PagamentoResponse): void {
+    this.processandoAprovacaoId = p.id;
+    this.pagamentoService.aprovarPagamentoGestor(p.id).subscribe({
+      next: () => {
+        this.processandoAprovacaoId = null;
+        this.mostrarNotificacao('Pagamento aprovado e contabilizado na dívida.', 'success');
+        this.carregarTudo();
+      },
+      error: (err: unknown) => {
+        this.processandoAprovacaoId = null;
+        const msg =
+          err && typeof err === 'object' && 'error' in err
+            ? (err as { error?: { error?: string } }).error?.error
+            : null;
+        this.mostrarNotificacao(msg || 'Erro ao aprovar.', 'error');
+      }
+    });
+  }
+
+  recusarPagamentoGestor(p: PagamentoResponse): void {
+    const motivo = typeof window !== 'undefined' ? window.prompt('Motivo da recusa:', '') : null;
+    if (motivo === null) return;
+    const trimmed = (motivo || '').trim();
+    if (!trimmed) {
+      this.mostrarNotificacao('Indique um motivo para recusar.', 'error');
+      return;
+    }
+    this.processandoAprovacaoId = p.id;
+    this.pagamentoService.recusarPagamentoGestor(p.id, trimmed).subscribe({
+      next: () => {
+        this.processandoAprovacaoId = null;
+        this.mostrarNotificacao('Pagamento recusado.', 'success');
+        this.carregarTudo();
+      },
+      error: (err: unknown) => {
+        this.processandoAprovacaoId = null;
+        const msg =
+          err && typeof err === 'object' && 'error' in err
+            ? (err as { error?: { error?: string } }).error?.error
+            : null;
+        this.mostrarNotificacao(msg || 'Erro ao recusar.', 'error');
+      }
+    });
+  }
+
   private mostrarNotificacao(message: string, type: 'success' | 'error'): void {
     this.notificationMessage = message;
     this.notificationType = type;
@@ -184,11 +250,30 @@ export class EncomendasDetalheComponent implements OnInit {
   }
 
   labelVerificacao(status: string): string {
-    return status === 'PENDING_BANK' ? 'Aguarda extrato' : 'Confirmado';
+    switch (status) {
+      case 'PENDING_BANK':
+        return 'Aguarda extrato';
+      case 'PENDING_APPROVAL':
+        return 'Aguarda aprovação';
+      case 'REJECTED':
+        return 'Recusado';
+      case 'CONFIRMED':
+      default:
+        return 'Confirmado';
+    }
   }
 
   badgeVerificacao(status: string): string {
-    return status === 'PENDING_BANK' ? 'badge-warning' : 'badge-success';
+    switch (status) {
+      case 'PENDING_BANK':
+      case 'PENDING_APPROVAL':
+        return 'badge-warning';
+      case 'REJECTED':
+        return 'badge-danger';
+      case 'CONFIRMED':
+      default:
+        return 'badge-success';
+    }
   }
 
   formatarData(data: string): string {
@@ -197,17 +282,6 @@ export class EncomendasDetalheComponent implements OnInit {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
-    });
-  }
-
-  formatarDataHora(iso: string): string {
-    if (!iso) return '';
-    return new Date(iso).toLocaleString('pt-MZ', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
     });
   }
 

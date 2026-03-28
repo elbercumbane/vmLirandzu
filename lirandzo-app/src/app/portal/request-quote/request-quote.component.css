@@ -113,8 +113,8 @@
 }
 .form-section.expanded {
   background: #fff;
-  border-color: rgba(220, 38, 38, 0.2);
-  box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.08);
+  border-color: #e2e8f0;
+  box-shadow: none;
 }
 
 .form-section-header {
@@ -144,16 +144,6 @@
   align-items: center;
   gap: 0.5rem;
 }
-.form-section-title::before {
-  content: '';
-  width: 4px;
-  height: 1.1em;
-  background: var(--brand-red);
-  border-radius: 2px;
-}
-.form-section.expanded .form-section-title {
-  color: var(--brand-red);
-}
 
 .form-section-chevron {
   font-size: 1.25rem;
@@ -163,7 +153,7 @@
 }
 .form-section.expanded .form-section-chevron {
   transform: rotate(90deg);
-  color: var(--brand-red);
+  color: #475569;
 }
 
 .form-section-body {
@@ -259,11 +249,6 @@
   color: #b91c1c;
 }
 
-.form-section.section-has-error {
-  border-color: rgba(220, 38, 38, 0.45);
-  box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.12);
-}
-
 input.field-invalid,
 select.field-invalid,
 textarea.field-invalid {
@@ -312,6 +297,18 @@ textarea.field-invalid {
 .form-cell select option {
   color: #1a1a24;
   background: #fff;
+}
+
+.quote-contact-person-hint {
+  grid-column: 1 / -1;
+  margin: -0.15rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: #64748b;
+  padding: 0.5rem 0.65rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
 }
 
 .form-row input:hover,
@@ -509,7 +506,7 @@ textarea.field-invalid {
   background: #e2e8f0;
 }
 
-/* Popup de confirmacao */
+/* Popup de confirmação — resumo por secções (alinhado ao formulário) */
 .quote-confirm-overlay {
   position: fixed;
   inset: 0;
@@ -517,96 +514,240 @@ textarea.field-invalid {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
+  padding: 1rem;
   animation: successOverlayIn 0.3s ease-out;
 }
 .quote-confirm-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
 }
 .quote-confirm-modal {
   position: relative;
   width: 100%;
-  max-width: 480px;
-  max-height: 90vh;
-  overflow-y: auto;
-  background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.12);
-  padding: 1.75rem 2rem 1.5rem;
-  animation: successModalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.quote-confirm-title {
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: #0a0a0f;
-  margin: 0 0 0.25rem;
-}
-.quote-confirm-subtitle {
-  font-size: 0.9rem;
-  color: #64748b;
-  margin: 0 0 1.25rem;
-}
-.quote-confirm-summary {
+  max-width: 520px;
+  max-height: min(720px, 88vh, calc(100dvh - 2rem));
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
-  margin-bottom: 1.5rem;
+  background: #f1f5f9;
+  border-radius: 22px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.65) inset,
+    0 25px 50px -12px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+  animation: successModalIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.quote-confirm-accent {
+  height: 4px;
+  width: 100%;
+  flex-shrink: 0;
+  background: linear-gradient(90deg, var(--brand-red) 0%, var(--brand-red-hover) 45%, #b91c1c 100%);
+}
+.quote-confirm-close {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  color: #64748b;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+.quote-confirm-close:hover {
+  background: #fff;
+  color: #0f172a;
+  transform: scale(1.05);
+}
+.quote-confirm-modal-inner {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  padding: 1.35rem 1.5rem 1.25rem;
+  padding-top: 1.5rem;
+}
+.quote-confirm-title {
+  flex-shrink: 0;
+  font-size: clamp(1.2rem, 3.5vw, 1.45rem);
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 2.25rem 0.35rem 0;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.quote-confirm-subtitle {
+  flex-shrink: 0;
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0 2rem 1rem 0;
+  line-height: 1.45;
+}
+.quote-confirm-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1.1rem;
+  padding-right: 0.35rem;
+  scrollbar-gutter: stable;
+}
+.quote-confirm-block {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+.quote-confirm-block--message {
+  border-color: rgba(220, 38, 38, 0.15);
+  box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.06);
+}
+.quote-confirm-block-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.65rem 1rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #b91c1c;
+  background: linear-gradient(180deg, #fff 0%, #fafafa 100%);
+  border-bottom: 1px solid #f1f5f9;
+}
+.quote-confirm-block-title::before {
+  content: '';
+  width: 3px;
+  height: 1em;
+  background: var(--brand-red);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.quote-confirm-block-body {
+  padding: 0.65rem 1rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 .quote-confirm-row {
   display: grid;
-  grid-template-columns: 110px 1fr;
-  gap: 0.75rem;
-  align-items: start;
-  font-size: 0.95rem;
+  grid-template-columns: minmax(0, 38%) 1fr;
+  gap: 0.65rem 1rem;
+  align-items: baseline;
+  padding: 0.5rem 0;
+  font-size: 0.9375rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+.quote-confirm-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
 }
 .quote-confirm-label {
   color: #64748b;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  line-height: 1.35;
 }
 .quote-confirm-value {
-  color: #1a1a24;
+  color: #0f172a;
+  font-weight: 500;
   word-break: break-word;
+  line-height: 1.45;
+  text-align: right;
 }
-.quote-confirm-row-message .quote-confirm-value {
+.quote-confirm-message-box {
+  padding-top: 0.5rem;
+  padding-bottom: 0.75rem;
+}
+.quote-confirm-message-text {
+  margin: 0;
   white-space: pre-wrap;
-}
-.quote-confirm-message {
-  max-height: 120px;
-  overflow-y: auto;
+  word-break: break-word;
   font-size: 0.9rem;
+  line-height: 1.55;
+  color: #334155;
+  padding: 0.65rem 0.75rem;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
 }
 .quote-confirm-actions {
+  flex-shrink: 0;
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.65rem;
   justify-content: flex-end;
+  padding-top: 0.25rem;
+  border-top: 1px solid #e2e8f0;
+  margin: 0 -0.25rem;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
 }
 .quote-confirm-btn {
-  padding: 0.75rem 1.5rem;
+  padding: 0.7rem 1.35rem;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.9375rem;
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 .quote-confirm-btn-edit {
-  background: #f1f5f9;
+  background: #fff;
   color: #475569;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 .quote-confirm-btn-edit:hover {
-  background: #e2e8f0;
+  background: #f8fafc;
+  border-color: #cbd5e1;
 }
 .quote-confirm-btn-send {
-  background: var(--brand-red);
+  background: linear-gradient(180deg, var(--brand-red) 0%, #b91c1c 100%);
   color: #fff;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
 }
 .quote-confirm-btn-send:hover {
-  background: var(--brand-red-hover);
-  transform: translateY(-2px);
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+@media (max-width: 480px) {
+  .quote-confirm-row {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+    padding: 0.55rem 0;
+  }
+  .quote-confirm-value {
+    text-align: left;
+    font-weight: 600;
+  }
+  .quote-confirm-actions {
+    flex-direction: column-reverse;
+  }
+  .quote-confirm-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 /* Popup de sucesso flutuante - moderno com backdrop blur */

@@ -7,6 +7,20 @@ import { gsap } from 'gsap';
 
 type FormaEnvio = CotacaoPortalRequest['formaEnvioPreferida'];
 
+const PROVINCIAS_MZ = [
+  'Maputo Cidade',
+  'Maputo Província',
+  'Gaza',
+  'Inhambane',
+  'Sofala',
+  'Manica',
+  'Tete',
+  'Zambézia',
+  'Nampula',
+  'Niassa',
+  'Cabo Delgado'
+];
+
 /** Chaves de campos que podem ser validados / realçados */
 type QuoteFieldKey =
   | 'name'
@@ -28,6 +42,8 @@ export class RequestQuoteComponent implements AfterViewInit {
   private cotacaoService = inject(CotacaoService);
   private transloco = inject(TranslocoService);
   private el = inject(ElementRef);
+
+  readonly provincias = PROVINCIAS_MZ;
 
   submitted = false;
   loading = false;
@@ -68,6 +84,10 @@ export class RequestQuoteComponent implements AfterViewInit {
     name: '',
     email: '',
     phone1: '',
+    nuit: '',
+    address: '',
+    province: '',
+    contactPerson: '',
     origin: '',
     destination: '',
     message: '',
@@ -88,6 +108,11 @@ export class RequestQuoteComponent implements AfterViewInit {
   /** Telefone: apenas dígitos, espaços, +, -, parênteses. */
   private sanitizeTelefone(s: string): string {
     return s.replace(/[^0-9+\s()-]/g, '');
+  }
+
+  /** NUIT: letras, números e espaços. */
+  private sanitizeNuit(s: string): string {
+    return s.replace(/[^\p{L}\p{N}\s]/gu, '');
   }
 
   /** E-mail: letras, números e @ . _ + - */
@@ -126,6 +151,24 @@ export class RequestQuoteComponent implements AfterViewInit {
     if (v !== next) this.charsStrippedOutsideEmail = true;
     this.form.phone1 = next;
     if (this.form.phone1.trim()) this.invalidFields.delete('phone1');
+  }
+
+  onNuitChange(v: string): void {
+    const next = this.sanitizeNuit(v);
+    if (v !== next) this.charsStrippedOutsideEmail = true;
+    this.form.nuit = next;
+  }
+
+  onAddressChange(v: string): void {
+    const next = this.sanitizeRota(v);
+    if (v !== next) this.charsStrippedOutsideEmail = true;
+    this.form.address = next;
+  }
+
+  onContactPersonChange(v: string): void {
+    const next = this.sanitizeNombreEmpresa(v);
+    if (v !== next) this.charsStrippedOutsideEmail = true;
+    this.form.contactPerson = next;
   }
 
   onEmailChange(v: string): void {
@@ -170,6 +213,10 @@ export class RequestQuoteComponent implements AfterViewInit {
     this.form.name = '';
     this.form.email = '';
     this.form.phone1 = '';
+    this.form.nuit = '';
+    this.form.address = '';
+    this.form.province = '';
+    this.form.contactPerson = '';
     this.form.origin = '';
     this.form.destination = '';
     this.form.message = '';
@@ -302,7 +349,11 @@ export class RequestQuoteComponent implements AfterViewInit {
       destino: this.form.destination,
       mensagem: this.form.message,
       formaEnvioPreferida: this.form.deliveryMethod as FormaEnvio,
-      tipoServico: this.form.tipoServico
+      tipoServico: this.form.tipoServico,
+      nuit: this.form.nuit?.trim() || undefined,
+      endereco: this.form.address?.trim() || undefined,
+      provincia: this.form.province?.trim() || undefined,
+      pessoaContacto: this.form.contactPerson?.trim() || undefined
     }).subscribe({
       next: () => {
         this.loading = false;

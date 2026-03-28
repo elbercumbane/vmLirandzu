@@ -1,4 +1,29 @@
 :host {
   display: block;
   min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/**
+ * Portal público: coluna flex com altura mínima do ecrã.
+ * O <main> cresce entre navbar e footer para o rodapé não aparecer “colado”
+ * ao topo enquanto o router-outlet (lazy) ainda não pintou o conteúdo.
+ */
+.app-portal-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+}
+
+.app-portal-main {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  background: #fff;
+}
+
+.app-portal-footer {
+  flex-shrink: 0;
 }

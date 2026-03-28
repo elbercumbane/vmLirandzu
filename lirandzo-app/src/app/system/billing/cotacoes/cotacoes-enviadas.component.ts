@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { combineLatest } from 'rxjs';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
 import { CotacaoService, CotacaoResponse } from '../../../services/cotacao.service';
-import { EncomendaService, EmitirFacturaResponse } from '../../../services/encomenda.service';
 import { NotificationPopupComponent } from '../../../shared/components/notification-popup/notification-popup.component';
 import { CotacaoPreviewModalComponent } from './cotacao-preview-modal.component';
 
@@ -21,6 +20,8 @@ interface CotacaoEnviadaDisplay {
   cliente: string;
   contacto: string;
   telefone: string;
+  /** E-mail do contacto (mostrado na célula se não houver telefone). */
+  email?: string;
   origem: string;
   destino: string;
   descricaoCarga: string;
@@ -30,11 +31,8 @@ interface CotacaoEnviadaDisplay {
   dataCriacaoMs: number;
   estado: string;
   operador: string;
-  dataResposta: string;
-  tempoResposta: string;
   formaEnvio: string;
   formaEnvioRaw: string;
-  ajusteInfo?: string;
 }
 
 @Component({
@@ -54,7 +52,7 @@ export class CotacoesEnviadasComponent implements OnInit {
   /** Rota `/billing/cotacoes/para-facturar`: só emissão de factura, sem duplicar lógica de comercial. */
   modoParaFacturar = false;
 
-  pageTitle = 'Cotações em negociação & ajuste';
+  pageTitle = 'Negociação e ajuste';
   pageSubtitle = 'Negocie e ajuste preços; em seguida facture após aceitação do contacto';
   helpTitle = 'Fluxo comercial';
   helpItems: string[] = [
@@ -62,7 +60,7 @@ export class CotacoesEnviadasComponent implements OnInit {
     '«Proposta pronta»: ainda pode ajustar valores no ecrã de gerar cotação antes de o contacto aceitar.',
     '«Registar aceitação»: use quando o contacto confirmou a proposta (telefone, WhatsApp, e-mail). Depois vá a Facturação → Cotações para facturar.',
     'Com «Todos», a tabela ordena por estado: propostas prontas no topo; aceites e facturadas vão abaixo (dentro de cada grupo, use a seta em «Entrada» para a data).',
-    'Use «Filtrar por estado» e a paginação no rodapé da tabela para navegar muitas linhas.',
+    'No rodapé: primeira/última página, anterior/seguinte, indicador numérico (página / total) e linhas por página.',
     'As cotações expiram automaticamente após a validade definida no sistema.'
   ];
 
@@ -75,16 +73,12 @@ export class CotacoesEnviadasComponent implements OnInit {
   private readonly STATUS_RESPONDIDO_BACKEND = 'RESPONDED';
   private readonly STATUS_CANCELLED_BACKEND = 'CANCELLED';
 
-  emitindoCotacaoId: number | null = null;
-
   /** Ordenação da coluna Entrada: mais recentes primeiro (desc) ou mais antigas primeiro (asc). */
   ordenacaoData: 'desc' | 'asc' = 'desc';
 
-  /** Paginação: padrão 500 linhas; opcionalmente sobrepõe-se com `manualLinhasPorPagina`. */
-  readonly opcoesLinhasPorPagina = [10, 20, 50, 100, 200, 500, 5000] as const;
-  linhasPorPaginaSelecionadas = 500;
-  /** Valor opcional digitado pelo utilizador (1–10000); se válido, tem prioridade sobre a lista. */
-  manualLinhasPorPagina = '';
+  /** Paginação: linhas por página (valores fixos). */
+  readonly opcoesLinhasPorPagina = [50, 100, 300, 700, 1000] as const;
+  linhasPorPaginaSelecionadas = 50;
 
   currentPage = 1;
 
@@ -100,21 +94,21 @@ export class CotacoesEnviadasComponent implements OnInit {
 
   constructor(
     private cotacaoService: CotacaoService,
-    private encomendaService: EncomendaService,
-    private router: Router,
     private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     combineLatest([this.route.data, this.route.queryParams]).subscribe(([data, params]) => {
-      this.modoParaFacturar = !!data['cotacaoModoParaFacturar'];
+      const pathFacturacao = this.route.snapshot.routeConfig?.path === 'cotacoes/para-facturar';
+      this.modoParaFacturar = !!data['cotacaoModoParaFacturar'] || pathFacturacao;
       const raw = params['highlightId'];
       this.highlightId = raw ? Number(raw) : null;
 
       this.aplicarTextosCabecalho();
 
       if (this.modoParaFacturar) {
-        this.filtroEstado = ESTADO_ACEITE_CLIENTE;
+        this.filtroEstado = 'TODOS';
+        this.filtro = '';
       } else if (this.highlightId) {
         this.filtroEstado = ESTADO_PROPOSTA_PRONTA;
       }
@@ -125,24 +119,24 @@ export class CotacoesEnviadasComponent implements OnInit {
 
   private aplicarTextosCabecalho(): void {
     if (this.modoParaFacturar) {
-      this.pageTitle = 'Cotações para facturar';
-      this.pageSubtitle = 'Apenas propostas já aceites pelo cliente — emita a factura aqui';
-      this.helpTitle = 'Facturação a partir da cotação';
+      this.pageTitle = 'Facturação';
+      this.pageSubtitle = 'Fila de cotações aceites pelo cliente — ainda sem factura. Use «Emitir factura» em cada linha.';
+      this.helpTitle = 'Fila de facturação';
       this.helpItems = [
-        'Só aparecem linhas com aceitação registada (estado «Aceite pelo cliente»).',
-        'Se ainda precisa de ajustar preços, volte ao menu Comercial → Cotações enviadas, abra «Ajustar proposta» e só depois registe de novo a aceitação.',
-        'Emitir factura cria a encomenda e liga à cotação; aí sim o contacto entra no circuito de cliente facturado.',
-        'No rodapé da tabela pode alterar quantas linhas vê por página (incluindo valor manual opcional).'
+        'Só entram aqui cotações com aceitação registada e que ainda não foram facturadas (desaparecem da lista após emitir).',
+        'Se precisar de ajustar preços, vá a Cotações → Negociação e ajuste, «Ajustar proposta», e registe de novo a aceitação se necessário.',
+        '«Emitir factura» abre o ecrã de nova factura com os dados da cotação; revise, complete e finalize — a encomenda só é criada ao confirmar.',
+        'No rodapé: primeira e última página, página a página, números da página e linhas por página.'
       ];
     } else {
-      this.pageTitle = 'Cotações em negociação & ajuste';
+      this.pageTitle = 'Negociação e ajuste';
       this.pageSubtitle = 'Negocie e ajuste preços; em seguida facture após aceitação do contacto';
       this.helpTitle = 'Fluxo comercial';
       this.helpItems = [
         'Quem pede cotação é um contacto — só passa a «cliente» no sentido de facturação quando existe documento (encomenda/factura).',
         '«Proposta pronta»: ainda pode ajustar valores no ecrã de gerar cotação antes de o contacto aceitar.',
-        '«Registar aceitação»: use quando o contacto confirmou a proposta. A factura emite-se em Facturação → Cotações para facturar.',
-        'Com «Todos», propostas prontas aparecem primeiro; aceites e facturadas listam-se abaixo. Paginação no rodapé da tabela.',
+        '«Registar aceitação»: use quando o contacto confirmou a proposta. A factura emite-se em Facturas → Facturação.',
+        'Com «Todos», propostas prontas aparecem primeiro; aceites e facturadas listam-se abaixo. Paginação no rodapé com números e primeira/última página.',
         'As cotações expiram automaticamente após a validade definida no sistema.'
       ];
     }
@@ -154,20 +148,29 @@ export class CotacoesEnviadasComponent implements OnInit {
 
     this.cotacaoService.listarCotacoes().subscribe({
       next: (cotacoes: CotacaoResponse[]) => {
-        const enviadas = cotacoes.filter((c) => {
-          const statusUpper = (c.status || '').toUpperCase();
-          return (
-            statusUpper === 'QUOTATION_GENERATED' ||
-            statusUpper === 'COTACAO_GERADA' ||
-            statusUpper === 'COTACAO GERADA' ||
-            statusUpper === 'RESPONDED' ||
-            statusUpper === 'RESPONDIDO' ||
-            statusUpper === 'INVOICED' ||
-            statusUpper === 'FACTURADA' ||
-            statusUpper === 'CANCELLED' ||
-            statusUpper === 'CANCELADA'
-          );
-        });
+        let enviadas: CotacaoResponse[];
+        if (this.modoParaFacturar) {
+          // Fila: só aceites ainda por facturar (INVOICED não entra)
+          enviadas = cotacoes.filter((c) => {
+            const statusUpper = (c.status || '').toUpperCase();
+            return statusUpper === 'RESPONDED' || statusUpper === 'RESPONDIDO';
+          });
+        } else {
+          enviadas = cotacoes.filter((c) => {
+            const statusUpper = (c.status || '').toUpperCase();
+            return (
+              statusUpper === 'QUOTATION_GENERATED' ||
+              statusUpper === 'COTACAO_GERADA' ||
+              statusUpper === 'COTACAO GERADA' ||
+              statusUpper === 'RESPONDED' ||
+              statusUpper === 'RESPONDIDO' ||
+              statusUpper === 'INVOICED' ||
+              statusUpper === 'FACTURADA' ||
+              statusUpper === 'CANCELLED' ||
+              statusUpper === 'CANCELADA'
+            );
+          });
+        }
         this.cotacoes = enviadas.map((c) => this.mapearCotacao(c));
         this.currentPage = 1;
         this.loading = false;
@@ -210,27 +213,7 @@ export class CotacoesEnviadasComponent implements OnInit {
         })
       : '';
 
-    const dataResposta = c.dataResposta
-      ? new Date(c.dataResposta).toLocaleString('pt-MZ', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        })
-      : '';
-
     const statusUpper = (c.status || '').toUpperCase();
-    let tempoResposta = '—';
-    if (c.dataCriacao && c.dataResposta) {
-      const isAceite = statusUpper === 'RESPONDED' || statusUpper === 'RESPONDIDO';
-      if (isAceite) {
-        const inicioMs = new Date(c.dataCriacao).getTime();
-        const fimMs = new Date(c.dataResposta).getTime();
-        const diffMs = fimMs - inicioMs;
-        tempoResposta = diffMs >= 0 ? this.formatarDuracao(diffMs) : '—';
-      }
-    }
     const statusMap: { [key: string]: string } = {
       RESPONDED: ESTADO_ACEITE_CLIENTE,
       RESPONDIDO: ESTADO_ACEITE_CLIENTE,
@@ -276,6 +259,7 @@ export class CotacoesEnviadasComponent implements OnInit {
       cliente: clienteNome,
       contacto,
       telefone,
+      email: email || undefined,
       origem: c.origem || '',
       destino: c.destino || '',
       descricaoCarga: c.descricaoCarga || '',
@@ -284,36 +268,9 @@ export class CotacoesEnviadasComponent implements OnInit {
       dataCriacaoMs: dataCriacaoObj ? dataCriacaoObj.getTime() : 0,
       estado,
       operador: c.operador || '',
-      dataResposta,
-      tempoResposta: tempoResposta || '—',
       formaEnvio,
-      formaEnvioRaw,
-      ajusteInfo
+      formaEnvioRaw
     };
-  }
-
-  private formatarDuracao(diffMs: number): string {
-    const totalSeconds = Math.floor(diffMs / 1000);
-    if (totalSeconds <= 0) return '—';
-
-    const dias = Math.floor(totalSeconds / 86400);
-    const horas = Math.floor((totalSeconds % 86400) / 3600);
-    const minutos = Math.floor((totalSeconds % 3600) / 60);
-    const segundos = totalSeconds % 60;
-
-    const pluralDia = dias === 1 ? 'dia' : 'dias';
-    const pluralMin = minutos === 1 ? 'minuto' : 'minutos';
-
-    if (dias > 0) {
-      const partes: string[] = [`${dias} ${pluralDia}`];
-      if (horas > 0) partes.push(`${horas}h`);
-      if (minutos > 0) partes.push(`${minutos} ${pluralMin}`);
-      partes.push(`${segundos}s`);
-      return partes.join(' e ');
-    }
-
-    const mm = String(minutos).padStart(2, '0');
-    return `${horas}h:${mm} e ${segundos}s`;
   }
 
   /**
@@ -337,10 +294,10 @@ export class CotacoesEnviadasComponent implements OnInit {
 
   get cotacoesFiltradas(): CotacaoEnviadaDisplay[] {
     let lista = this.cotacoes;
-    if (this.filtroEstado !== 'TODOS') {
+    if (!this.modoParaFacturar && this.filtroEstado !== 'TODOS') {
       lista = lista.filter((c) => c.estado === this.filtroEstado);
     }
-    if (this.filtro.trim()) {
+    if (!this.modoParaFacturar && this.filtro.trim()) {
       const f = this.filtro.toLowerCase();
       lista = lista.filter(
         (c) =>
@@ -348,7 +305,9 @@ export class CotacoesEnviadasComponent implements OnInit {
           c.ref.toLowerCase().includes(f) ||
           c.destino.toLowerCase().includes(f) ||
           c.descricaoCarga.toLowerCase().includes(f) ||
-          c.formaEnvio.toLowerCase().includes(f)
+          c.formaEnvio.toLowerCase().includes(f) ||
+          (c.telefone || '').toLowerCase().includes(f) ||
+          (c.email || '').toLowerCase().includes(f)
       );
     }
     const porEstadoEData = (a: CotacaoEnviadaDisplay, b: CotacaoEnviadaDisplay) => {
@@ -361,19 +320,9 @@ export class CotacoesEnviadasComponent implements OnInit {
     return [...lista].sort(porEstadoEData);
   }
 
-  /** Linhas por página efectivas (manual válido sobrepõe o select). */
-  get linhasPorPaginaEfectivas(): number {
-    const raw = this.manualLinhasPorPagina?.trim();
-    if (raw) {
-      const n = Number.parseInt(raw, 10);
-      if (Number.isFinite(n) && n >= 1 && n <= 10000) return n;
-    }
-    return this.linhasPorPaginaSelecionadas;
-  }
-
   get totalPaginas(): number {
     const n = this.cotacoesFiltradas.length;
-    const size = this.linhasPorPaginaEfectivas;
+    const size = this.linhasPorPaginaSelecionadas;
     return Math.max(1, Math.ceil(n / size));
   }
 
@@ -384,20 +333,10 @@ export class CotacoesEnviadasComponent implements OnInit {
 
   get cotacoesPagina(): CotacaoEnviadaDisplay[] {
     const all = this.cotacoesFiltradas;
-    const size = this.linhasPorPaginaEfectivas;
+    const size = this.linhasPorPaginaSelecionadas;
     const page = this.paginaCorrenteSegura;
     const start = (page - 1) * size;
     return all.slice(start, start + size);
-  }
-
-  get intervaloPaginaTexto(): string {
-    const all = this.cotacoesFiltradas.length;
-    if (all === 0) return '0 de 0';
-    const size = this.linhasPorPaginaEfectivas;
-    const page = this.paginaCorrenteSegura;
-    const from = (page - 1) * size + 1;
-    const to = Math.min(page * size, all);
-    return `${from}–${to} de ${all}`;
   }
 
   definirFiltroEstado(valor: string): void {
@@ -413,8 +352,12 @@ export class CotacoesEnviadasComponent implements OnInit {
     this.currentPage = 1;
   }
 
-  aplicarManualLinhasPorPagina(): void {
+  paginaPrimeira(): void {
     this.currentPage = 1;
+  }
+
+  paginaUltima(): void {
+    this.currentPage = this.totalPaginas;
   }
 
   paginaAnterior(): void {
@@ -453,34 +396,8 @@ export class CotacoesEnviadasComponent implements OnInit {
   }
 
   podeEmitirFactura(estado: string): boolean {
-    return this.modoParaFacturar && estado === ESTADO_ACEITE_CLIENTE;
-  }
-
-  emitirFactura(c: CotacaoEnviadaDisplay): void {
-    this.emitindoCotacaoId = c.id;
-    this.encomendaService.emitirFacturaDeCotacao(c.id).subscribe({
-      next: (enc: EmitirFacturaResponse) => {
-        this.emitindoCotacaoId = null;
-        const idEnc = enc?.numeroEncomenda;
-        if (idEnc == null || Number.isNaN(Number(idEnc))) {
-          this.mostrarNotificacao('Factura emitida. Abra a lista de encomendas para ver os detalhes.', 'success');
-          this.carregarCotacoes();
-          this.router.navigate(['/billing/encomendas']);
-          return;
-        }
-        const ref = enc.invoiceNumber || `FAC-${idEnc}`;
-        this.mostrarNotificacao(`Factura ${ref} emitida. A cotação foi marcada como facturada.`, 'success');
-        this.carregarCotacoes();
-        this.router.navigate(['/billing/encomendas', idEnc]);
-      },
-      error: (err: unknown) => {
-        this.emitindoCotacaoId = null;
-        const body =
-          err && typeof err === 'object' && 'error' in err ? (err as { error?: { error?: string } }).error : undefined;
-        const msg = body?.error || 'Não foi possível emitir a factura.';
-        this.mostrarNotificacao(msg, 'error');
-      }
-    });
+    const aceite = (estado || '').trim() === ESTADO_ACEITE_CLIENTE;
+    return this.modoParaFacturar && aceite;
   }
 
   abrirPrevisualizar(c: CotacaoEnviadaDisplay): void {
@@ -527,7 +444,7 @@ export class CotacoesEnviadasComponent implements OnInit {
             this.filtroEstado = 'TODOS';
             this.carregarCotacoes();
             this.mostrarNotificacao(
-              'Aceitação pelo cliente registada. Pode emitir a factura em Facturação → Cotações para facturar.',
+              'Aceitação pelo cliente registada. Pode emitir a factura em Facturas → Facturação.',
               'success'
             );
           },

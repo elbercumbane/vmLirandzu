@@ -7,8 +7,10 @@ import {
   parseDescricaoCarga,
   repartirValorTotalNosItensSeNecessario
 } from './cotacao-descricao-itens.util';
+import { labelCondicaoPagamentoPt, normalizeCondicaoPagamento } from './cotacao-condicao-pagamento.util';
+import type { CondicaoPagamentoCotacao } from '../../../services/cotacao.service';
 
-/** Pré-visualização / PDF na mesma sessão (lista de cotações enviadas). */
+/** Pré-visualização / PDF na mesma sessão (Negociação e ajuste). */
 @Component({
   selector: 'app-cotacao-preview-modal',
   standalone: true,
@@ -35,11 +37,16 @@ export class CotacaoPreviewModalComponent implements OnInit {
     clienteNome: '',
     clienteTelefone: '',
     clienteEmail: '',
+    clienteNuit: '',
+    clienteEndereco: '',
+    clienteProvincia: '',
+    clientePessoaContacto: '',
     origem: '',
     destino: '',
     tipoServico: 'TRANSPORTE',
     discountAmount: 0,
-    custoRecolha: null as number | null
+    custoRecolha: null as number | null,
+    condicaoPagamento: undefined as CondicaoPagamentoCotacao | undefined
   };
 
   itens: ItemCotacao[] = [];
@@ -66,11 +73,16 @@ export class CotacaoPreviewModalComponent implements OnInit {
     this.cotacao.clienteNome = c.cliente?.nome || '';
     this.cotacao.clienteTelefone = c.cliente?.telefone || '';
     this.cotacao.clienteEmail = c.cliente?.email || '';
+    this.cotacao.clienteNuit = c.cliente?.nif || '';
+    this.cotacao.clienteEndereco = c.cliente?.endereco || '';
+    this.cotacao.clienteProvincia = c.cliente?.provincia || '';
+    this.cotacao.clientePessoaContacto = c.cliente?.pessoaContacto || '';
     this.cotacao.origem = c.origem || '';
     this.cotacao.destino = c.destino || '';
     this.cotacao.tipoServico = c.tipoServico || 'TRANSPORTE';
     this.cotacao.discountAmount = c.discountAmount ?? 0;
     this.cotacao.custoRecolha = c.custoRecolha ?? null;
+    this.cotacao.condicaoPagamento = normalizeCondicaoPagamento(c.condicaoPagamento) ?? undefined;
 
     if (c.descricaoCarga) {
       this.itens = parseDescricaoCarga(c.descricaoCarga);
@@ -122,6 +134,12 @@ export class CotacaoPreviewModalComponent implements OnInit {
 
   get vatReasonPreview(): string {
     return this.temIvaPreview ? 'IVA 16%' : 'ISENTO';
+  }
+
+  get textoCondicaoPagamentoCotacao(): string {
+    const raw = this.cotacao.condicaoPagamento;
+    const norm = normalizeCondicaoPagamento(raw);
+    return labelCondicaoPagamentoPt(norm ?? raw);
   }
 
   formatarData(data: string | null | undefined): string {

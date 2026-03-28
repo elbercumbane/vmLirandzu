@@ -1,0 +1,243 @@
+<app-billing-section-header
+  [showBack]="true"
+  [showHelp]="true"
+  [backLink]="'/billing'"
+  title="Registo de pagamentos"
+  subtitle="Lance pagamentos parciais ou totais por factura. Técnicos: aguarda aprovação ou extrato. Gestor/Admin: confirmam aqui."
+  helpTitle="Como funciona"
+  [helpItems]="[
+    'Escolha a factura na tabela e «Registar pagamento». O cliente pode pagar em várias vezes — cada lançamento é um movimento.',
+    'Se marcar «aguarda extrato», o valor só entra na dívida depois de confirmar na lista de conciliação (abaixo).',
+    'Sem ser gestor/admin, cada pagamento vai para «aguarda aprovação» até alguém aprovar (excepto «aguarda extrato»).',
+    'Use «Visualizar facturas» para consultar documentos; o histórico cotação→pagamento abre pelo botão Histórico na lista.'
+  ]"
+></app-billing-section-header>
+
+@if (loading) {
+  <div class="card">
+    <div class="loading-state"><p>A carregar facturas e pendências…</p></div>
+  </div>
+} @else if (error) {
+  <div class="card">
+    <div class="error-state">
+      <p>{{ error }}</p>
+      <button type="button" class="btn-secondary" (click)="carregarTudo()">Tentar novamente</button>
+    </div>
+  </div>
+} @else {
+  @if (podeAprovarOuConciliar && (pendentesAprovacao.length || pendentesBanco.length)) {
+    <div class="card pagamentos-pendencias-card">
+      <h3 class="pagamentos-section-title">Acções de gestão — confirmar pagamentos</h3>
+      <p class="text-muted" style="margin:0 0 1rem;font-size:0.88rem;">
+        Valide lançamentos dos técnicos ou confirme valores já vistos no extrato / M-Pesa.
+      </p>
+
+      @if (pendentesBanco.length) {
+        <h4 class="pagamentos-subtitle">Aguardam confirmação no extrato</h4>
+        <div class="table-wrapper" style="margin-bottom:1.25rem;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Factura / Encomenda</th>
+                <th>Cliente</th>
+                <th>Data</th>
+                <th>Valor</th>
+                <th>Ref.</th>
+                <th>Acção</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of pendentesBanco; track p.id) {
+                <tr>
+                  <td>{{ p.encomenda?.invoiceNumber || rotuloEncomenda(p) }}</td>
+                  <td>{{ p.encomenda?.cliente?.nome || '—' }}</td>
+                  <td>{{ formatarData(p.dataPagamento || '') }}</td>
+                  <td style="font-weight:600">{{ p.valor | number:'1.2-2' }} MZN</td>
+                  <td style="font-family:monospace;font-size:0.85rem;">{{ p.referencia || '—' }}</td>
+                  <td>
+                    <button type="button" class="btn-primary btn-sm" [disabled]="confirmandoId === p.id" (click)="confirmarNoExtrato(p)">
+                      {{ confirmandoId === p.id ? '…' : 'Confirmar no extrato' }}
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      @if (pendentesAprovacao.length) {
+        <h4 class="pagamentos-subtitle">Aguardam aprovação (técnico)</h4>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Factura / Encomenda</th>
+                <th>Cliente</th>
+                <th>Data</th>
+                <th>Valor</th>
+                <th>Método</th>
+                <th>Estado</th>
+                <th>Acções</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of pendentesAprovacao; track p.id) {
+                <tr>
+                  <td>{{ p.encomenda?.invoiceNumber || rotuloEncomenda(p) }}</td>
+                  <td>{{ p.encomenda?.cliente?.nome || '—' }}</td>
+                  <td>{{ formatarData(p.dataPagamento || '') }}</td>
+                  <td style="font-weight:600">{{ p.valor | number:'1.2-2' }} MZN</td>
+                  <td>{{ p.metodoPagamento || '—' }}</td>
+                  <td><span class="badge" [ngClass]="badgeVerificacao(p.verificationStatus)">{{ labelVerificacao(p.verificationStatus) }}</span></td>
+                  <td>
+                    <div class="pagamento-acoes-inline">
+                      <button type="button" class="btn-primary btn-sm" [disabled]="processandoAprovacaoId === p.id" (click)="aprovarPagamento(p)">Aprovar</button>
+                      <button type="button" class="btn-secondary btn-sm" [disabled]="processandoAprovacaoId === p.id" (click)="recusarPagamento(p)">Recusar</button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+  <div class="card">
+    <div class="toolbar" style="flex-wrap:wrap;gap:0.75rem;">
+      <div class="search-wrapper" style="flex:1;min-width:220px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" class="search-input" placeholder="Pesquisar factura, nº ou cliente…" [(ngModel)]="searchTerm" name="qPag" />
+      </div>
+      <a routerLink="/billing/encomendas" class="btn-secondary">Visualizar facturas</a>
+    </div>
+
+    <div class="table-wrapper" style="margin-top:1rem;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Factura</th>
+            <th>Nº</th>
+            <th>Cliente</th>
+            <th>Total</th>
+            <th>Pago</th>
+            <th>Dívida</th>
+            <th>Estado</th>
+            <th>Data</th>
+            <th>Acções</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (e of filtradas; track e.id) {
+            <tr>
+              <td style="font-weight:600;color:var(--accent)">{{ e.factura }}</td>
+              <td>{{ e.numero }}</td>
+              <td>{{ e.cliente }}</td>
+              <td>{{ e.total | number:'1.2-2' }} MZN</td>
+              <td>{{ e.pago | number:'1.2-2' }} MZN</td>
+              <td>{{ e.divida | number:'1.2-2' }} MZN</td>
+              <td>
+                @switch (e.status) {
+                  @case ('PAGO') { <span class="badge badge-success">{{ e.status }}</span> }
+                  @case ('PARCIAL') { <span class="badge badge-warning">{{ e.status }}</span> }
+                  @case ('NÃO PAGO') { <span class="badge badge-danger">{{ e.status }}</span> }
+                  @default { <span class="badge badge-neutral">{{ e.status }}</span> }
+                }
+              </td>
+              <td>{{ e.data }}</td>
+              <td>
+                <div class="pagamentos-acoes-celula">
+                  <button type="button" class="action-btn action-btn-primary-soft" title="Registar pagamento" (click)="abrirModal(e)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <line x1="12" y1="1" x2="12" y2="23"></line>
+                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                  </button>
+                  <a [routerLink]="['/billing/encomendas', e.id]" class="action-btn" title="Ver factura">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </a>
+                  <a [routerLink]="['/billing/encomendas', e.id, 'historico']" class="action-btn" title="Histórico">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="9" class="empty-state">Nenhuma factura encontrada.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}
+
+@if (modalAberto && linhaModal) {
+  <div class="pagamentos-modal-overlay" (click)="fecharModal()">
+    <div class="pagamentos-modal" (click)="$event.stopPropagation()">
+      <div class="pagamentos-modal-header">
+        <h3>Registar pagamento</h3>
+        <button type="button" class="preview-modal-close" (click)="fecharModal()" aria-label="Fechar">×</button>
+      </div>
+      <p class="text-muted" style="margin:0 0 1rem;font-size:0.9rem;">
+        <strong>{{ linhaModal.factura }}</strong> · {{ linhaModal.cliente }} · Dívida actual: <strong>{{ linhaModal.divida | number:'1.2-2' }} MZN</strong>
+      </p>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Valor (MZN) *</label>
+          <input type="number" class="form-control" [(ngModel)]="novoPagamento.valor" name="valorPag" min="0.01" step="0.01" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data</label>
+          <input type="date" class="form-control" [(ngModel)]="novoPagamento.dataPagamento" name="dataPag" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Método</label>
+          <select class="form-control" [(ngModel)]="novoPagamento.metodoPagamento" name="metodoPag">
+            <option value="">—</option>
+            @for (m of metodosPagamento; track m) {
+              <option [value]="m">{{ m }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ref. extrato / M-Pesa</label>
+          <input type="text" class="form-control" [(ngModel)]="novoPagamento.referencia" name="refPag" placeholder="ID da transação" />
+        </div>
+        <div class="form-group full-width">
+          <label class="form-label">Observações</label>
+          <input type="text" class="form-control" [(ngModel)]="novoPagamento.observacoes" name="obsPag" />
+        </div>
+        <div class="form-group full-width" style="display:flex;align-items:center;gap:0.5rem;">
+          <input type="checkbox" id="aguardaExtratoPag" [(ngModel)]="novoPagamento.aguardaExtrato" name="aguardaExtrato" />
+          <label for="aguardaExtratoPag" style="margin:0;font-weight:normal;">Ainda não confirmei no extrato — só registar (gestor confirma depois)</label>
+        </div>
+      </div>
+      <div class="form-actions" style="margin-top:1rem;">
+        <button type="button" class="btn-secondary" (click)="fecharModal()">Cancelar</button>
+        <button type="button" class="btn-primary" [disabled]="aGuardarPagamento" (click)="registarPagamento()">
+          {{ aGuardarPagamento ? 'A guardar…' : 'Registar pagamento' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<app-notification-popup
+  *ngIf="showNotification"
+  [message]="notificationMessage"
+  [type]="notificationType"
+  [duration]="7000">
+</app-notification-popup>

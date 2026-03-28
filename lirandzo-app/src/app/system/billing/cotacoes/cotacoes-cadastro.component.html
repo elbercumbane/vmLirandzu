@@ -9,6 +9,7 @@
   [helpItems]="[
     'Preencha os dados do cliente e da rota (origem e destino).',
     modoPortal ? 'Pedidos do portal trazem a carga definida pelo cliente — ajuste preços e finalize a proposta.' : 'Adicione produtos/serviços e valores para formar o total da cotação.',
+    'Defina as condições de pagamento (total, adiantado, duas prestações ou parcial) — constam no PDF.',
     'O operador responsável é o utilizador com sessão iniciada (controlo interno).'
   ]"
 ></app-billing-section-header>
@@ -57,6 +58,25 @@
     <div class="form-group">
       <label class="form-label">Email</label>
         <input type="email" class="form-control" [(ngModel)]="cotacao.clienteEmail" [readonly]="modoPortal" [disabled]="modoPortal" placeholder="email&#64;empresa.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">NUIT <span class="form-optional">(opcional)</span></label>
+      <input type="text" class="form-control" [(ngModel)]="cotacao.clienteNuit" [readonly]="modoPortal" [disabled]="modoPortal" placeholder="Nº contribuinte">
+    </div>
+    <div class="form-group full-width">
+      <label class="form-label">Endereço</label>
+      <input type="text" class="form-control" [(ngModel)]="cotacao.clienteEndereco" [readonly]="modoPortal" [disabled]="modoPortal" placeholder="Ex: Aldeia Napaco Mpupene">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Província</label>
+      <select class="form-control" [(ngModel)]="cotacao.clienteProvincia" [disabled]="modoPortal">
+        <option value="">Seleccionar…</option>
+        <option *ngFor="let p of provincias" [value]="p">{{ p }}</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">ATT (Pessoa de Contacto)</label>
+      <input type="text" class="form-control" [(ngModel)]="cotacao.clientePessoaContacto" [readonly]="modoPortal" [disabled]="modoPortal" placeholder="Ex: Sr. Euclides">
     </div>
   </div>
 
@@ -170,6 +190,19 @@
     </div>
   </div>
 
+  <h3 class="form-section-title">Condições de pagamento</h3>
+  <div class="form-grid">
+    <div class="form-group full-width">
+      <label class="form-label">Forma de pagamento prevista</label>
+      <select class="form-control" [(ngModel)]="cotacao.condicaoPagamento" name="condicaoPagamento">
+        @for (op of opcoesCondicaoPagamento; track op.value) {
+          <option [ngValue]="op.value">{{ op.label }}</option>
+        }
+      </select>
+      <p class="form-hint" style="margin-top:0.35rem;font-size:0.85rem;opacity:0.85;">Consta na cotação em PDF (e no pedido vindo do portal, se o cliente indicou).</p>
+    </div>
+  </div>
+
   <!-- Totais -->
   <div class="quote-totals">
     <div class="quote-total-row"><span>Subtotal Itens</span><span>{{ subtotalItens | number:'1.2-2' }} MZN</span></div>
@@ -177,6 +210,10 @@
     <div class="quote-total-row"><span>Desconto</span><span>{{ (cotacao.discountAmount || 0) | number:'1.2-2' }} MZN</span></div>
     <div class="quote-total-row"><span>IVA</span><span>{{ vatAmountPreview | number:'1.2-2' }} MZN</span></div>
     <div class="quote-total-row quote-total-final"><span>TOTAL</span><span>{{ totalFinalPreview | number:'1.2-2' }} MZN</span></div>
+  </div>
+
+  <div class="quote-payment-terms-doc" style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--border,#e5e7eb);font-size:0.95rem;">
+    <strong>Condições de pagamento:</strong> {{ textoCondicaoPagamentoCotacao }}
   </div>
 
   @if (!modoPdfOnly) {
@@ -268,6 +305,18 @@
                 <div class="qpdf-client-name">Exmo. Sr. {{ cotacao.clienteNome || 'N/A' }}</div>
                 <div class="qpdf-client-details">
                   <div>{{ cotacao.origem || '—' }} → {{ cotacao.destino || '—' }}</div>
+                  @if ((cotacao.clienteNuit || '').trim()) {
+                    <div><strong>NUIT:</strong> {{ cotacao.clienteNuit }}</div>
+                  }
+                  @if ((cotacao.clienteEndereco || '').trim()) {
+                    <div><strong>Address / Endereço:</strong> {{ cotacao.clienteEndereco }}</div>
+                  }
+                  @if ((cotacao.clienteProvincia || '').trim()) {
+                    <div><strong>Province / Província:</strong> {{ cotacao.clienteProvincia }}</div>
+                  }
+                  @if ((cotacao.clientePessoaContacto || '').trim()) {
+                    <div><strong>ATT:</strong> {{ cotacao.clientePessoaContacto }}</div>
+                  }
                   <div><strong>Phone:</strong> {{ cotacao.clienteTelefone || '—' }}</div>
                   <div><strong>Email:</strong> {{ cotacao.clienteEmail || '—' }}</div>
                 </div>
@@ -335,6 +384,10 @@
               </div>
             </div>
           }
+
+          <div class="qpdf-payment-terms" style="margin:1rem 0;padding:0.65rem 0;border-top:1px solid #ddd;font-size:10pt;page-break-inside:avoid">
+            <strong>Payment terms / Condições de pagamento:</strong> {{ textoCondicaoPagamentoCotacao }}
+          </div>
 
           <div class="qpdf-validity-section">
             <strong>Note:</strong> This quotation is valid for 7 days from the issue date.

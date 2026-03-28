@@ -1,0 +1,86 @@
+.pagamentos-pendencias-card {
+  margin-bottom: 1.25rem;
+}
+
+.pagamentos-section-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.pagamentos-subtitle {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.pagamento-acoes-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.pagamentos-acoes-celula {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.action-btn-primary-soft {
+  color: var(--accent, #dc2626);
+  border-color: rgba(220, 38, 38, 0.35);
+}
+
+.action-btn-primary-soft:hover {
+  background: rgba(220, 38, 38, 0.08);
+}
+
+.pagamentos-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.pagamentos-modal {
+  background: var(--bg-card, #fff);
+  border-radius: 12px;
+  max-width: 520px;
+  width: 100%;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.pagamentos-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.pagamentos-modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.preview-modal-close {
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0.25rem;
+}
+
+.preview-modal-close:hover {
+  color: var(--text-primary);
+}

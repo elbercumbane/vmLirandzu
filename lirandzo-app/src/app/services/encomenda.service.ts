@@ -38,6 +38,22 @@ export interface EmitirFacturaResponse {
   invoiceDate?: string;
 }
 
+/** Dados opcionais na emissão (revisão no ecrã antes de gravar). */
+export interface EmitirFacturaCotacaoPayload {
+  produto?: string;
+  origem?: string;
+  destino?: string;
+  valorTotal?: number;
+  dataEncomenda?: string;
+  /** Revisto no formulário — persistido no cliente antes da factura. */
+  clienteNome?: string;
+  clienteTelefone?: string;
+  clienteEndereco?: string;
+  clienteNif?: string;
+  clienteProvincia?: string;
+  clientePessoaContacto?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -66,8 +82,12 @@ export class EncomendaService {
     return this.http.put<EncomendaResponse>(`${this.apiUrl}/encomendas/${id}`, encomenda);
   }
 
-  /** Cria encomenda com factura a partir de uma cotação enviada (estado respondida ou cotação gerada). */
-  emitirFacturaDeCotacao(cotacaoId: number): Observable<EmitirFacturaResponse> {
-    return this.http.post<EmitirFacturaResponse>(`${this.apiUrl}/facturacao/cotacao/${cotacaoId}/emitir`, {});
+  /** Cria encomenda com factura a partir de uma cotação aceite; payload opcional com texto/valores revistos no formulário. */
+  emitirFacturaDeCotacao(
+    cotacaoId: number,
+    payload?: EmitirFacturaCotacaoPayload | null
+  ): Observable<EmitirFacturaResponse> {
+    const body = payload && Object.keys(payload).length ? payload : {};
+    return this.http.post<EmitirFacturaResponse>(`${this.apiUrl}/facturacao/cotacao/${cotacaoId}/emitir`, body);
   }
 }

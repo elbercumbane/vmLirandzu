@@ -1,4 +1,4 @@
-## Visão Geral do Sistema de Billing (Estado Actual da branch `Elber` = `guilherme_lirandzo`)
+## Visão Geral do Sistema de Billing (Estado actual da branch `Elber`)
 
 Este documento descreve, em linguagem natural, **como está construído** o módulo de billing/facturação dentro do portal `lirandzo-app`.  
 O objectivo é poderes colar este texto numa outra LLM para pedir sugestões de UX, melhorias de dados, etc.

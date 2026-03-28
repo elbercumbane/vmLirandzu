@@ -1,7 +1,10 @@
-import { Injectable, signal, inject } from '@angular/core';
+import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '@environments/environment';
+
+const AUTH_STORAGE_KEY = 'lirandzo.auth.session';
 
 export type UserRole = 'admin' | 'gestor' | 'tecnico' | null;
 export type AccessContext = 'sistema' | 'cliente';
@@ -12,6 +15,12 @@ export interface UserProfile {
   email: string;
   role: UserRole;
   avatar: string;
+}
+
+interface StoredAuthSession {
+  user: UserProfile;
+  context: AccessContext;
+  loginTime: number;
 }
 
 export interface AuthApiResponse {
@@ -31,6 +40,7 @@ const ROLE_LABELS: Record<string, string> = {
 export class AuthService {
   private readonly apiUrl = environment.apiUrl || 'http://localhost:8080/api';
   private readonly http = inject(HttpClient);
+  private readonly platformId = inject(PLATFORM_ID);
 
   readonly currentUser = signal<UserProfile | null>(null);
   readonly accessContext = signal<AccessContext>('sistema');
@@ -63,6 +73,54 @@ export class AuthService {
   canDeactivateAccount(): boolean { return this.role === 'admin' || this.role === 'gestor'; }
   canAccessConfiguracoes(): boolean { return this.role === 'admin' || this.role === 'gestor'; }
 
+  /** Editar dados da factura/encomenda (não confundir com registar pagamento). */
+  canEditFacturas(): boolean { return this.isAdmin || this.isGestor; }
+
+  constructor() {
+    this.restoreFromStorage();
+  }
+
+  private canUseStorage(): boolean {
+    return isPlatformBrowser(this.platformId) && typeof localStorage !== 'undefined';
+  }
+
+  private restoreFromStorage(): void {
+    if (!this.canUseStorage()) return;
+    try {
+      const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw) as StoredAuthSession;
+      if (!data?.user || typeof data.user.id !== 'number' || !data.user.nome || !data.user.email) {
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+        return;
+      }
+      if (data.context !== 'sistema' && data.context !== 'cliente') {
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+        return;
+      }
+      this.currentUser.set(data.user);
+      this.accessContext.set(data.context);
+      this.loginTime = typeof data.loginTime === 'number' ? data.loginTime : Date.now();
+    } catch {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+    }
+  }
+
+  private persistToStorage(): void {
+    if (!this.canUseStorage()) return;
+    const user = this.currentUser();
+    if (!user) {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+      return;
+    }
+    const payload: StoredAuthSession = {
+      user,
+      context: this.accessContext(),
+      loginTime: this.loginTime ?? Date.now()
+    };
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(payload));
+  }
+
   login(username: string, password: string, context: AccessContext = 'sistema'): Observable<UserProfile | null> {
     return this.http.post<AuthApiResponse>(`${this.apiUrl}/auth/login`, { username, password }).pipe(
       map(res => {
@@ -76,6 +134,7 @@ export class AuthService {
         this.currentUser.set(profile);
         this.accessContext.set(context);
         this.loginTime = Date.now();
+        this.persistToStorage();
         return profile;
       })
     );
@@ -93,5 +152,8 @@ export class AuthService {
     this.currentUser.set(null);
     this.accessContext.set('sistema');
     this.loginTime = null;
+    if (this.canUseStorage()) {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+    }
   }
 }

@@ -3,6 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
 
+export type VerificationStatusApi =
+  | 'CONFIRMED'
+  | 'PENDING_BANK'
+  | 'PENDING_APPROVAL'
+  | 'REJECTED';
+
 export interface PagamentoResponse {
   id: number;
   valor: number;
@@ -10,7 +16,7 @@ export interface PagamentoResponse {
   referencia?: string;
   observacoes?: string;
   metodoPagamento?: string;
-  verificationStatus: 'CONFIRMED' | 'PENDING_BANK';
+  verificationStatus: VerificationStatusApi;
   encomenda?: {
     numeroEncomenda: number;
     invoiceNumber?: string;
@@ -25,7 +31,7 @@ export interface PagamentoCreateRequest {
   referencia?: string;
   observacoes?: string;
   metodoPagamento?: string;
-  verificationStatus: 'CONFIRMED' | 'PENDING_BANK';
+  verificationStatus: VerificationStatusApi;
 }
 
 @Injectable({
@@ -48,12 +54,24 @@ export class PagamentoService {
     return this.http.get<PagamentoResponse[]>(`${this.apiUrl}/pagamentos/pendentes-conciliacao`);
   }
 
+  listarPendentesAprovacao(): Observable<PagamentoResponse[]> {
+    return this.http.get<PagamentoResponse[]>(`${this.apiUrl}/pagamentos/pendentes-aprovacao`);
+  }
+
   criar(p: PagamentoCreateRequest): Observable<PagamentoResponse> {
     return this.http.post<PagamentoResponse>(`${this.apiUrl}/pagamentos`, p);
   }
 
   confirmarConciliacao(id: number): Observable<PagamentoResponse> {
     return this.http.post<PagamentoResponse>(`${this.apiUrl}/pagamentos/${id}/confirmar`, {});
+  }
+
+  aprovarPagamentoGestor(id: number): Observable<PagamentoResponse> {
+    return this.http.post<PagamentoResponse>(`${this.apiUrl}/pagamentos/${id}/aprovar`, {});
+  }
+
+  recusarPagamentoGestor(id: number, motivo?: string): Observable<PagamentoResponse> {
+    return this.http.post<PagamentoResponse>(`${this.apiUrl}/pagamentos/${id}/recusar`, { motivo: motivo || '' });
   }
 
   eliminar(id: number): Observable<void> {

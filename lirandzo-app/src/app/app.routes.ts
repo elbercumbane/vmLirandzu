@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { configuracoesGuard } from './shared/guards/configuracoes.guard';
+import { facturaEditarGuard } from './shared/guards/factura-editar.guard';
 import { systemAuthGuard } from './shared/guards/system-auth.guard';
 
 export const routes: Routes = [
@@ -41,9 +42,22 @@ export const routes: Routes = [
       { path: 'motoristas/destaques', loadComponent: () => import('./system/billing/motoristas/motoristas-destaque.component').then(m => m.MotoristasDestaqueComponent) },
       { path: 'encomendas', loadComponent: () => import('./system/billing/encomendas/encomendas-lista.component').then(m => m.EncomendasListaComponent) },
       { path: 'encomendas/nova', loadComponent: () => import('./system/billing/encomendas/encomendas-cadastro.component').then(m => m.EncomendasCadastroComponent) },
-      { path: 'encomendas/pagas', loadComponent: () => import('./system/billing/encomendas/encomendas-lista.component').then(m => m.EncomendasListaComponent) },
+      {
+        path: 'encomendas/pagamentos',
+        loadComponent: () =>
+          import('./system/billing/encomendas/encomendas-pagamentos.component').then((m) => m.EncomendasPagamentosComponent)
+      },
+      { path: 'encomendas/pagas', redirectTo: 'encomendas?estado=pago', pathMatch: 'full' },
+      {
+        path: 'encomendas/:id/historico',
+        loadComponent: () => import('./system/billing/encomendas/encomendas-historico.component').then(m => m.EncomendasHistoricoComponent)
+      },
+      {
+        path: 'encomendas/:id/editar',
+        loadComponent: () => import('./system/billing/encomendas/encomendas-editar.component').then(m => m.EncomendasEditarComponent),
+        canActivate: [facturaEditarGuard]
+      },
       { path: 'encomendas/:id', loadComponent: () => import('./system/billing/encomendas/encomendas-detalhe.component').then(m => m.EncomendasDetalheComponent) },
-      { path: 'encomendas/:id/editar', loadComponent: () => import('./system/billing/encomendas/encomendas-editar.component').then(m => m.EncomendasEditarComponent) },
       { path: 'cotacoes', loadComponent: () => import('./system/billing/cotacoes/cotacoes-lista.component').then(m => m.CotacoesListaComponent) },
       { path: 'cotacoes/gerar/:id', loadComponent: () => import('./system/billing/cotacoes/cotacoes-cadastro.component').then(m => m.CotacoesCadastroComponent) },
       { path: 'cotacoes/gerar', loadComponent: () => import('./system/billing/cotacoes/cotacoes-cadastro.component').then(m => m.CotacoesCadastroComponent) },

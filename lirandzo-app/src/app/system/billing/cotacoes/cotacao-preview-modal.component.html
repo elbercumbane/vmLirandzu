@@ -47,6 +47,18 @@
                   <div class="qpdf-client-name">Exmo. Sr. {{ cotacao.clienteNome || 'N/A' }}</div>
                   <div class="qpdf-client-details">
                     <div>{{ cotacao.origem || '—' }} → {{ cotacao.destino || '—' }}</div>
+                    @if ((cotacao.clienteNuit || '').trim()) {
+                      <div><strong>NUIT:</strong> {{ cotacao.clienteNuit }}</div>
+                    }
+                    @if ((cotacao.clienteEndereco || '').trim()) {
+                      <div><strong>Address / Endereço:</strong> {{ cotacao.clienteEndereco }}</div>
+                    }
+                    @if ((cotacao.clienteProvincia || '').trim()) {
+                      <div><strong>Province / Província:</strong> {{ cotacao.clienteProvincia }}</div>
+                    }
+                    @if ((cotacao.clientePessoaContacto || '').trim()) {
+                      <div><strong>ATT:</strong> {{ cotacao.clientePessoaContacto }}</div>
+                    }
                     <div><strong>Phone:</strong> {{ cotacao.clienteTelefone || '—' }}</div>
                     <div><strong>Email:</strong> {{ cotacao.clienteEmail || '—' }}</div>
                   </div>
@@ -111,9 +123,16 @@
                   <div class="qpdf-tax-line"><span>Discounts</span><span>{{ (cotacao.discountAmount || 0) | number:'1.2-2' }} MT</span></div>
                   <div class="qpdf-tax-line"><span>Total VAT</span><span>{{ (vatAmountPreview || 0) | number:'1.2-2' }} MT</span></div>
                   <div class="qpdf-tax-line qpdf-tax-grand"><span>Total (MT)</span><span>{{ ((totalGeral || 0) - (cotacao.discountAmount || 0) + (vatAmountPreview || 0)) | number:'1.2-2' }} MT</span></div>
-                </div>
               </div>
-            }
+            </div>
+          }
+
+            <div
+              class="qpdf-payment-terms"
+              style="margin:1rem 0;padding:0.65rem 0;border-top:1px solid #ddd;font-size:10pt;page-break-inside:avoid"
+            >
+              <strong>Payment terms / Condições de pagamento:</strong> {{ textoCondicaoPagamentoCotacao }}
+            </div>
 
             <div class="qpdf-validity-section">
               <strong>Note:</strong> This quotation is valid for 7 days from the issue date.

@@ -34,6 +34,11 @@ public class PagamentoService {
         return pagamentoRepository.findByVerificationStatusOrderByDataPagamentoAsc(VerificationStatus.PENDING_BANK);
     }
 
+    /** Pagamentos registados por técnico — aguardam aprovação de gestor/admin */
+    public List<Pagamento> findPendentesAprovacaoGestor() {
+        return pagamentoRepository.findByVerificationStatusOrderByDataPagamentoAsc(VerificationStatus.PENDING_APPROVAL);
+    }
+
     public Optional<Pagamento> findById(Long id) {
         return pagamentoRepository.findById(id);
     }
@@ -90,6 +95,37 @@ public class PagamentoService {
                         throw new IllegalStateException("Apenas pagamentos pendentes de banco podem ser confirmados.");
                     }
                     pagamento.setVerificationStatus(VerificationStatus.CONFIRMED);
+                    Pagamento saved = pagamentoRepository.save(pagamento);
+                    recalcularValorPagoEncomenda(saved.getEncomenda().getNumeroEncomenda());
+                    return saved;
+                });
+    }
+
+    public Optional<Pagamento> aprovarPagamentoGestor(Long id) {
+        return pagamentoRepository.findById(id)
+                .map(pagamento -> {
+                    if (pagamento.getVerificationStatus() != VerificationStatus.PENDING_APPROVAL) {
+                        throw new IllegalStateException("Apenas pagamentos em aguardo de aprovação podem ser aprovados.");
+                    }
+                    pagamento.setVerificationStatus(VerificationStatus.CONFIRMED);
+                    Pagamento saved = pagamentoRepository.save(pagamento);
+                    recalcularValorPagoEncomenda(saved.getEncomenda().getNumeroEncomenda());
+                    return saved;
+                });
+    }
+
+    public Optional<Pagamento> recusarPagamentoGestor(Long id, String motivo) {
+        return pagamentoRepository.findById(id)
+                .map(pagamento -> {
+                    if (pagamento.getVerificationStatus() != VerificationStatus.PENDING_APPROVAL) {
+                        throw new IllegalStateException("Apenas pagamentos em aguardo de aprovação podem ser recusados.");
+                    }
+                    pagamento.setVerificationStatus(VerificationStatus.REJECTED);
+                    String m = motivo != null && !motivo.isBlank() ? motivo.trim() : "Recusado pela gestão";
+                    String obs = pagamento.getObservacoes() != null && !pagamento.getObservacoes().isBlank()
+                            ? pagamento.getObservacoes() + " | [RECUSADO] " + m
+                            : "[RECUSADO] " + m;
+                    pagamento.setObservacoes(obs.length() > 500 ? obs.substring(0, 497) + "…" : obs);
                     Pagamento saved = pagamentoRepository.save(pagamento);
                     recalcularValorPagoEncomenda(saved.getEncomenda().getNumeroEncomenda());
                     return saved;

@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
 import { EncomendaService, EncomendaResponse } from '../../../services/encomenda.service';
+import { AuthService } from '../../../shared/services/auth.service';
 
 interface EncomendaDisplay {
   id: number;
@@ -35,32 +36,36 @@ export class EncomendasListaComponent implements OnInit {
   loading = true;
   error: string | null = null;
 
-  pageTitle = 'Recibo e lista de facturas';
-  pageSubtitle = 'Gestão de pagamentos, saldo em falta e todas as facturas (pagar / ver)';
+  pageTitle = 'Visualizar facturas';
+  pageSubtitle = 'Consulta de documentos e estado de pagamento — use os filtros (pago, parcial, em dívida)';
   helpTitle = 'Como usar esta lista';
   helpItems: string[] = [
     'Use os filtros e a pesquisa para encontrar encomendas por nº, factura, cliente ou produto.',
     'O estado reflecte o total pago face ao total da factura: pago integral, parcial ou em falta.',
-    'Para emitir a partir de uma cotação aceite, use «Cotações para facturar» no menu.',
-    'Para registar pagamentos e conciliar com o banco, use «Baixas & tesouraria».'
+    'Para emitir a partir de uma cotação aceite, use Facturas → Facturação no menu.',
+    'Para registar pagamentos (vários por factura), use Facturas → Registar pagamentos. O histórico cotação→pagamento abre em «Histórico» na coluna Acções.'
   ];
 
   constructor(
     private encomendaService: EncomendaService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private auth: AuthService
   ) {}
 
+  get podeEditarFacturas(): boolean {
+    return this.auth.canEditFacturas();
+  }
+
   ngOnInit() {
-    const pagas = this.route.snapshot.url.some((s) => s.path === 'pagas');
-    if (pagas) {
+    const estado = (this.route.snapshot.queryParamMap.get('estado') || '').toUpperCase();
+    if (estado === 'PAGO' || estado === 'PAGAS') {
       this.activeFilter = 'PAGO';
-      this.pageTitle = 'Facturas pagas';
-      this.pageSubtitle = 'Apenas encomendas com pagamento integral confirmado';
-      this.helpTitle = 'Lista só de facturas liquidadas';
+      this.pageTitle = 'Facturas liquidadas';
+      this.pageSubtitle = 'Filtro: pagamento integral — use «Todos» no filtro para ver o resto';
+      this.helpTitle = 'Facturas com saldo zero';
       this.helpItems = [
-        'Esta vista mostra só documentos com saldo zero (total = pago).',
-        'Para pagamentos parciais ou em dívida, volte à «Lista de facturas» e filtre por Parcial ou Não pago.',
-        'O histórico de recebimentos por linha está na página da encomenda e na tesouraria.'
+        'O atalho antigo «/encomendas/pagas» abre esta lista com filtro Pago.',
+        'Para parciais ou em dívida, altere o filtro em cima da tabela.'
       ];
     }
     this.carregarEncomendas();

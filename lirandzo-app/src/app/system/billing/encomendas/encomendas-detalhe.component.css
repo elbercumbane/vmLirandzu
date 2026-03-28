@@ -283,3 +283,27 @@
     text-align: left;
   }
 }
+
+.historico-cta-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin: 1rem 0 1.25rem;
+  padding: 0.85rem 1rem;
+  background: var(--bg-card-inner, #f8fafc);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-radius: 10px;
+}
+
+.historico-cta-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.pagamento-acoes-gestor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}

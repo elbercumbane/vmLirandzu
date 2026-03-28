@@ -8,6 +8,7 @@
   [helpItems]="helpItems"
 ></app-billing-section-header>
 
+@if (!modoParaFacturar) {
 <div class="kpi-grid">
   <div class="kpi-card">
     <div class="kpi-top-line" style="background: var(--accent)"></div>
@@ -19,11 +20,10 @@
         <line x1="16" y1="17" x2="8" y2="17"></line>
       </svg>
     </div>
-    <div class="kpi-label">{{ modoParaFacturar ? 'Na fila de facturação' : 'Nesta vista' }}</div>
+    <div class="kpi-label">Nesta vista</div>
     <div class="kpi-value">{{ cotacoes.length }}</div>
     <div class="kpi-sub">{{ cotacoesFiltradas.length }} visível(is)</div>
   </div>
-  @if (!modoParaFacturar) {
   <div class="kpi-card">
     <div class="kpi-top-line" style="background: #d97706"></div>
     <div class="kpi-icon" style="color: #d97706">
@@ -36,24 +36,11 @@
     <div class="kpi-value" style="color: #d97706">{{ totalPropostasProntas }}</div>
     <div class="kpi-sub">aguardam aceitação do contacto</div>
   </div>
-  }
-  @if (modoParaFacturar) {
-  <div class="kpi-card">
-    <div class="kpi-top-line" style="background: var(--success)"></div>
-    <div class="kpi-icon" style="color: var(--success)">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-      </svg>
-    </div>
-    <div class="kpi-label">Aceites (facturáveis)</div>
-    <div class="kpi-value" style="color: var(--success)">{{ totalAceitesFacturaveis }}</div>
-    <div class="kpi-sub">prontos para emitir factura</div>
-  </div>
-  }
 </div>
+}
 
 <div class="card">
+  @if (!modoParaFacturar) {
   <div class="ce-toolbar">
     <div class="ce-toolbar__search" role="search">
       <label class="ce-toolbar__label" for="ce-cotacoes-search">Pesquisa</label>
@@ -68,7 +55,7 @@
           class="ce-search-shell__input"
           [(ngModel)]="filtro"
           (ngModelChange)="aoAlterarPesquisa()"
-          placeholder="Contacto, referência, destino, forma de envio…"
+          placeholder="Contacto, telefone, e-mail, referência, destino…"
           autocomplete="off"
         >
       </div>
@@ -77,17 +64,10 @@
     <div class="ce-toolbar__filters">
       <div class="ce-toolbar__filters-head">
         <h3 class="ce-toolbar__filters-heading">Estado da cotação</h3>
-        @if (modoParaFacturar) {
-          <p class="ce-toolbar__filters-lead" id="ce-filtros-hint">
-            <strong>Use os filtros</strong> para alternar entre toda a fila, só as <strong>aceites pelo cliente</strong> ou já <strong>facturadas</strong>.
-            Com a pesquisa ao lado encontra rapidamente por contacto, referência ou destino.
-          </p>
-        } @else {
           <p class="ce-toolbar__filters-lead" id="ce-filtros-hint">
             <strong>Use os filtros</strong> abaixo para mostrar só o que precisa — propostas prontas, aceites, facturadas ou anuladas.
             Em <strong>Todos</strong> vê todas as fases juntas; as propostas ainda por aceitar aparecem primeiro na lista.
           </p>
-        }
       </div>
       <div
         class="ce-segmented"
@@ -104,17 +84,15 @@
         >
           Todos
         </button>
-        @if (!modoParaFacturar) {
-          <button
-            type="button"
-            class="ce-segment"
-            [class.ce-segment--active]="filtroEstado === estados.propostaPronta"
-            [attr.aria-pressed]="filtroEstado === estados.propostaPronta"
-            (click)="definirFiltroEstado(estados.propostaPronta)"
-          >
-            Proposta pronta
-          </button>
-        }
+        <button
+          type="button"
+          class="ce-segment"
+          [class.ce-segment--active]="filtroEstado === estados.propostaPronta"
+          [attr.aria-pressed]="filtroEstado === estados.propostaPronta"
+          (click)="definirFiltroEstado(estados.propostaPronta)"
+        >
+          Proposta pronta
+        </button>
         <button
           type="button"
           class="ce-segment"
@@ -133,20 +111,19 @@
         >
           Facturadas
         </button>
-        @if (!modoParaFacturar) {
-          <button
-            type="button"
-            class="ce-segment"
-            [class.ce-segment--active]="filtroEstado === estados.cancelada"
-            [attr.aria-pressed]="filtroEstado === estados.cancelada"
-            (click)="definirFiltroEstado(estados.cancelada)"
-          >
-            Anuladas
-          </button>
-        }
+        <button
+          type="button"
+          class="ce-segment"
+          [class.ce-segment--active]="filtroEstado === estados.cancelada"
+          [attr.aria-pressed]="filtroEstado === estados.cancelada"
+          (click)="definirFiltroEstado(estados.cancelada)"
+        >
+          Anuladas
+        </button>
       </div>
     </div>
   </div>
+  }
 
   @if (loading) {
     <div class="loading-state">
@@ -158,85 +135,91 @@
       <button type="button" class="btn-secondary" (click)="carregarCotacoes()">Tentar Novamente</button>
     </div>
   } @else {
-    <div class="table-wrapper">
-      <table class="data-table">
+    <div class="table-wrapper cotacoes-table-scroll">
+      <table class="data-table cotacoes-data-table">
         <thead>
           <tr>
-            <th>Ref.</th>
-            <th>Contacto (pedido)</th>
-            <th>Rota</th>
-            <th>Carga</th>
-            <th class="th-sort-entrada">
-              <span class="th-sort-label">Entrada</span>
-              <button type="button" class="sort-data-btn" (click)="alternarOrdenacaoEntrada()" [title]="ordenacaoData === 'desc' ? 'Dentro de cada estado: mais recentes primeiro — clique para inverter' : 'Dentro de cada estado: mais antigas primeiro — clique para inverter'">
-                @if (ordenacaoData === 'desc') {
-                  <span class="sort-data-icon" aria-hidden="true">↓</span><span class="visually-hidden">Ordem decrescente por data</span>
-                } @else {
-                  <span class="sort-data-icon" aria-hidden="true">↑</span><span class="visually-hidden">Ordem crescente por data</span>
-                }
-              </button>
+            <th class="ce-tcol ce-tcol-ref">Ref.</th>
+            <th class="ce-tcol ce-tcol-contacto">Contacto (pedido)</th>
+            <th class="ce-tcol ce-tcol-rota">Rota</th>
+            <th class="ce-tcol ce-tcol-carga">Carga</th>
+            <th class="ce-tcol ce-tcol-entrada th-sort-entrada">
+              <div class="ce-th-entrada-inner">
+                <span class="th-sort-label">Entrada</span>
+                <button
+                  type="button"
+                  class="sort-data-btn"
+                  (click)="alternarOrdenacaoEntrada()"
+                  [title]="ordenacaoData === 'desc' ? 'Mais recentes primeiro — clique para inverter' : 'Mais antigas primeiro — clique para inverter'"
+                  [attr.aria-label]="ordenacaoData === 'desc' ? 'Ordenar entrada: mais recentes primeiro. Clicar para mais antigas primeiro.' : 'Ordenar entrada: mais antigas primeiro. Clicar para mais recentes primeiro.'"
+                >
+                  <span class="sort-data-icon" aria-hidden="true">{{ ordenacaoData === 'desc' ? '↓' : '↑' }}</span>
+                </button>
+              </div>
             </th>
-            <th>Estado</th>
-            <th>Ajuste</th>
-            <th>Forma de Envio</th>
-            <th>Operador</th>
-            <th>Tempo até aceitação</th>
-            <th style="min-width: 140px;">Ações</th>
+            @if (!modoParaFacturar) {
+            <th class="ce-tcol ce-tcol-estado">Estado</th>
+            }
+            <th class="ce-tcol ce-tcol-forma">Forma de envio</th>
+            <th class="ce-tcol ce-tcol-operador">Operador</th>
+            <th class="ce-tcol ce-tcol-acoes">Ações</th>
           </tr>
         </thead>
         <tbody>
           @for (c of cotacoesPagina; track c.id) {
           <tr [attr.data-cotacao-id]="c.id" [class.cotacao-highlight]="c.id === highlightId">
-            <td style="font-weight: 600; color: var(--accent)">{{ c.ref }}</td>
-            <td>
-              <div style="font-weight: 600; color: var(--text-primary)">{{ c.cliente }}</div>
+            <td class="ce-tcol ce-tcol-ref ce-cell-ref">{{ c.ref }}</td>
+            <td class="ce-tcol ce-tcol-contacto">
+              <div class="ce-cell-name">{{ c.cliente }}</div>
               @if (c.telefone) {
-              <div style="font-size: 0.75rem; color: var(--text-muted)">{{ c.telefone }}</div>
+              <div class="ce-cell-muted">{{ c.telefone }}</div>
+              }
+              @if (!c.telefone && c.email) {
+              <div class="ce-cell-muted">{{ c.email }}</div>
               }
             </td>
-            <td>{{ c.origem }} → {{ c.destino }}</td>
-            <td style="max-width: 200px">{{ c.descricaoCarga }}</td>
-            <td>
+            <td class="ce-tcol ce-tcol-rota ce-cell-rota">{{ c.origem }} → {{ c.destino }}</td>
+            <td class="ce-tcol ce-tcol-carga ce-cell-carga">{{ c.descricaoCarga }}</td>
+            <td class="ce-tcol ce-tcol-entrada ce-cell-stack">
               <div>{{ c.dataEntrada }}</div>
               @if (c.horaEntrada) {
-              <div style="font-size: 0.75rem; color: var(--text-muted)">{{ c.horaEntrada }}</div>
+              <div class="ce-cell-muted">{{ c.horaEntrada }}</div>
               }
             </td>
-            <td><span [class]="getBadgeClass(c.estado)">{{ c.estado }}</span></td>
-            <td>{{ c.ajusteInfo || '—' }}</td>
-            <td>
-              <span class="badge badge-info" style="font-size: 0.75rem;">{{ c.formaEnvio }}</span>
+            @if (!modoParaFacturar) {
+            <td class="ce-tcol ce-tcol-estado"><span [class]="getBadgeClass(c.estado)">{{ c.estado }}</span></td>
+            }
+            <td class="ce-tcol ce-tcol-forma">
+              <span class="badge badge-info ce-badge-forma">{{ c.formaEnvio }}</span>
             </td>
-            <td>{{ c.operador || '—' }}</td>
-            <td>{{ c.tempoResposta || '—' }}</td>
-            <td>
+            <td class="ce-tcol ce-tcol-operador">{{ c.operador || '—' }}</td>
+            <td class="ce-tcol ce-tcol-acoes">
               <div class="cotacao-acoes">
-                <button type="button" class="btn-secondary btn-sm" (click)="abrirPrevisualizar(c)" title="Ver o documento da cotação aqui mesmo (pode baixar PDF)">
+                <button type="button" class="btn-secondary btn-sm ce-acao-btn" (click)="abrirPrevisualizar(c)" title="Ver o documento da cotação aqui mesmo (pode baixar PDF)">
                   Pré-visualizar
                 </button>
                 @if (!modoParaFacturar && c.estado === estados.propostaPronta) {
-                  <a [routerLink]="['/billing/cotacoes/gerar', c.id]" class="btn-secondary btn-sm cotacao-acoes-link">Ajustar proposta</a>
-                  <button type="button" class="btn-primary btn-sm" (click)="registarAceitacaoCliente(c)">
+                  <a [routerLink]="['/billing/cotacoes/gerar', c.id]" class="btn-secondary btn-sm cotacao-acoes-link ce-acao-btn">Ajustar proposta</a>
+                  <button type="button" class="btn-primary btn-sm ce-acao-btn" (click)="registarAceitacaoCliente(c)">
                     Registar aceitação
                   </button>
                 }
                 @if (podeEmitirFactura(c.estado)) {
-                  <button
-                    type="button"
-                    class="btn-primary btn-sm"
-                    [disabled]="emitindoCotacaoId === c.id"
-                    (click)="emitirFactura(c)"
+                  <a
+                    class="btn-primary btn-sm cotacao-acoes-link ce-acao-btn"
+                    [routerLink]="['/billing/encomendas/nova']"
+                    [queryParams]="{ cotacaoId: c.id }"
                   >
-                    {{ emitindoCotacaoId === c.id ? 'A emitir…' : 'Emitir factura' }}
-                  </button>
+                    Emitir factura
+                  </a>
                 }
               </div>
             </td>
           </tr>
           } @empty {
             <tr>
-              <td colspan="11" class="empty-state">
-                <p>{{ modoParaFacturar ? 'Nenhuma cotação aceite pendente de facturação.' : 'Nenhuma cotação neste filtro.' }}</p>
+              <td [attr.colspan]="modoParaFacturar ? 8 : 9" class="empty-state">
+                <p>{{ modoParaFacturar ? 'Nenhuma cotação aceite à espera de facturação.' : 'Nenhuma cotação neste filtro.' }}</p>
               </td>
             </tr>
           }
@@ -244,40 +227,69 @@
       </table>
     </div>
 
-    <div class="table-pagination" *ngIf="!loading && !error && cotacoesFiltradas.length > 0">
-      <div class="pagination-row">
-        <label class="pagination-label" for="linhas-pagina">Linhas por página</label>
+    <div class="ce-pagination-minimal" *ngIf="!loading && !error && cotacoesFiltradas.length > 0">
+      <nav class="ce-pagination-minimal__nav" aria-label="Paginação da tabela">
+        <button
+          type="button"
+          class="ce-page-nav-btn ce-page-nav-btn--edge"
+          (click)="paginaPrimeira()"
+          [disabled]="paginaCorrenteSegura <= 1"
+          aria-label="Primeira página"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M17 18L11 12l6-6M11 18L5 12l6-6"></path>
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="ce-page-nav-btn"
+          (click)="paginaAnterior()"
+          [disabled]="paginaCorrenteSegura <= 1"
+          aria-label="Página anterior"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6"></path>
+          </svg>
+        </button>
+        <span class="ce-pagination-minimal__pages" aria-live="polite" [attr.title]="'Página ' + paginaCorrenteSegura + ' de ' + totalPaginas">
+          <span class="ce-pagination-minimal__page-current">{{ paginaCorrenteSegura }}</span>
+          <span class="ce-pagination-minimal__page-sep" aria-hidden="true">/</span>
+          <span class="ce-pagination-minimal__page-total">{{ totalPaginas }}</span>
+        </span>
+        <button
+          type="button"
+          class="ce-page-nav-btn"
+          (click)="paginaSeguinte()"
+          [disabled]="paginaCorrenteSegura >= totalPaginas"
+          aria-label="Página seguinte"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9 18l6-6-6-6"></path>
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="ce-page-nav-btn ce-page-nav-btn--edge"
+          (click)="paginaUltima()"
+          [disabled]="paginaCorrenteSegura >= totalPaginas"
+          aria-label="Última página"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M7 18l6-6-6-6M13 18l6-6-6-6"></path>
+          </svg>
+        </button>
         <select
           id="linhas-pagina"
-          class="pagination-select"
+          class="ce-pagination-minimal__select"
           [(ngModel)]="linhasPorPaginaSelecionadas"
           (ngModelChange)="aoAlterarLinhasPorPagina()"
+          [attr.aria-label]="'Linhas por página'"
         >
           @for (n of opcoesLinhasPorPagina; track n) {
             <option [ngValue]="n">{{ n }}</option>
           }
         </select>
-        <span class="pagination-or">ou</span>
-        <label class="pagination-label" for="manual-linhas">valor manual (opcional)</label>
-        <input
-          id="manual-linhas"
-          type="number"
-          class="pagination-input-num"
-          min="1"
-          max="10000"
-          [(ngModel)]="manualLinhasPorPagina"
-          (blur)="aplicarManualLinhasPorPagina()"
-          placeholder="ex.: 75"
-          title="Se preencher com um número entre 1 e 10000, substitui a lista ao lado"
-        >
-        <button type="button" class="btn-sm ce-btn-aplicar" (click)="aplicarManualLinhasPorPagina()">Aplicar</button>
-      </div>
-      <div class="pagination-row pagination-nav">
-        <span class="pagination-range">{{ intervaloPaginaTexto }}</span>
-        <span class="pagination-pages">Página {{ paginaCorrenteSegura }} de {{ totalPaginas }}</span>
-        <button type="button" class="btn-secondary btn-sm" (click)="paginaAnterior()" [disabled]="paginaCorrenteSegura <= 1">Anterior</button>
-        <button type="button" class="btn-secondary btn-sm" (click)="paginaSeguinte()" [disabled]="paginaCorrenteSegura >= totalPaginas">Seguinte</button>
-      </div>
+      </nav>
     </div>
   }
 </div>

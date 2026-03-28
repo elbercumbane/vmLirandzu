@@ -3,7 +3,17 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
-import { CotacaoService, CotacaoRequest, CotacaoResponse } from '../../../services/cotacao.service';
+import {
+  CondicaoPagamentoCotacao,
+  CotacaoService,
+  CotacaoRequest,
+  CotacaoResponse
+} from '../../../services/cotacao.service';
+import {
+  CONDICAO_PAGAMENTO_OPCOES,
+  labelCondicaoPagamentoPt,
+  normalizeCondicaoPagamento
+} from './cotacao-condicao-pagamento.util';
 import { ClienteService, Cliente } from '../../../services/cliente.service';
 import { NotificationPopupComponent } from '../../../shared/components/notification-popup/notification-popup.component';
 import { AuthService } from '../../../shared/services/auth.service';
@@ -35,6 +45,10 @@ export class CotacoesCadastroComponent implements OnInit {
     clienteNome: '',
     clienteTelefone: '',
     clienteEmail: '',
+    clienteNuit: '',
+    clienteEndereco: '',
+    clienteProvincia: '',
+    clientePessoaContacto: '',
     origem: '',
     destino: '',
     tipoVeiculo: '',
@@ -48,14 +62,31 @@ export class CotacoesCadastroComponent implements OnInit {
     vatReason: 'ISENTO',
     // Nesta tela, "observacoes" será usado como "Origem" automática (PORTAL / MANUAL)
     observacoes: 'MANUAL',
-    formaEnvioPreferida: 'whatsapp' as string
+    formaEnvioPreferida: 'whatsapp' as string,
+    condicaoPagamento: 'TOTALIDADE' as CondicaoPagamentoCotacao
   };
+
+  readonly opcoesCondicaoPagamento = CONDICAO_PAGAMENTO_OPCOES;
 
   itens: ItemCotacao[] = [
     { descricao: '', quantidade: 1, unidade: '', precoUnitario: null }
   ];
 
   tiposVeiculo = ['Camião Pesado (+16t)', 'Camião Médio (7.5-16t)', 'Camião Leve (até 7.5t)', 'Semi-Reboque'];
+
+  readonly provincias = [
+    'Maputo Cidade',
+    'Maputo Província',
+    'Gaza',
+    'Inhambane',
+    'Sofala',
+    'Manica',
+    'Tete',
+    'Zambézia',
+    'Nampula',
+    'Niassa',
+    'Cabo Delgado'
+  ];
 
   private readonly auth = inject(AuthService);
 
@@ -128,6 +159,10 @@ export class CotacoesCadastroComponent implements OnInit {
     return this.edicaoCotacaoExistente ? 'Ajustar cotação' : 'Criar Cotação';
   }
 
+  get textoCondicaoPagamentoCotacao(): string {
+    return labelCondicaoPagamentoPt(this.cotacao.condicaoPagamento);
+  }
+
   get subtituloPaginaCotacao(): string {
     if (this.modoPdfOnly && this.modoAutoPdf) {
       return 'O PDF abrirá num novo separador do browser.';
@@ -188,6 +223,10 @@ export class CotacoesCadastroComponent implements OnInit {
           this.cotacao.clienteNome = cotacao.cliente.nome || '';
           this.cotacao.clienteTelefone = cotacao.cliente.telefone || '';
           this.cotacao.clienteEmail = cotacao.cliente.email || '';
+          this.cotacao.clienteNuit = cotacao.cliente.nif || '';
+          this.cotacao.clienteEndereco = cotacao.cliente.endereco || '';
+          this.cotacao.clienteProvincia = cotacao.cliente.provincia || '';
+          this.cotacao.clientePessoaContacto = cotacao.cliente.pessoaContacto || '';
           this.clienteIdAtual = cotacao.cliente.id || null;
         }
         
@@ -250,6 +289,9 @@ export class CotacoesCadastroComponent implements OnInit {
 
         // Preferência de envio deve vir do portal (para alimentar a coluna na lista)
         this.cotacao.formaEnvioPreferida = (cotacao.formaEnvioPreferida || cotacao.formaEnvioRealizada || this.cotacao.formaEnvioPreferida || 'whatsapp');
+
+        const condNorm = normalizeCondicaoPagamento(cotacao.condicaoPagamento);
+        this.cotacao.condicaoPagamento = condNorm ?? 'TOTALIDADE';
         
         // Guardar o ID da cotação para atualização posterior
         this.ultimaCotacaoId = cotacao.id;
@@ -313,7 +355,7 @@ export class CotacoesCadastroComponent implements OnInit {
   }
 
   /**
-   * Gera uma cotação e envia o utilizador para a página de "Cotações Enviadas".
+   * Gera uma cotação e envia o utilizador para «Negociação e ajuste».
    * Marca a cotação com status COTACAO_GERADA para aparecer na lista.
    */
   gerarCotacao(): void {
@@ -357,7 +399,8 @@ export class CotacoesCadastroComponent implements OnInit {
         status: this.edicaoCotacaoExistente ? this.statusAoGravarRascunho() : this.STATUS_PENDENTE_BACKEND,
         observacoes: this.cotacao.observacoes || undefined,
         formaEnvioPreferida: this.cotacao.formaEnvioPreferida || undefined,
-        operador: this.cotacao.operador || undefined
+        operador: this.cotacao.operador || undefined,
+        condicaoPagamento: this.cotacao.condicaoPagamento || undefined
       };
 
       const handleSuccess = (res: CotacaoResponse) => {
@@ -397,7 +440,7 @@ export class CotacoesCadastroComponent implements OnInit {
    * Finaliza a geração:
    *  - atualiza status para QUOTATION_GENERATED
    *  - baixa o PDF automaticamente
-   *  - redireciona para Cotações Enviadas
+   *  - redireciona para Negociação e ajuste
    */
   async finalizarGeracao(): Promise<void> {
     if (!this.ultimaCotacaoId) {
@@ -446,7 +489,8 @@ export class CotacoesCadastroComponent implements OnInit {
           ? ((this.statusBackendCarregado || '').toUpperCase() === 'RESPONDED' || (this.statusBackendCarregado || '').toUpperCase() === 'RESPONDIDO'
               ? 'AJUSTE_APOS_ACEITE'
               : 'AJUSTE_PRECO')
-          : undefined
+          : undefined,
+        condicaoPagamento: this.cotacao.condicaoPagamento || undefined
       };
 
       await new Promise<void>((resolve, reject) => {
@@ -529,7 +573,8 @@ export class CotacoesCadastroComponent implements OnInit {
         dataValidade: this.cotacao.validade || undefined,
         status: this.STATUS_PENDENTE_BACKEND,
         observacoes: this.cotacao.observacoes || undefined,
-        operador: this.cotacao.operador || undefined
+        operador: this.cotacao.operador || undefined,
+        condicaoPagamento: this.cotacao.condicaoPagamento || undefined
       };
 
       // Se já existe uma cotação (vindo de um pedido), atualizar em vez de criar nova
@@ -584,7 +629,7 @@ export class CotacoesCadastroComponent implements OnInit {
   }
 
   /**
-   * Confirma o envio da cotação: guarda se necessário, marca como enviada e redireciona para Cotações Enviadas.
+   * Confirma o envio da cotação: guarda se necessário, marca como enviada e redireciona para Negociação e ajuste.
    */
   confirmarEnvio(): void {
     if (!this.cotacao.clienteNome || !this.cotacao.origem || !this.cotacao.destino) {
@@ -617,7 +662,8 @@ export class CotacoesCadastroComponent implements OnInit {
           dataValidade: this.cotacao.validade || undefined,
           status: this.STATUS_PENDENTE_BACKEND,
           observacoes: this.cotacao.observacoes || undefined,
-          operador: this.cotacao.operador || undefined
+          operador: this.cotacao.operador || undefined,
+          condicaoPagamento: this.cotacao.condicaoPagamento || undefined
         };
 
         this.cotacaoService.criarCotacao(payload).subscribe({
@@ -676,7 +722,8 @@ export class CotacoesCadastroComponent implements OnInit {
         status: this.STATUS_COTACAO_GERADA_BACKEND,
         observacoes: this.cotacao.observacoes || undefined,
         operador: this.cotacao.operador || undefined,
-        formaEnvioRealizada: formaEnvio
+        formaEnvioRealizada: formaEnvio,
+        condicaoPagamento: this.cotacao.condicaoPagamento || undefined
       };
 
       // Obter formaEnvioPreferida da cotação existente se existir
@@ -693,7 +740,7 @@ export class CotacoesCadastroComponent implements OnInit {
               const mensagem = mensagemSucesso || 'Cotação enviada e guardada com sucesso!';
               this.mostrarNotificacao(mensagem, 'success');
               
-              // Redirecionar para cotações enviadas após 1.5 segundos
+              // Redirecionar para Negociação e ajuste após 1.5 segundos
               setTimeout(() => {
                 this.router.navigate(['/billing/cotacoes/enviadas']);
               }, 1500);
@@ -712,7 +759,7 @@ export class CotacoesCadastroComponent implements OnInit {
               const mensagem = mensagemSucesso || 'Cotação enviada e guardada com sucesso!';
               this.mostrarNotificacao(mensagem, 'success');
               
-              // Redirecionar para cotações enviadas após 1.5 segundos
+              // Redirecionar para Negociação e ajuste após 1.5 segundos
               setTimeout(() => {
                 this.router.navigate(['/billing/cotacoes/enviadas']);
               }, 1500);
@@ -741,7 +788,8 @@ export class CotacoesCadastroComponent implements OnInit {
     texto += `*Referência:* ${ref}\n`;
     texto += `*Data:* ${data}\n`;
     texto += `*Rota:* ${this.cotacao.origem} → ${this.cotacao.destino}\n`;
-    texto += `\n*Valor Total:* ${total} MZN\n\n`;
+    texto += `\n*Valor Total:* ${total} MZN\n`;
+    texto += `*Condições de pagamento:* ${this.textoCondicaoPagamentoCotacao}\n\n`;
     texto += `Agradecemos a preferência!\n\nVM Transportes - Lirandzo`;
 
     return texto;
@@ -991,8 +1039,10 @@ export class CotacoesCadastroComponent implements OnInit {
         nome: this.cotacao.clienteNome,
         telefone: this.cotacao.clienteTelefone || '',
         email: this.cotacao.clienteEmail || '',
-        endereco: this.cotacao.origem || '',
-        nif: ''
+        endereco: (this.cotacao.clienteEndereco || this.cotacao.origem || '').trim(),
+        nif: (this.cotacao.clienteNuit || '').trim(),
+        provincia: (this.cotacao.clienteProvincia || '').trim(),
+        pessoaContacto: (this.cotacao.clientePessoaContacto || '').trim()
       };
 
       this.clienteService.criarCliente(clienteData).subscribe({

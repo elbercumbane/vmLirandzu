@@ -66,6 +66,52 @@
                   </div>
                 </div>
               </div>
+              <div class="form-row">
+                <label for="nuit">{{ 'quotePage.nuit' | transloco }}</label>
+                <input
+                  id="nuit"
+                  type="text"
+                  [ngModel]="form.nuit"
+                  (ngModelChange)="onNuitChange($event)"
+                  name="nuit"
+                  [placeholder]="'quotePage.nuitPh' | transloco"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="form-row">
+                <label for="address">{{ 'quotePage.address' | transloco }}</label>
+                <input
+                  id="address"
+                  type="text"
+                  [ngModel]="form.address"
+                  (ngModelChange)="onAddressChange($event)"
+                  name="address"
+                  [placeholder]="'quotePage.addressPh' | transloco"
+                  autocomplete="street-address"
+                />
+              </div>
+              <div class="form-row form-row-split">
+                <div class="form-cell">
+                  <label for="province">{{ 'quotePage.province' | transloco }}</label>
+                  <select id="province" [(ngModel)]="form.province" name="province">
+                    <option value="">{{ 'quotePage.provincePh' | transloco }}</option>
+                    <option *ngFor="let p of provincias" [value]="p">{{ p }}</option>
+                  </select>
+                </div>
+                <div class="form-cell">
+                  <label for="contactPerson">{{ 'quotePage.contactPerson' | transloco }}</label>
+                  <input
+                    id="contactPerson"
+                    type="text"
+                    [ngModel]="form.contactPerson"
+                    (ngModelChange)="onContactPersonChange($event)"
+                    name="contactPerson"
+                    [placeholder]="'quotePage.contactPersonPh' | transloco"
+                    autocomplete="name"
+                  />
+                </div>
+              </div>
+              <p class="quote-contact-person-hint">{{ 'quotePage.contactPersonHint' | transloco }}</p>
             </div>
             </div>
           </div>
@@ -208,54 +254,98 @@
     </div>
   }
 
-  <!-- Popup de confirmação (resumo dos dados, Editar / Enviar) -->
+  <!-- Popup de confirmação (resumo por secções, alinhado ao formulário) -->
   @if (confirmacaoOpen) {
     <div class="quote-confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="quote-confirm-title">
-      <div class="quote-confirm-backdrop" aria-hidden="true"></div>
-      <div class="quote-confirm-modal">
-        <h2 id="quote-confirm-title" class="quote-confirm-title">{{ 'quotePage.confirmTitle' | transloco }}</h2>
-        <p class="quote-confirm-subtitle">{{ 'quotePage.confirmSubtitle' | transloco }}</p>
-        <div class="quote-confirm-summary">
-          <div class="quote-confirm-row">
-            <span class="quote-confirm-label">{{ 'quotePage.lblName' | transloco }}</span>
-            <span class="quote-confirm-value">{{ form.name }}</span>
+      <div class="quote-confirm-backdrop" (click)="closeConfirmacao()" aria-hidden="true"></div>
+      <div class="quote-confirm-modal" (click)="$event.stopPropagation()">
+        <button type="button" class="quote-confirm-close" (click)="closeConfirmacao()" [attr.aria-label]="'quotePage.confirmCloseAria' | transloco">×</button>
+        <div class="quote-confirm-accent" aria-hidden="true"></div>
+        <div class="quote-confirm-modal-inner">
+          <h2 id="quote-confirm-title" class="quote-confirm-title">{{ 'quotePage.confirmTitle' | transloco }}</h2>
+          <p class="quote-confirm-subtitle">{{ 'quotePage.confirmSubtitle' | transloco }}</p>
+
+          <div class="quote-confirm-scroll">
+            <section class="quote-confirm-block" aria-labelledby="qc-personal">
+              <h3 id="qc-personal" class="quote-confirm-block-title">{{ 'quotePage.sectionPersonal' | transloco }}</h3>
+              <div class="quote-confirm-block-body">
+                <div class="quote-confirm-row">
+                  <span class="quote-confirm-label">{{ 'quotePage.lblName' | transloco }}</span>
+                  <span class="quote-confirm-value">{{ form.name }}</span>
+                </div>
+                <div class="quote-confirm-row">
+                  <span class="quote-confirm-label">{{ 'quotePage.lblEmail' | transloco }}</span>
+                  <span class="quote-confirm-value">{{ form.email }}</span>
+                </div>
+                @if (form.phone1) {
+                  <div class="quote-confirm-row">
+                    <span class="quote-confirm-label">{{ 'quotePage.lblPhone' | transloco }}</span>
+                    <span class="quote-confirm-value">{{ form.phone1 }}</span>
+                  </div>
+                }
+                @if ((form.nuit || '').trim()) {
+                  <div class="quote-confirm-row">
+                    <span class="quote-confirm-label">{{ 'quotePage.lblNuit' | transloco }}</span>
+                    <span class="quote-confirm-value">{{ form.nuit }}</span>
+                  </div>
+                }
+                @if ((form.address || '').trim()) {
+                  <div class="quote-confirm-row">
+                    <span class="quote-confirm-label">{{ 'quotePage.lblAddress' | transloco }}</span>
+                    <span class="quote-confirm-value">{{ form.address }}</span>
+                  </div>
+                }
+                @if ((form.province || '').trim()) {
+                  <div class="quote-confirm-row">
+                    <span class="quote-confirm-label">{{ 'quotePage.lblProvince' | transloco }}</span>
+                    <span class="quote-confirm-value">{{ form.province }}</span>
+                  </div>
+                }
+                @if ((form.contactPerson || '').trim()) {
+                  <div class="quote-confirm-row">
+                    <span class="quote-confirm-label">{{ 'quotePage.lblContactPerson' | transloco }}</span>
+                    <span class="quote-confirm-value">{{ form.contactPerson }}</span>
+                  </div>
+                }
+              </div>
+            </section>
+
+            <section class="quote-confirm-block" aria-labelledby="qc-quote">
+              <h3 id="qc-quote" class="quote-confirm-block-title">{{ 'quotePage.sectionQuote' | transloco }}</h3>
+              <div class="quote-confirm-block-body">
+                <div class="quote-confirm-row">
+                  <span class="quote-confirm-label">{{ 'quotePage.lblOrigin' | transloco }}</span>
+                  <span class="quote-confirm-value">{{ form.origin }}</span>
+                </div>
+                <div class="quote-confirm-row">
+                  <span class="quote-confirm-label">{{ 'quotePage.lblDest' | transloco }}</span>
+                  <span class="quote-confirm-value">{{ form.destination }}</span>
+                </div>
+                <div class="quote-confirm-row">
+                  <span class="quote-confirm-label">{{ 'quotePage.lblService' | transloco }}</span>
+                  <span class="quote-confirm-value">{{ getTipoServicoLabel() }}</span>
+                </div>
+                <div class="quote-confirm-row">
+                  <span class="quote-confirm-label">{{ 'quotePage.lblWhereQuote' | transloco }}</span>
+                  <span class="quote-confirm-value">{{ getDeliveryLabel() }}</span>
+                </div>
+              </div>
+            </section>
+
+            @if (form.message) {
+              <section class="quote-confirm-block quote-confirm-block--message" aria-labelledby="qc-need">
+                <h3 id="qc-need" class="quote-confirm-block-title">{{ 'quotePage.sectionNeed' | transloco }}</h3>
+                <div class="quote-confirm-block-body quote-confirm-message-box">
+                  <p class="quote-confirm-message-text">{{ form.message }}</p>
+                </div>
+              </section>
+            }
           </div>
-          <div class="quote-confirm-row">
-            <span class="quote-confirm-label">{{ 'quotePage.lblEmail' | transloco }}</span>
-            <span class="quote-confirm-value">{{ form.email }}</span>
+
+          <div class="quote-confirm-actions">
+            <button type="button" class="quote-confirm-btn quote-confirm-btn-edit" (click)="closeConfirmacao()">{{ 'quotePage.edit' | transloco }}</button>
+            <button type="button" class="quote-confirm-btn quote-confirm-btn-send" (click)="doSubmit()">{{ 'quotePage.send' | transloco }}</button>
           </div>
-          @if (form.phone1) {
-            <div class="quote-confirm-row">
-              <span class="quote-confirm-label">{{ 'quotePage.lblPhone' | transloco }}</span>
-              <span class="quote-confirm-value">{{ form.phone1 }}</span>
-            </div>
-          }
-          <div class="quote-confirm-row">
-            <span class="quote-confirm-label">{{ 'quotePage.lblOrigin' | transloco }}</span>
-            <span class="quote-confirm-value">{{ form.origin }}</span>
-          </div>
-          <div class="quote-confirm-row">
-            <span class="quote-confirm-label">{{ 'quotePage.lblDest' | transloco }}</span>
-            <span class="quote-confirm-value">{{ form.destination }}</span>
-          </div>
-          <div class="quote-confirm-row">
-            <span class="quote-confirm-label">{{ 'quotePage.lblService' | transloco }}</span>
-            <span class="quote-confirm-value">{{ getTipoServicoLabel() }}</span>
-          </div>
-          <div class="quote-confirm-row">
-            <span class="quote-confirm-label">{{ 'quotePage.lblWhereQuote' | transloco }}</span>
-            <span class="quote-confirm-value">{{ getDeliveryLabel() }}</span>
-          </div>
-          @if (form.message) {
-          <div class="quote-confirm-row quote-confirm-row-message">
-            <span class="quote-confirm-label">{{ 'quotePage.lblMessage' | transloco }}</span>
-            <span class="quote-confirm-value quote-confirm-message">{{ form.message }}</span>
-          </div>
-          }
-        </div>
-        <div class="quote-confirm-actions">
-          <button type="button" class="quote-confirm-btn quote-confirm-btn-edit" (click)="closeConfirmacao()">{{ 'quotePage.edit' | transloco }}</button>
-          <button type="button" class="quote-confirm-btn quote-confirm-btn-send" (click)="doSubmit()">{{ 'quotePage.send' | transloco }}</button>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@
   [showHelp]="false"
   [backLink]="'/billing/encomendas'"
   title="Detalhes da Encomenda"
-  subtitle="Visualização completa da factura"
+  subtitle="Factura, valores e pagamentos — o histórico da cotação está numa página à parte"
 ></app-billing-section-header>
 
 @if (loading) {
@@ -35,13 +35,15 @@
         <span [class]="'badge ' + getStatusClass(encomenda.status)">
           {{ formatarStatus(encomenda.status) }}
         </span>
-        <button type="button" class="btn-primary" (click)="editar()" style="margin-left: 1rem;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="margin-right: 0.5rem;">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-          </svg>
-          Editar
-        </button>
+        @if (podeEditarFactura) {
+          <button type="button" class="btn-primary" (click)="editar()" style="margin-left: 1rem;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="margin-right: 0.5rem;">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            Editar
+          </button>
+        }
         <button type="button" class="btn-secondary" (click)="abrirPdfPreview()" style="margin-left: 0.5rem;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="margin-right: 0.5rem;">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -54,30 +56,12 @@
       </div>
     </div>
 
-    @if (timeline && timeline.eventos.length > 0) {
-      <div class="rastreamento-card">
-        <div class="rastreamento-head">
-          <h4>Rastreio do processo</h4>
-          <span class="rastreamento-pct">{{ timeline.progressoPercentual }}%</span>
-        </div>
-        <p class="rastreamento-sub">Da cotação à factura, pagamentos e viagem (quando aplicável).</p>
-        <div class="rastreamento-bar" aria-hidden="true">
-          <div class="rastreamento-bar-fill" [style.width.%]="timeline.progressoPercentual"></div>
-        </div>
-        <ul class="rastreamento-timeline" role="list">
-          @for (ev of timeline.eventos; track $index) {
-            <li class="rastreamento-step" [class.rastreamento-step--done]="ev.concluido" [class.rastreamento-step--pending]="!ev.concluido">
-              <span class="rastreamento-dot" [attr.data-done]="ev.concluido"></span>
-              <div class="rastreamento-step-body">
-                <strong>{{ ev.titulo }}</strong>
-                @if (ev.detalhe) {
-                  <span class="rastreamento-detalhe">{{ ev.detalhe }}</span>
-                }
-                <span class="rastreamento-data">{{ formatarDataHora(ev.dataOcorrencia) }}</span>
-              </div>
-            </li>
-          }
-        </ul>
+    @if (encomendaId) {
+      <div class="historico-cta-bar">
+        <a [routerLink]="['/billing/encomendas', encomendaId, 'historico']" class="btn-secondary btn-sm historico-cta-link">
+          Ver histórico completo (cotação → factura → pagamentos)
+        </a>
+        <span class="historico-cta-hint">Abre uma página só com a linha do tempo e datas.</span>
       </div>
     }
 
@@ -87,6 +71,10 @@
         <div class="detail-item">
           <span class="detail-label">Nome:</span>
           <span class="detail-value">{{ encomenda.cliente?.nome || 'Não especificado' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">NUIT:</span>
+          <span class="detail-value">{{ encomenda.cliente?.nif || 'Não especificado' }}</span>
         </div>
         <div class="detail-item">
           <span class="detail-label">Telefone:</span>
@@ -99,6 +87,14 @@
         <div class="detail-item">
           <span class="detail-label">Endereço:</span>
           <span class="detail-value">{{ encomenda.cliente?.endereco || 'Não especificado' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Província:</span>
+          <span class="detail-value">{{ encomenda.cliente?.provincia || 'Não especificado' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">ATT:</span>
+          <span class="detail-value">{{ encomenda.cliente?.pessoaContacto || 'Não especificado' }}</span>
         </div>
       </div>
 
@@ -143,6 +139,13 @@
             <p style="margin:0.35rem 0 0;font-size:0.8rem;color:var(--text-muted);">Valor registado mas ainda não confirmado no banco / M-Pesa. Confirme na lista abaixo após verificar.</p>
           </div>
         }
+        @if (valorPendenteAprovacao > 0) {
+          <div class="detail-item" style="margin-top:0.75rem;padding:0.75rem;background:rgba(59,130,246,0.1);border-radius:8px;">
+            <span class="detail-label">Aguarda aprovação (gestão):</span>
+            <span class="detail-value" style="color:var(--accent, #2563eb);font-weight:600">{{ valorPendenteAprovacao | number:'1.2-2' }} MZN</span>
+            <p style="margin:0.35rem 0 0;font-size:0.8rem;color:var(--text-muted);">Registado por um técnico — gestor ou admin deve aprovar na tabela abaixo para contabilizar na dívida.</p>
+          </div>
+        }
       </div>
     </div>
 
@@ -151,8 +154,8 @@
         <div>
           <h3 style="margin:0;">Pagamentos</h3>
           <p class="text-muted" style="margin:0.25rem 0 0;font-size:0.85rem;">
-            Sem ligação ao banco: use a referência do SMS ou do extrato para cruzar manualmente.
-            Só os pagamentos <strong>confirmados</strong> reduzem a dívida.
+            Use referência do SMS ou extrato para cruzar. Só pagamentos <strong>confirmados</strong> reduzem a dívida.
+            Técnicos: o registo fica <strong>aguarda aprovação</strong> até gestor/admin confirmar (excepto «aguarda extrato»).
           </p>
         </div>
       </div>
@@ -166,7 +169,7 @@
               <th>Método</th>
               <th>Ref. banco / M-Pesa</th>
               <th>Estado</th>
-              <th style="width:120px;">Acção</th>
+              <th style="min-width:200px;">Acção</th>
             </tr>
           </thead>
           <tbody>
@@ -180,9 +183,24 @@
                 <td>
                   @if (p.verificationStatus === 'PENDING_BANK') {
                     <button type="button" class="btn-primary btn-sm" [disabled]="confirmandoId === p.id" (click)="confirmarNoExtrato(p)">
-                      {{ confirmandoId === p.id ? '…' : 'Confirmar' }}
+                      {{ confirmandoId === p.id ? '…' : 'Confirmar no extrato' }}
                     </button>
-                  } @else { — }
+                  } @else if (p.verificationStatus === 'PENDING_APPROVAL' && podeAprovarPagamentos) {
+                    <div class="pagamento-acoes-gestor">
+                      <button type="button" class="btn-primary btn-sm" [disabled]="processandoAprovacaoId === p.id" (click)="aprovarPagamentoGestor(p)">
+                        {{ processandoAprovacaoId === p.id ? '…' : 'Aprovar' }}
+                      </button>
+                      <button type="button" class="btn-secondary btn-sm" [disabled]="processandoAprovacaoId === p.id" (click)="recusarPagamentoGestor(p)">
+                        Recusar
+                      </button>
+                    </div>
+                  } @else if (p.verificationStatus === 'PENDING_APPROVAL') {
+                    <span class="text-muted" style="font-size:0.8rem;">Aguarda gestor/admin</span>
+                  } @else if (p.verificationStatus === 'REJECTED') {
+                    <span class="text-muted" style="font-size:0.8rem;">—</span>
+                  } @else {
+                    —
+                  }
                 </td>
               </tr>
             } @empty {
@@ -334,6 +352,26 @@
               <div style="font-size:13px; color:#111111; padding:6px 10px;
                           background:#f9fafb; border:1px solid #e5e7eb; border-radius:6px;">
                 {{ encomenda.cliente?.endereco || '—' }}
+              </div>
+            </div>
+
+            <!-- Província -->
+            <div>
+              <div style="font-size:10px; font-weight:600; color:#6b7280; text-transform:uppercase;
+                          letter-spacing:0.04em; margin-bottom:3px;">Província</div>
+              <div style="font-size:13px; color:#111111; padding:6px 10px;
+                          background:#f9fafb; border:1px solid #e5e7eb; border-radius:6px;">
+                {{ encomenda.cliente?.provincia || '—' }}
+              </div>
+            </div>
+
+            <!-- ATT (pessoa de contacto) -->
+            <div>
+              <div style="font-size:10px; font-weight:600; color:#6b7280; text-transform:uppercase;
+                          letter-spacing:0.04em; margin-bottom:3px;">ATT</div>
+              <div style="font-size:13px; color:#111111; padding:6px 10px;
+                          background:#f9fafb; border:1px solid #e5e7eb; border-radius:6px;">
+                {{ encomenda.cliente?.pessoaContacto || '—' }}
               </div>
             </div>
 

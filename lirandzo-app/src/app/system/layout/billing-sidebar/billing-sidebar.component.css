@@ -134,6 +134,17 @@
   opacity: 0.8;
 }
 
+/* Grupo com página actual dentro do submenu (ex.: Facturas) */
+.sidebar-group-active > .sidebar-group-toggle {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sidebar-group-active > .sidebar-group-toggle .sidebar-icon {
+  stroke: var(--accent);
+  opacity: 1;
+}
+
 /* Sub-menu */
 .sidebar-submenu {
   list-style: none;
@@ -145,7 +156,7 @@
 }
 
 .sidebar-group.expanded > .sidebar-submenu {
-  max-height: 200px;
+  max-height: 320px;
 }
 
 .sidebar-sub-link {
