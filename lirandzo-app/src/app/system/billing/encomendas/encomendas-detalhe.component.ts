@@ -8,6 +8,7 @@ import { catchError } from 'rxjs/operators';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
 import { EncomendaService, EncomendaResponse } from '../../../services/encomenda.service';
 import { PagamentoService, PagamentoResponse } from '../../../services/pagamento.service';
+import { RastreamentoService, RastreamentoTimeline } from '../../../services/rastreamento.service';
 import { NotificationPopupComponent } from '../../../shared/components/notification-popup/notification-popup.component';
 
 @Component({
@@ -20,6 +21,7 @@ import { NotificationPopupComponent } from '../../../shared/components/notificat
 export class EncomendasDetalheComponent implements OnInit {
   encomenda: EncomendaResponse | null = null;
   pagamentos: PagamentoResponse[] = [];
+  timeline: RastreamentoTimeline | null = null;
   loading = true;
   error: string | null = null;
   encomendaId: number | null = null;
@@ -45,7 +47,8 @@ export class EncomendasDetalheComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private encomendaService: EncomendaService,
-    private pagamentoService: PagamentoService
+    private pagamentoService: PagamentoService,
+    private rastreamentoService: RastreamentoService
   ) {}
 
   ngOnInit() {
@@ -73,11 +76,18 @@ export class EncomendasDetalheComponent implements OnInit {
           console.warn('Pagamentos não carregados (continuação sem lista):', e);
           return of([] as PagamentoResponse[]);
         })
+      ),
+      timeline: this.rastreamentoService.obterTimelinePorEncomenda(this.encomendaId).pipe(
+        catchError((e) => {
+          console.warn('Timeline de rastreio não disponível:', e);
+          return of(null as RastreamentoTimeline | null);
+        })
       )
     }).subscribe({
-      next: ({ encomenda, pagamentos }) => {
+      next: ({ encomenda, pagamentos, timeline }) => {
         this.encomenda = encomenda;
         this.pagamentos = pagamentos;
+        this.timeline = timeline;
         this.loading = false;
       },
       error: (err: unknown) => {
@@ -187,6 +197,17 @@ export class EncomendasDetalheComponent implements OnInit {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
+    });
+  }
+
+  formatarDataHora(iso: string): string {
+    if (!iso) return '';
+    return new Date(iso).toLocaleString('pt-MZ', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   }
 

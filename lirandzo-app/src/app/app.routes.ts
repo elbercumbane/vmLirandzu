@@ -24,6 +24,7 @@ export const routes: Routes = [
     path: 'billing',
     loadComponent: () => import('./system/billing/layout/billing-layout.component').then(m => m.BillingLayoutComponent),
     canActivate: [systemAuthGuard],
+    canActivateChild: [systemAuthGuard],
     children: [
       { path: '', loadComponent: () => import('./system/billing/dashboard/billing-dashboard.component').then(m => m.BillingDashboardComponent) },
       { path: 'viaturas', loadComponent: () => import('./system/billing/viaturas/viaturas-lista.component').then(m => m.ViaturasListaComponent) },

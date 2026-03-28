@@ -27,6 +27,7 @@ export interface EncomendaResponse {
   dataEncomenda: string;
   invoiceNumber?: string;
   invoiceDate?: string;
+  trackingCode?: string | null;
   cotacao?: { id: number; referencia?: string };
 }
 

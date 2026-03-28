@@ -5,7 +5,7 @@
   background: #f5f6fa;
 }
 
-/* Hero começa do início da página */
+/* Hero no topo da pagina */
 .quote-hero {
   position: relative;
   width: 100%;
@@ -94,134 +94,6 @@
   resize: vertical;
 }
 
-/* Items list */
-.items-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.item-row {
-  display: flex;
-  align-items: flex-end;
-  gap: 0.75rem;
-}
-
-.item-qty-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  min-width: 80px;
-}
-
-.item-qty-wrap label,
-.item-desc-wrap label {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #374151;
-}
-
-.item-qty-input {
-  width: 80px;
-  padding: 0.55rem 0.6rem;
-  border: 1.5px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  background: #fff;
-  color: #111;
-  transition: border-color 0.2s;
-}
-.item-qty-input:focus {
-  outline: none;
-  border-color: var(--brand-red);
-}
-
-.item-desc-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  flex: 1;
-}
-
-.item-desc-input {
-  width: 100%;
-  padding: 0.55rem 0.75rem;
-  border: 1.5px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  background: #fff;
-  color: #111;
-  transition: border-color 0.2s;
-}
-.item-desc-input:focus {
-  outline: none;
-  border-color: var(--brand-red);
-}
-
-.item-remove-btn {
-  background: none;
-  border: 1.5px solid #fca5a5;
-  color: #dc2626;
-  border-radius: 6px;
-  width: 32px;
-  height: 32px;
-  font-size: 1.1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: background 0.2s, color 0.2s;
-  margin-bottom: 2px;
-}
-.item-remove-btn:hover {
-  background: #fee2e2;
-}
-
-.item-add-btn {
-  align-self: flex-start;
-  background: none;
-  border: 1.5px dashed #d1d5db;
-  color: #6b7280;
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-  font-size: 0.88rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 0.25rem;
-  transition: border-color 0.2s, color 0.2s;
-}
-.item-add-btn:hover {
-  border-color: var(--brand-red);
-  color: var(--brand-red);
-}
-
-/* Validation modal */
-.quote-validation-modal {
-  text-align: center;
-}
-.quote-validation-icon {
-  color: #dc2626;
-  margin-bottom: 0.75rem;
-}
-.quote-validation-list {
-  list-style: none;
-  padding: 0;
-  margin: 0.75rem 0 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-.quote-validation-list li {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #991b1b;
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
 .quote-form {
   display: flex;
   flex-direction: column;
@@ -300,7 +172,7 @@
   transition: max-height 0.35s ease-out;
 }
 .form-section-body.expanded {
-  max-height: 3000px;
+  max-height: 1200px;
   transition: max-height 0.4s ease-in-out;
 }
 
@@ -380,6 +252,23 @@
 }
 .radio-group-inline .radio-option {
   margin: 0;
+}
+
+.form-row.field-row-invalid > label,
+.form-cell.field-row-invalid > label {
+  color: #b91c1c;
+}
+
+.form-section.section-has-error {
+  border-color: rgba(220, 38, 38, 0.45);
+  box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.12);
+}
+
+input.field-invalid,
+select.field-invalid,
+textarea.field-invalid {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.18);
 }
 
 .form-row label,
@@ -479,16 +368,6 @@
   transform: translateY(-2px);
 }
 
-.quote-missing-fields {
-  padding: 1rem 1.25rem;
-  background: #fffbeb;
-  border: 1px solid #fde68a;
-  border-radius: 10px;
-  color: #92400e;
-  font-size: 0.9rem;
-  margin: 0;
-}
-
 .quote-error {
   padding: 1rem 1.25rem;
   background: #fef2f2;
@@ -499,7 +378,138 @@
   margin: 0;
 }
 
-/* Popup de confirmação */
+/* Assistente de validação */
+.quote-validation-overlay {
+  z-index: 10000;
+}
+
+.quote-validation-modal {
+  max-width: 380px;
+  padding: 1.25rem 1.35rem 1.15rem;
+}
+
+.quote-validation-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.quote-validation-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #fff7ed 0%, #ffedd5 100%);
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.quote-validation-head-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.quote-validation-title {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.2rem;
+  line-height: 1.25;
+  text-align: left;
+}
+
+.quote-validation-lead {
+  font-size: 0.8125rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.quote-validation-hint-strip {
+  font-size: 0.75rem;
+  color: #9a3412;
+  margin: 0 0 0.75rem;
+  line-height: 1.35;
+  padding: 0.5rem 0.6rem;
+  background: #fffbeb;
+  border-radius: 8px;
+  border: 1px solid #fde68a;
+}
+
+.quote-validation-hint-strip--email {
+  color: #1e40af;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.quote-validation-actions {
+  list-style: none;
+  margin: 0 0 0.85rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: min(42vh, 280px);
+  overflow-y: auto;
+}
+
+.quote-validation-field-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.65rem;
+  font: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fafafa;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.quote-validation-field-btn:hover {
+  border-color: var(--brand-red);
+  background: #fff;
+}
+
+.quote-validation-field-label {
+  font-weight: 600;
+  color: #334155;
+}
+
+.quote-validation-field-arrow {
+  color: var(--brand-red);
+  font-weight: 700;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+}
+
+.quote-validation-dismiss {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #f1f5f9;
+  color: #475569;
+  transition: background 0.2s;
+}
+
+.quote-validation-dismiss:hover {
+  background: #e2e8f0;
+}
+
+/* Popup de confirmacao */
 .quote-confirm-overlay {
   position: fixed;
   inset: 0;

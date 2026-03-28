@@ -3,13 +3,13 @@
   [showBack]="true"
   [backLink]="'/billing/cotacoes'"
   [showHelp]="true"
-  title="Criar Cotação"
-  subtitle="Crie e envie cotações profissionais para os clientes"
+  [title]="tituloPaginaCotacao"
+  [subtitle]="subtituloPaginaCotacao"
   helpTitle="Como gerar uma Cotação"
   [helpItems]="[
     'Preencha os dados do cliente e da rota (origem e destino).',
-    'Adicione produtos/serviços e valores para formar o total da cotação.',
-    'Defina a validade e o operador responsável para controlo interno.'
+    modoPortal ? 'Pedidos do portal trazem a carga definida pelo cliente — ajuste preços e finalize a proposta.' : 'Adicione produtos/serviços e valores para formar o total da cotação.',
+    'O operador responsável é o utilizador com sessão iniciada (controlo interno).'
   ]"
 ></app-billing-section-header>
 }
@@ -39,11 +39,8 @@
       <input type="date" class="form-control" [(ngModel)]="cotacao.validade">
     </div>
     <div class="form-group">
-      <label class="form-label">Operador Responsável</label>
-      <select class="form-control" [(ngModel)]="cotacao.operador">
-        <option value="">Seleccionar...</option>
-        <option *ngFor="let op of operadores" [value]="op">{{ op }}</option>
-      </select>
+      <label class="form-label">Operador responsável</label>
+      <input type="text" class="form-control" [value]="cotacao.operador || '—'" readonly title="Utilizador com sessão iniciada">
     </div>
   </div>
 
@@ -110,10 +107,12 @@
       </tbody>
     </table>
   </div>
+  @if (!modoPortal) {
   <button type="button" class="btn-secondary" (click)="adicionarItem()" style="margin-top: 0.75rem">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
     Adicionar Item
   </button>
+  }
 
   <h3 class="form-section-title">Custos Adicionais</h3>
   <div class="form-grid">
@@ -277,20 +276,19 @@
           </div>
 
           <div class="qpdf-items-section">
-            <div class="qpdf-section-label">Services</div>
+            <div class="qpdf-section-label qpdf-transport-label">transport</div>
             <table class="qpdf-items-table">
               <thead>
                 <tr>
                   <th class="qpdf-col-index">#</th>
                   <th class="qpdf-col-description">Description</th>
                   <th class="qpdf-col-qty">Qty</th>
-                  <th class="qpdf-col-unit">Unit Price</th>
                   <th class="qpdf-col-total">Total</th>
                 </tr>
               </thead>
               <tbody>
                 @for (item of itens; track $index) {
-                  @if (item.descricao || item.precoUnitario) {
+                  @if (item.descricao) {
                     <tr>
                       <td>{{ $index + 1 }}</td>
                       <td>
@@ -300,8 +298,7 @@
                         </div>
                       </td>
                       <td>{{ item.quantidade }} {{ item.unidade || '' }}</td>
-                      <td>{{ (item.precoUnitario || 0) | number:'1.2-2' }} MZN</td>
-                      <td style="font-weight: 700; text-align: right">{{ getSubtotalItem(item) | number:'1.2-2' }} MZN</td>
+                      <td>{{ getSubtotalItem(item) | number:'1.2-2' }} MZN</td>
                     </tr>
                   }
                 }

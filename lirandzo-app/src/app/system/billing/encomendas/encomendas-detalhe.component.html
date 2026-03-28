@@ -27,6 +27,9 @@
         @if (encomenda.cotacao?.referencia) {
           <p class="text-muted">Cotação origem: <a [routerLink]="['/billing/cotacoes/gerar', encomenda.cotacao!.id]">{{ encomenda.cotacao!.referencia }}</a></p>
         }
+        @if (encomenda.trackingCode) {
+          <p class="text-muted">Código de rastreio: <strong style="font-family:monospace;letter-spacing:0.04em;">{{ encomenda.trackingCode }}</strong></p>
+        }
       </div>
       <div>
         <span [class]="'badge ' + getStatusClass(encomenda.status)">
@@ -50,6 +53,33 @@
         </button>
       </div>
     </div>
+
+    @if (timeline && timeline.eventos.length > 0) {
+      <div class="rastreamento-card">
+        <div class="rastreamento-head">
+          <h4>Rastreio do processo</h4>
+          <span class="rastreamento-pct">{{ timeline.progressoPercentual }}%</span>
+        </div>
+        <p class="rastreamento-sub">Da cotação à factura, pagamentos e viagem (quando aplicável).</p>
+        <div class="rastreamento-bar" aria-hidden="true">
+          <div class="rastreamento-bar-fill" [style.width.%]="timeline.progressoPercentual"></div>
+        </div>
+        <ul class="rastreamento-timeline" role="list">
+          @for (ev of timeline.eventos; track $index) {
+            <li class="rastreamento-step" [class.rastreamento-step--done]="ev.concluido" [class.rastreamento-step--pending]="!ev.concluido">
+              <span class="rastreamento-dot" [attr.data-done]="ev.concluido"></span>
+              <div class="rastreamento-step-body">
+                <strong>{{ ev.titulo }}</strong>
+                @if (ev.detalhe) {
+                  <span class="rastreamento-detalhe">{{ ev.detalhe }}</span>
+                }
+                <span class="rastreamento-data">{{ formatarDataHora(ev.dataOcorrencia) }}</span>
+              </div>
+            </li>
+          }
+        </ul>
+      </div>
+    }
 
     <div class="detail-grid">
       <div class="detail-section">

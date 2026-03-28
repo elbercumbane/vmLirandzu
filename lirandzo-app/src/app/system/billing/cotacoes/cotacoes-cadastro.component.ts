@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -6,14 +6,13 @@ import { BillingSectionHeaderComponent } from '../shared/billing-section-header.
 import { CotacaoService, CotacaoRequest, CotacaoResponse } from '../../../services/cotacao.service';
 import { ClienteService, Cliente } from '../../../services/cliente.service';
 import { NotificationPopupComponent } from '../../../shared/components/notification-popup/notification-popup.component';
+import { AuthService } from '../../../shared/services/auth.service';
 import html2pdf from 'html2pdf.js';
-
-interface ItemCotacao {
-  descricao: string;
-  quantidade: number;
-  unidade: 'kg' | 'toneladas' | '';
-  precoUnitario: number | null;
-}
+import {
+  ItemCotacao,
+  parseDescricaoCarga,
+  repartirValorTotalNosItensSeNecessario
+} from './cotacao-descricao-itens.util';
 
 @Component({
   selector: 'app-cotacoes-cadastro',
@@ -56,8 +55,9 @@ export class CotacoesCadastroComponent implements OnInit {
     { descricao: '', quantidade: 1, unidade: '', precoUnitario: null }
   ];
 
-  operadores = ['Ana Silva', 'João Macuácua', 'Alberto Chissano', 'Mário Tembe'];
   tiposVeiculo = ['Camião Pesado (+16t)', 'Camião Médio (7.5-16t)', 'Camião Leve (até 7.5t)', 'Semi-Reboque'];
+
+  private readonly auth = inject(AuthService);
 
   // Notificação
   showNotification: boolean = false;
@@ -96,6 +96,7 @@ export class CotacoesCadastroComponent implements OnInit {
     // Modo manual: data = hoje e validade = +3 dias (os inputs serão bloqueados)
     this.cotacao.validade = this.calcularValidadeISO(this.cotacao.data);
     this.cotacao.observacoes = 'MANUAL';
+    this.cotacao.operador = this.nomeOperadorLogado();
 
     this.route.queryParams.subscribe((params) => {
       this.modoPdfOnly = params['pdfOnly'] === '1';
@@ -110,8 +111,15 @@ export class CotacoesCadastroComponent implements OnInit {
         this.carregarDadosPedido(Number(pedidoId));
       } else {
         this.statusBackendCarregado = null;
+        this.modoPortal = false;
+        this.cotacao.operador = this.nomeOperadorLogado();
       }
     });
+  }
+
+  /** Nome do utilizador com sessão iniciada (gravado como operador na cotação). */
+  private nomeOperadorLogado(): string {
+    return this.auth.currentUser()?.nome?.trim() || '';
   }
 
   get tituloPaginaCotacao(): string {
@@ -165,29 +173,6 @@ export class CotacoesCadastroComponent implements OnInit {
     };
   }
 
-  /**
-   * Quando o backend tem valor total mas as linhas vieram só com texto (sem preços), reparte o valor pelos itens.
-   */
-  private repartirValorTotalNosItensSeNecessario(cotacao: CotacaoResponse): void {
-    const valorRef = cotacao.valorTotal;
-    if (valorRef == null || valorRef <= 0 || !this.itens.length) return;
-
-    const somaLinhas = this.itens.reduce((acc, i) => acc + (i.precoUnitario ?? 0), 0);
-    if (somaLinhas > 0.01) return;
-
-    const recolha = cotacao.custoRecolha ?? 0;
-    const baseItens = Math.max(0, valorRef - recolha);
-    if (baseItens <= 0) return;
-
-    const n = this.itens.length;
-    const porLinha = Math.round((baseItens / n) * 100) / 100;
-    let resto = baseItens - porLinha * (n - 1);
-    this.itens = this.itens.map((it, idx) => ({
-      ...it,
-      precoUnitario: idx === n - 1 ? Math.round(resto * 100) / 100 : porLinha
-    }));
-  }
-
   carregarDadosPedido(pedidoId: number): void {
     const qp = this.route.snapshot.queryParamMap;
     this.modoPdfOnly = qp.get('pdfOnly') === '1';
@@ -233,7 +218,7 @@ export class CotacoesCadastroComponent implements OnInit {
         this.cotacao.custoRecolha = cotacao.custoRecolha ?? null;
         this.cotacao.custoTransporte = cotacao.custoTransporte ?? null;
         this.cotacao.custoBillOfEntry = cotacao.custoBillOfEntry ?? null;
-        this.cotacao.operador = cotacao.operador || '';
+        this.cotacao.operador = (cotacao.operador || '').trim() || this.nomeOperadorLogado();
 
         // Garantir coerência no preview quando o operador alterar desconto.
         this.recalcularCamposFinanceiros();
@@ -245,13 +230,13 @@ export class CotacoesCadastroComponent implements OnInit {
         
         // Preencher descrição da carga (mensagem do pedido) — parsear quantidades e unidades
         if (cotacao.descricaoCarga) {
-          this.itens = this.parseDescricaoCarga(cotacao.descricaoCarga);
+          this.itens = parseDescricaoCarga(cotacao.descricaoCarga);
           if (this.itens.length === 0) {
             this.itens = [{ descricao: cotacao.descricaoCarga, quantidade: 1, unidade: '', precoUnitario: null }];
           }
         }
 
-        this.repartirValorTotalNosItensSeNecessario(cotacao);
+        this.itens = repartirValorTotalNosItensSeNecessario(this.itens, cotacao);
         
         // Origem automática: PORTAL ou MANUAL
         const fonte = (cotacao.fontePedido || '').toUpperCase();
@@ -302,75 +287,6 @@ export class CotacoesCadastroComponent implements OnInit {
 
   adicionarItem(): void {
     this.itens.push({ descricao: '', quantidade: 1, unidade: '', precoUnitario: null });
-  }
-
-  /**
-   * Parseia o texto da descrição da carga e extrai quantidades e unidades.
-   * Reconhece: 500kg, 500 kilos, 100 toneladas, 3 toneldas (typo), kg porco (unidade primeiro), etc.
-   * Quando não reconhece, define quantidade 1 para permitir edição manual.
-   */
-  private parseDescricaoCarga(texto: string): ItemCotacao[] {
-    const itens: ItemCotacao[] = [];
-    // Suporte a separador por vírgula (formato antigo) e por nova linha (formato novo)
-    const linhas = texto.includes('\n')
-      ? texto.split(/\r?\n/)
-      : texto.split(/,(?![^\[]*\])/).map(s => s.trim()); // split por vírgula fora de [...]
-
-    const linhasFiltradas = linhas.map(l => l.trim()).filter(l => l.length > 0);
-
-    // Padrão 1: número + unidade + descrição (ex: 50 kg porco, 3 toneldas de ferramentas)
-    const numUnidadeRegex = /^([\d.,]+)\s*(kgs?|kilos?|quilos?|toneladas?|toneldas?|tonneladas?|t)\b\s*(?:de\s+)?(.*)$/i;
-    // Padrão 2: unidade + descrição sem número (ex: kg porco, toneladas feijao)
-    const unidadeDescricaoRegex = /^(kgs?|kilos?|quilos?|toneladas?|toneldas?|tonneladas?|t)\b\s+(.+)$/i;
-    // Padrão de preço embutido: [PRECO:12345.67]
-    const precoRegex = /\[PRECO:([\d.]+)\]/;
-
-    const normalizarUnidade = (raw: string): 'kg' | 'toneladas' | '' => {
-      const r = raw.toLowerCase();
-      if (/^(kg|kgs|kilo|kilos|quilo|quilos)$/.test(r)) return 'kg';
-      if (/^(tonelada|toneladas|toneldas?|tonneladas?|t)$/.test(r)) return 'toneladas';
-      return '';
-    };
-
-    const extrairPreco = (linha: string): { texto: string; preco: number | null } => {
-      const m = linha.match(precoRegex);
-      if (m) {
-        return { texto: linha.replace(precoRegex, '').trim(), preco: parseFloat(m[1]) };
-      }
-      return { texto: linha, preco: null };
-    };
-
-    for (const linha of linhasFiltradas) {
-      const { texto: linhaLimpa, preco } = extrairPreco(linha);
-      const limpa = linhaLimpa.replace(/^\s*\d+[.)]\s*/, '').trim();
-      const matchNum = limpa.match(numUnidadeRegex);
-      const matchUnidade = limpa.match(unidadeDescricaoRegex);
-
-      if (matchNum) {
-        const numStr = (matchNum[1] || '').replace(',', '.');
-        const quantidade = parseFloat(numStr) || 1;
-        const unidade = normalizarUnidade(matchNum[2] || '');
-        const descResto = (matchNum[3] || '').trim();
-        itens.push({
-          descricao: descResto || limpa,
-          quantidade: Math.round(quantidade) === quantidade ? quantidade : Math.round(quantidade * 100) / 100,
-          unidade,
-          precoUnitario: preco
-        });
-      } else if (matchUnidade) {
-        const unidade = normalizarUnidade(matchUnidade[1] || '');
-        const descResto = (matchUnidade[2] || '').trim();
-        itens.push({
-          descricao: descResto || limpa,
-          quantidade: 1,
-          unidade,
-          precoUnitario: preco
-        });
-      } else {
-        itens.push({ descricao: limpa || linhaLimpa, quantidade: 1, unidade: '', precoUnitario: preco });
-      }
-    }
-    return itens;
   }
 
   removerItem(i: number): void {

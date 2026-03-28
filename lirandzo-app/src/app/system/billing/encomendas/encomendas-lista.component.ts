@@ -35,8 +35,8 @@ export class EncomendasListaComponent implements OnInit {
   loading = true;
   error: string | null = null;
 
-  pageTitle = 'Facturas (encomendas)';
-  pageSubtitle = 'Gestão de encomendas, números de factura e estado de pagamento';
+  pageTitle = 'Recibo e lista de facturas';
+  pageSubtitle = 'Gestão de pagamentos, saldo em falta e todas as facturas (pagar / ver)';
   helpTitle = 'Como usar esta lista';
   helpItems: string[] = [
     'Use os filtros e a pesquisa para encontrar encomendas por nº, factura, cliente ou produto.',

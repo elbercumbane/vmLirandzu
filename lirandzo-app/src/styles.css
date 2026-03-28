@@ -33,6 +33,15 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Suavidade nas mudanças de rota (navegadores com View Transitions API + withViewTransitions no router) */
+@supports (view-transition-name: none) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 280ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
 /* Esconde a barra de scroll lateral na página Sobre */
 html:has(main.about-page),
 body:has(main.about-page) {

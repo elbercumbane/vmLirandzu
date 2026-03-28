@@ -19,7 +19,7 @@
         <line x1="16" y1="17" x2="8" y2="17"></line>
       </svg>
     </div>
-    <div class="kpi-label">{{ modoParaFacturar ? 'Na fila de facturação' : 'No pipeline' }}</div>
+    <div class="kpi-label">{{ modoParaFacturar ? 'Na fila de facturação' : 'Nesta vista' }}</div>
     <div class="kpi-value">{{ cotacoes.length }}</div>
     <div class="kpi-sub">{{ cotacoesFiltradas.length }} visível(is)</div>
   </div>
@@ -54,18 +54,97 @@
 </div>
 
 <div class="card">
-  <div class="toolbar">
-    <input type="text" class="search-input" [(ngModel)]="filtro" placeholder="Pesquisar por contacto, referência, destino, forma de envio...">
-    <div class="filter-chips">
-      <button type="button" class="filter-chip" [class.active]="filtroEstado === 'TODOS'" (click)="filtroEstado = 'TODOS'">Todos</button>
-      @if (!modoParaFacturar) {
-        <button type="button" class="filter-chip" [class.active]="filtroEstado === estados.propostaPronta" (click)="filtroEstado = estados.propostaPronta">Proposta pronta</button>
-      }
-      <button type="button" class="filter-chip" [class.active]="filtroEstado === estados.aceite" (click)="filtroEstado = estados.aceite">Aceite pelo contacto</button>
-      <button type="button" class="filter-chip" [class.active]="filtroEstado === estados.facturada" (click)="filtroEstado = estados.facturada">Facturadas</button>
-      @if (!modoParaFacturar) {
-        <button type="button" class="filter-chip" [class.active]="filtroEstado === estados.cancelada" (click)="filtroEstado = estados.cancelada">Anuladas</button>
-      }
+  <div class="ce-toolbar">
+    <div class="ce-toolbar__search" role="search">
+      <label class="ce-toolbar__label" for="ce-cotacoes-search">Pesquisa</label>
+      <div class="ce-search-shell">
+        <svg class="ce-search-shell__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </svg>
+        <input
+          id="ce-cotacoes-search"
+          type="search"
+          class="ce-search-shell__input"
+          [(ngModel)]="filtro"
+          (ngModelChange)="aoAlterarPesquisa()"
+          placeholder="Contacto, referência, destino, forma de envio…"
+          autocomplete="off"
+        >
+      </div>
+    </div>
+
+    <div class="ce-toolbar__filters">
+      <div class="ce-toolbar__filters-head">
+        <h3 class="ce-toolbar__filters-heading">Estado da cotação</h3>
+        @if (modoParaFacturar) {
+          <p class="ce-toolbar__filters-lead" id="ce-filtros-hint">
+            <strong>Use os filtros</strong> para alternar entre toda a fila, só as <strong>aceites pelo cliente</strong> ou já <strong>facturadas</strong>.
+            Com a pesquisa ao lado encontra rapidamente por contacto, referência ou destino.
+          </p>
+        } @else {
+          <p class="ce-toolbar__filters-lead" id="ce-filtros-hint">
+            <strong>Use os filtros</strong> abaixo para mostrar só o que precisa — propostas prontas, aceites, facturadas ou anuladas.
+            Em <strong>Todos</strong> vê todas as fases juntas; as propostas ainda por aceitar aparecem primeiro na lista.
+          </p>
+        }
+      </div>
+      <div
+        class="ce-segmented"
+        role="group"
+        aria-label="Filtro por estado da cotação"
+        aria-describedby="ce-filtros-hint"
+      >
+        <button
+          type="button"
+          class="ce-segment"
+          [class.ce-segment--active]="filtroEstado === 'TODOS'"
+          [attr.aria-pressed]="filtroEstado === 'TODOS'"
+          (click)="definirFiltroEstado('TODOS')"
+        >
+          Todos
+        </button>
+        @if (!modoParaFacturar) {
+          <button
+            type="button"
+            class="ce-segment"
+            [class.ce-segment--active]="filtroEstado === estados.propostaPronta"
+            [attr.aria-pressed]="filtroEstado === estados.propostaPronta"
+            (click)="definirFiltroEstado(estados.propostaPronta)"
+          >
+            Proposta pronta
+          </button>
+        }
+        <button
+          type="button"
+          class="ce-segment"
+          [class.ce-segment--active]="filtroEstado === estados.aceite"
+          [attr.aria-pressed]="filtroEstado === estados.aceite"
+          (click)="definirFiltroEstado(estados.aceite)"
+        >
+          Aceite pelo cliente
+        </button>
+        <button
+          type="button"
+          class="ce-segment"
+          [class.ce-segment--active]="filtroEstado === estados.facturada"
+          [attr.aria-pressed]="filtroEstado === estados.facturada"
+          (click)="definirFiltroEstado(estados.facturada)"
+        >
+          Facturadas
+        </button>
+        @if (!modoParaFacturar) {
+          <button
+            type="button"
+            class="ce-segment"
+            [class.ce-segment--active]="filtroEstado === estados.cancelada"
+            [attr.aria-pressed]="filtroEstado === estados.cancelada"
+            (click)="definirFiltroEstado(estados.cancelada)"
+          >
+            Anuladas
+          </button>
+        }
+      </div>
     </div>
   </div>
 
@@ -87,7 +166,16 @@
             <th>Contacto (pedido)</th>
             <th>Rota</th>
             <th>Carga</th>
-            <th>Entrada</th>
+            <th class="th-sort-entrada">
+              <span class="th-sort-label">Entrada</span>
+              <button type="button" class="sort-data-btn" (click)="alternarOrdenacaoEntrada()" [title]="ordenacaoData === 'desc' ? 'Dentro de cada estado: mais recentes primeiro — clique para inverter' : 'Dentro de cada estado: mais antigas primeiro — clique para inverter'">
+                @if (ordenacaoData === 'desc') {
+                  <span class="sort-data-icon" aria-hidden="true">↓</span><span class="visually-hidden">Ordem decrescente por data</span>
+                } @else {
+                  <span class="sort-data-icon" aria-hidden="true">↑</span><span class="visually-hidden">Ordem crescente por data</span>
+                }
+              </button>
+            </th>
             <th>Estado</th>
             <th>Ajuste</th>
             <th>Forma de Envio</th>
@@ -97,7 +185,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (c of cotacoesFiltradas; track c.id) {
+          @for (c of cotacoesPagina; track c.id) {
           <tr [attr.data-cotacao-id]="c.id" [class.cotacao-highlight]="c.id === highlightId">
             <td style="font-weight: 600; color: var(--accent)">{{ c.ref }}</td>
             <td>
@@ -123,8 +211,8 @@
             <td>{{ c.tempoResposta || '—' }}</td>
             <td>
               <div class="cotacao-acoes">
-                <button type="button" class="btn-secondary btn-sm" (click)="visualizarPdfNovaAba(c)" title="Abre a cotação num separador novo">
-                  Visualizar Cotação
+                <button type="button" class="btn-secondary btn-sm" (click)="abrirPrevisualizar(c)" title="Ver o documento da cotação aqui mesmo (pode baixar PDF)">
+                  Pré-visualizar
                 </button>
                 @if (!modoParaFacturar && c.estado === estados.propostaPronta) {
                   <a [routerLink]="['/billing/cotacoes/gerar', c.id]" class="btn-secondary btn-sm cotacao-acoes-link">Ajustar proposta</a>
@@ -155,8 +243,48 @@
         </tbody>
       </table>
     </div>
+
+    <div class="table-pagination" *ngIf="!loading && !error && cotacoesFiltradas.length > 0">
+      <div class="pagination-row">
+        <label class="pagination-label" for="linhas-pagina">Linhas por página</label>
+        <select
+          id="linhas-pagina"
+          class="pagination-select"
+          [(ngModel)]="linhasPorPaginaSelecionadas"
+          (ngModelChange)="aoAlterarLinhasPorPagina()"
+        >
+          @for (n of opcoesLinhasPorPagina; track n) {
+            <option [ngValue]="n">{{ n }}</option>
+          }
+        </select>
+        <span class="pagination-or">ou</span>
+        <label class="pagination-label" for="manual-linhas">valor manual (opcional)</label>
+        <input
+          id="manual-linhas"
+          type="number"
+          class="pagination-input-num"
+          min="1"
+          max="10000"
+          [(ngModel)]="manualLinhasPorPagina"
+          (blur)="aplicarManualLinhasPorPagina()"
+          placeholder="ex.: 75"
+          title="Se preencher com um número entre 1 e 10000, substitui a lista ao lado"
+        >
+        <button type="button" class="btn-sm ce-btn-aplicar" (click)="aplicarManualLinhasPorPagina()">Aplicar</button>
+      </div>
+      <div class="pagination-row pagination-nav">
+        <span class="pagination-range">{{ intervaloPaginaTexto }}</span>
+        <span class="pagination-pages">Página {{ paginaCorrenteSegura }} de {{ totalPaginas }}</span>
+        <button type="button" class="btn-secondary btn-sm" (click)="paginaAnterior()" [disabled]="paginaCorrenteSegura <= 1">Anterior</button>
+        <button type="button" class="btn-secondary btn-sm" (click)="paginaSeguinte()" [disabled]="paginaCorrenteSegura >= totalPaginas">Seguinte</button>
+      </div>
+    </div>
   }
 </div>
+
+@if (previewModalCotacaoId !== null) {
+  <app-cotacao-preview-modal [cotacaoId]="previewModalCotacaoId" (closed)="fecharPrevisualizar()" />
+}
 
 <app-notification-popup
   *ngIf="showNotification"

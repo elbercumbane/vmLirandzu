@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, inject, computed, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { filter } from 'rxjs';
 import { AuthService } from '../../../shared/services/auth.service';
 
 @Component({
@@ -24,8 +25,18 @@ export class BillingSidebarComponent implements OnInit, OnDestroy {
   expandedMenus: Record<string, boolean> = {};
   private tempoInterval?: ReturnType<typeof setInterval>;
 
+  /** Item 2: formulário — criar, ajustar ou só pré-visualizar (PDF). */
+  cotacaoFormSidebarLabel = 'Criar cotação';
+
+  /** Item 3: lista — nome alinhado à página actual (enviadas / negociação). */
+  cotacaoListaSidebarLabel = 'Cotações enviadas';
+
   ngOnInit(): void {
     this.tempoLogado = this.auth.getTempoLogado();
+    this.actualizarRotulosCotacoesMenu();
+    this.router.events.pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd)).subscribe(() => {
+      this.actualizarRotulosCotacoesMenu();
+    });
     // Expandir menu activo conforme rota
     const url = this.router.url;
     if (url.includes('/encomendas') || url.includes('/baixas') || url.includes('/tesouraria') || url.includes('/para-facturar')) {
@@ -61,6 +72,28 @@ export class BillingSidebarComponent implements OnInit, OnDestroy {
 
   isExpanded(menu: string): boolean {
     return !!this.expandedMenus[menu];
+  }
+
+  private actualizarRotulosCotacoesMenu(): void {
+    const full = this.router.url;
+    const [path, queryString] = full.split('?');
+    const qp = new URLSearchParams(queryString || '');
+    const pdfOnly = qp.get('pdfOnly') === '1';
+
+    if (path.includes('/cotacoes/enviadas')) {
+      this.cotacaoListaSidebarLabel = 'Em negociação & ajuste';
+    } else {
+      this.cotacaoListaSidebarLabel = 'Cotações enviadas';
+    }
+
+    const gerarComId = /\/cotacoes\/gerar\/\d+\/?$/.test(path);
+    if (gerarComId && pdfOnly) {
+      this.cotacaoFormSidebarLabel = 'Pré-visualizar cotação';
+    } else if (gerarComId) {
+      this.cotacaoFormSidebarLabel = 'Ajustar cotação';
+    } else {
+      this.cotacaoFormSidebarLabel = 'Criar cotação';
+    }
   }
 
   logout(): void {

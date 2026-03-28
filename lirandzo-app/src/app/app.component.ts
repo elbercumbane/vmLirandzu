@@ -22,16 +22,7 @@ export class AppComponent {
   private transloco = inject(TranslocoService);
 
   constructor() {
-    const savedLang = (typeof localStorage !== 'undefined' ? localStorage.getItem('app_lang') : null) as 'pt' | 'en' | null;
-    if (savedLang === 'pt' || savedLang === 'en') {
-      this.transloco.setActiveLang(savedLang);
-      if (typeof document !== 'undefined' && document.documentElement) {
-        document.documentElement.lang = savedLang;
-      }
-    }
-
     this.transloco.langChanges$.subscribe(lang => {
-      if (typeof localStorage !== 'undefined') localStorage.setItem('app_lang', lang);
       if (typeof document !== 'undefined' && document.documentElement) {
         document.documentElement.lang = lang;
       }
