@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { billingFinanceiroGuard } from './shared/guards/billing-financeiro.guard';
 import { configuracoesGuard } from './shared/guards/configuracoes.guard';
 import { facturaEditarGuard } from './shared/guards/factura-editar.guard';
 import { systemAuthGuard } from './shared/guards/system-auth.guard';
@@ -83,8 +84,22 @@ export const routes: Routes = [
       { path: 'manutencao', loadComponent: () => import('./system/billing/manutencao/manutencao-lista.component').then(m => m.ManutencaoListaComponent) },
       { path: 'manutencao/nova', loadComponent: () => import('./system/billing/manutencao/manutencao-cadastro.component').then(m => m.ManutencaoCadastroComponent) },
       { path: 'manutencao/:id/editar', loadComponent: () => import('./system/billing/manutencao/manutencao-editar.component').then(m => m.ManutencaoEditarComponent) },
-      { path: 'baixas', loadComponent: () => import('./system/billing/tesouraria/tesouraria.component').then(m => m.TesourariaComponent), data: { tesourariaModoBaixas: true } },
-      { path: 'tesouraria', loadComponent: () => import('./system/billing/tesouraria/tesouraria.component').then(m => m.TesourariaComponent) },
+      {
+        path: 'baixas',
+        loadComponent: () => import('./system/billing/tesouraria/tesouraria.component').then((m) => m.TesourariaComponent),
+        canActivate: [billingFinanceiroGuard],
+        data: {
+          tesourariaModoBaixas: true,
+          tesourariaSomenteBaixas: true,
+          tesourariaAbaInicial: 'BAIXAS'
+        }
+      },
+      {
+        path: 'tesouraria',
+        loadComponent: () => import('./system/billing/tesouraria/tesouraria.component').then((m) => m.TesourariaComponent),
+        canActivate: [billingFinanceiroGuard],
+        data: { tesourariaAbaInicial: 'RECIBOS' }
+      },
       { path: 'meu-perfil', loadComponent: () => import('./system/billing/meu-perfil/meu-perfil.component').then(m => m.MeuPerfilComponent) },
       { path: 'relatorios', loadComponent: () => import('./system/billing-reports/billing-reports.component').then(m => m.BillingReportsComponent) },
       { path: 'configuracoes', loadComponent: () => import('./system/billing-settings/billing-settings.component').then(m => m.BillingSettingsComponent), canActivate: [configuracoesGuard] },

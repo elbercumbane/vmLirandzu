@@ -29,12 +29,11 @@ export class EncomendasDetalheComponent implements OnInit {
     valor: null as number | null,
     dataPagamento: '',
     referencia: '',
-    metodoPagamento: '',
-    observacoes: '',
-    aguardaExtrato: false
+    metodoPagamento: 'Transferência Bancária',
+    observacoes: ''
   };
 
-  metodosPagamento = ['Transferência Bancária', 'M-Pesa', 'e-Mola', 'Depósito', 'Numerário', 'Cheque'];
+  metodosPagamento = ['Transferência Bancária'];
 
   showNotification = false;
   notificationMessage = '';
@@ -119,21 +118,44 @@ export class EncomendasDetalheComponent implements OnInit {
       .reduce((s, p) => s + (p.valor || 0), 0);
   }
 
+  /** Tecto para novo lançamento: total da factura menos todos os pagamentos não recusados. */
+  maxValorPermitidoNovoPagamento(): number {
+    if (!this.encomenda) return 0;
+    const total = this.encomenda.valorTotal ?? 0;
+    const ocupado = this.pagamentos
+      .filter((p) => p.verificationStatus !== 'REJECTED')
+      .reduce((s, p) => s + (p.valor || 0), 0);
+    return Math.max(0, Math.round((total - ocupado) * 100) / 100);
+  }
+
+  valorDigitadoExcedeMaximo(): boolean {
+    if (!this.encomenda) return false;
+    const v = this.novoPagamento.valor;
+    if (v == null || v <= 0) return false;
+    return v > this.maxValorPermitidoNovoPagamento() + 0.004;
+  }
+
   registarPagamento(): void {
     if (!this.encomendaId || !this.novoPagamento.valor || this.novoPagamento.valor <= 0) {
       this.mostrarNotificacao('Indique um valor válido.', 'error');
       return;
     }
+    if (!this.novoPagamento.referencia?.trim()) {
+      this.mostrarNotificacao('Indique a referência do extrato ou do movimento.', 'error');
+      return;
+    }
+    const max = this.maxValorPermitidoNovoPagamento();
+    if (this.novoPagamento.valor > max + 0.004) {
+      this.mostrarNotificacao(
+        `O valor não pode exceder ${max.toFixed(2)} MZN (soma dos lançamentos não pode ultrapassar o total da factura).`,
+        'error'
+      );
+      return;
+    }
 
     this.aGuardarPagamento = true;
-    let verificationStatus: VerificationStatusApi;
-    if (this.novoPagamento.aguardaExtrato) {
-      verificationStatus = 'PENDING_BANK';
-    } else if (this.auth.isAdmin || this.auth.isGestor) {
-      verificationStatus = 'CONFIRMED';
-    } else {
-      verificationStatus = 'PENDING_APPROVAL';
-    }
+    const verificationStatus: VerificationStatusApi =
+      this.auth.isAdmin || this.auth.isGestor ? 'CONFIRMED' : 'PENDING_APPROVAL';
 
     const payload = {
       encomenda: { numeroEncomenda: this.encomendaId },
@@ -152,19 +174,13 @@ export class EncomendasDetalheComponent implements OnInit {
           valor: null,
           dataPagamento: new Date().toISOString().split('T')[0],
           referencia: '',
-          metodoPagamento: '',
-          observacoes: '',
-          aguardaExtrato: false
+          metodoPagamento: 'Transferência Bancária',
+          observacoes: ''
         };
-        let msg = 'Pagamento registado.';
-        if (payload.verificationStatus === 'PENDING_BANK') {
-          msg = 'Pagamento registado. Confirme no extrato quando verificar o valor.';
-        } else if (payload.verificationStatus === 'PENDING_APPROVAL') {
-          msg =
-            'Pedido de pagamento enviado. Um gestor ou administrador deve aprovar antes de contabilizar na dívida.';
-        } else {
-          msg = 'Pagamento registado e contabilizado na dívida.';
-        }
+        const msg =
+          payload.verificationStatus === 'PENDING_APPROVAL'
+            ? 'Pedido de pagamento enviado. Um gestor ou administrador deve aprovar antes de contabilizar na dívida.'
+            : 'Pagamento registado e contabilizado na dívida.';
         this.mostrarNotificacao(msg, 'success');
         this.carregarTudo();
       },

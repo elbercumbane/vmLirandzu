@@ -1,6 +1,7 @@
 import { ApplicationConfig, provideZoneChangeDetection, isDevMode } from '@angular/core';
 import { provideRouter, withInMemoryScrolling, withViewTransitions } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { lirandzoRoleInterceptor } from './shared/interceptors/lirandzo-role.interceptor';
 import { provideTransloco } from '@ngneat/transloco';
 
 import { routes } from './app.routes';
@@ -17,7 +18,7 @@ export const appConfig: ApplicationConfig = {
       }),
       withViewTransitions()
     ),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([lirandzoRoleInterceptor])),
     provideTransloco({
       config: {
         availableLangs: ['pt', 'en'],

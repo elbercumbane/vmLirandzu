@@ -20,6 +20,7 @@ export class BillingSidebarComponent implements OnInit, OnDestroy {
   userProfile = this.auth.currentUser;
   roleLabel = computed(() => this.auth.roleLabel);
   get canAccessConfiguracoes(): boolean { return this.auth.canAccessConfiguracoes(); }
+  get canAccessBaixasERecibos(): boolean { return this.auth.canAccessBaixasERecibos(); }
   tempoLogado = '';
 
   expandedMenus: Record<string, boolean> = {};

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, HostListener, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -54,6 +54,9 @@ export class EncomendasPagamentosComponent implements OnInit {
 
   modalAberto = false;
   linhaModal: LinhaFactura | null = null;
+  /** Pagamentos da encomenda do modal — para calcular o tecto (inclui pendentes de aprovação). */
+  pagamentosEncomendaModal: PagamentoResponse[] = [];
+  carregandoPagamentosModal = false;
   aGuardarPagamento = false;
   confirmandoId: number | null = null;
   processandoAprovacaoId: number | null = null;
@@ -62,12 +65,11 @@ export class EncomendasPagamentosComponent implements OnInit {
     valor: null as number | null,
     dataPagamento: '',
     referencia: '',
-    metodoPagamento: '',
-    observacoes: '',
-    aguardaExtrato: false
+    metodoPagamento: 'Transferência Bancária',
+    observacoes: ''
   };
 
-  metodosPagamento = ['Transferência Bancária', 'M-Pesa', 'e-Mola', 'Depósito', 'Numerário', 'Cheque'];
+  metodosPagamento = ['Transferência Bancária'];
 
   showNotification = false;
   notificationMessage = '';
@@ -165,14 +167,42 @@ export class EncomendasPagamentosComponent implements OnInit {
   abrirModal(l: LinhaFactura): void {
     this.linhaModal = l;
     this.modalAberto = true;
+    this.pagamentosEncomendaModal = [];
+    this.carregandoPagamentosModal = true;
     this.novoPagamento = {
       valor: null,
       dataPagamento: new Date().toISOString().split('T')[0],
       referencia: '',
-      metodoPagamento: '',
-      observacoes: '',
-      aguardaExtrato: false
+      metodoPagamento: 'Transferência Bancária',
+      observacoes: ''
     };
+    this.pagamentoService.listarPorEncomenda(l.id).subscribe({
+      next: (lista) => {
+        this.pagamentosEncomendaModal = lista;
+        this.carregandoPagamentosModal = false;
+      },
+      error: () => {
+        this.pagamentosEncomendaModal = [];
+        this.carregandoPagamentosModal = false;
+      }
+    });
+  }
+
+  maxValorPermitidoModal(): number {
+    if (!this.linhaModal) return 0;
+    const total = this.linhaModal.total;
+    const ocupado = this.pagamentosEncomendaModal
+      .filter((p) => p.verificationStatus !== 'REJECTED')
+      .reduce((s, p) => s + (p.valor || 0), 0);
+    return Math.max(0, Math.round((total - ocupado) * 100) / 100);
+  }
+
+  /** Aviso imediato no formulário quando o operador ultrapassa o tecto. */
+  valorDigitadoExcedeMaximoModal(): boolean {
+    if (!this.linhaModal || this.carregandoPagamentosModal) return false;
+    const v = this.novoPagamento.valor;
+    if (v == null || v <= 0) return false;
+    return v > this.maxValorPermitidoModal() + 0.004;
   }
 
   fecharModal(): void {
@@ -181,20 +211,37 @@ export class EncomendasPagamentosComponent implements OnInit {
     this.aGuardarPagamento = false;
   }
 
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscapeFecharModal(event: KeyboardEvent): void {
+    if (!this.modalAberto) return;
+    event.preventDefault();
+    this.fecharModal();
+  }
+
   registarPagamento(): void {
+    if (this.carregandoPagamentosModal) {
+      this.toast('Aguarde a carregar os pagamentos desta factura.', 'error');
+      return;
+    }
     if (!this.linhaModal || !this.novoPagamento.valor || this.novoPagamento.valor <= 0) {
       this.toast('Indique um valor válido.', 'error');
       return;
     }
-
-    let verificationStatus: VerificationStatusApi;
-    if (this.novoPagamento.aguardaExtrato) {
-      verificationStatus = 'PENDING_BANK';
-    } else if (this.auth.isAdmin || this.auth.isGestor) {
-      verificationStatus = 'CONFIRMED';
-    } else {
-      verificationStatus = 'PENDING_APPROVAL';
+    if (!this.novoPagamento.referencia?.trim()) {
+      this.toast('Indique a referência do extrato ou do movimento.', 'error');
+      return;
     }
+    const max = this.maxValorPermitidoModal();
+    if (this.novoPagamento.valor > max + 0.004) {
+      this.toast(
+        `O valor não pode exceder ${max.toFixed(2)} MZN (soma dos lançamentos não pode ultrapassar o total da factura).`,
+        'error'
+      );
+      return;
+    }
+
+    const verificationStatus: VerificationStatusApi =
+      this.auth.isAdmin || this.auth.isGestor ? 'CONFIRMED' : 'PENDING_APPROVAL';
 
     this.aGuardarPagamento = true;
     const payload = {
@@ -210,15 +257,10 @@ export class EncomendasPagamentosComponent implements OnInit {
     this.pagamentoService.criar(payload).subscribe({
       next: () => {
         this.aGuardarPagamento = false;
-        let msg = 'Pagamento registado.';
-        if (payload.verificationStatus === 'PENDING_BANK') {
-          msg = 'Pagamento registado. Confirme no extrato quando verificar o valor.';
-        } else if (payload.verificationStatus === 'PENDING_APPROVAL') {
-          msg =
-            'Pedido enviado. Um gestor ou administrador deve aprovar antes de contabilizar na dívida.';
-        } else {
-          msg = 'Pagamento registado e contabilizado na dívida.';
-        }
+        const msg =
+          payload.verificationStatus === 'PENDING_APPROVAL'
+            ? 'Pedido enviado. Um gestor ou administrador deve aprovar antes de contabilizar na dívida.'
+            : 'Pagamento registado e contabilizado na dívida.';
         this.toast(msg, 'success');
         this.fecharModal();
         this.carregarTudo();

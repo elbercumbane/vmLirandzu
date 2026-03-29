@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -25,6 +26,17 @@ public class PagamentoService {
 
     @Autowired
     private ClienteRepository clienteRepository;
+
+    @Autowired
+    private ReciboService reciboService;
+
+    private static final double VALOR_EPSILON = 0.005;
+
+    private void emitirReciboSePagamentoConfirmado(Pagamento p) {
+        if (p != null && p.getId() != null && p.getVerificationStatus() == VerificationStatus.CONFIRMED) {
+            reciboService.gerarReciboSeNecessario(p.getId());
+        }
+    }
 
     public List<Pagamento> findAll() {
         return pagamentoRepository.findAllOrderedWithDetails();
@@ -43,6 +55,9 @@ public class PagamentoService {
         return pagamentoRepository.findById(id);
     }
 
+    /**
+     * Fluxo interno (ex.: {@link com.lirandzo.service.EncomendaService}) — confirma sem exigir referência de extrato.
+     */
     public Pagamento save(Pagamento pagamento) {
         if (pagamento.getEncomenda() == null || pagamento.getEncomenda().getNumeroEncomenda() == null) {
             throw new IllegalArgumentException("Encomenda é obrigatória");
@@ -54,9 +69,112 @@ public class PagamentoService {
         if (pagamento.getVerificationStatus() == null) {
             pagamento.setVerificationStatus(VerificationStatus.CONFIRMED);
         }
+        validarValorNaoExcedeTectoFactura(managed, num, pagamento.getValor(), null);
         Pagamento saved = pagamentoRepository.save(pagamento);
         recalcularValorPagoEncomenda(num);
+        emitirReciboSePagamentoConfirmado(saved);
         return saved;
+    }
+
+    /**
+     * Registo via API (portal de facturação): referência obrigatória, valor limitado ao que ainda cabe na factura,
+     * e estado conforme perfil (técnico → sempre aguarda aprovação; admin/gestor → confirmado ou pendente banco).
+     */
+    public Pagamento saveFromClientRequest(Pagamento pagamento, String roleHeader) {
+        if (pagamento.getEncomenda() == null || pagamento.getEncomenda().getNumeroEncomenda() == null) {
+            throw new IllegalArgumentException("Encomenda é obrigatória");
+        }
+        Long num = pagamento.getEncomenda().getNumeroEncomenda();
+        Encomenda managed = encomendaRepository.findById(num)
+                .orElseThrow(() -> new IllegalArgumentException("Encomenda não encontrada"));
+        pagamento.setEncomenda(managed);
+
+        if (pagamento.getValor() == null || pagamento.getValor() <= 0) {
+            throw new IllegalArgumentException("Indique um valor de pagamento válido.");
+        }
+
+        String ref = pagamento.getReferencia() != null ? pagamento.getReferencia().trim() : "";
+        if (ref.isEmpty()) {
+            throw new IllegalArgumentException("A referência do extrato (ou do movimento) é obrigatória.");
+        }
+        if (ref.length() > 100) {
+            throw new IllegalArgumentException("Referência demasiado longa (máx. 100 caracteres).");
+        }
+        pagamento.setReferencia(ref);
+
+        validarValorNaoExcedeTectoFactura(managed, num, pagamento.getValor(), null);
+
+        boolean gestorOuAdmin = isGestorOuAdmin(roleHeader);
+        VerificationStatus pedido = pagamento.getVerificationStatus();
+        VerificationStatus resolvido = resolverEstadoInicialCliente(pedido, gestorOuAdmin);
+        pagamento.setVerificationStatus(resolvido);
+
+        Pagamento saved = pagamentoRepository.save(pagamento);
+        recalcularValorPagoEncomenda(num);
+        emitirReciboSePagamentoConfirmado(saved);
+        return saved;
+    }
+
+    private static boolean isGestorOuAdmin(String roleHeader) {
+        if (roleHeader == null || roleHeader.isBlank()) {
+            return false;
+        }
+        String r = roleHeader.trim().toLowerCase(Locale.ROOT);
+        return "admin".equals(r) || "gestor".equals(r);
+    }
+
+    /**
+     * Técnico ou pedido sem cabeçalho de perfil: não confiar em CONFIRMED vindo do cliente.
+     */
+    private static VerificationStatus resolverEstadoInicialCliente(VerificationStatus pedido, boolean gestorOuAdmin) {
+        if (!gestorOuAdmin) {
+            return VerificationStatus.PENDING_APPROVAL;
+        }
+        if (pedido == VerificationStatus.PENDING_BANK) {
+            return VerificationStatus.PENDING_BANK;
+        }
+        if (pedido == VerificationStatus.PENDING_APPROVAL) {
+            return VerificationStatus.PENDING_APPROVAL;
+        }
+        if (pedido == VerificationStatus.REJECTED) {
+            throw new IllegalArgumentException("Estado inválido para um novo pagamento.");
+        }
+        return VerificationStatus.CONFIRMED;
+    }
+
+    /** Soma valores já lançados que ainda “ocupam” o tecto da factura (tudo excepto recusados). */
+    private double somaValoresNaoRecusados(Long numeroEncomenda) {
+        return pagamentoRepository.findByEncomendaNumeroEncomendaOrderByIdDesc(numeroEncomenda).stream()
+                .filter(p -> p.getVerificationStatus() != VerificationStatus.REJECTED)
+                .mapToDouble(p -> p.getValor() != null ? p.getValor() : 0.0)
+                .sum();
+    }
+
+    /**
+     * Garante que o novo valor (ou alteração) não faz ultrapassar o total da encomenda.
+     *
+     * @param excluirPagamentoId opcional — para validar na aprovação de um registo existente
+     */
+    private void validarValorNaoExcedeTectoFactura(Encomenda encomenda, Long numeroEncomenda, Double valor,
+                                                   Long excluirPagamentoId) {
+        if (valor == null || valor <= 0) {
+            throw new IllegalArgumentException("Indique um valor de pagamento válido.");
+        }
+        double totalFactura = encomenda.getValorTotal() != null ? encomenda.getValorTotal() : 0.0;
+        double ocupado = somaValoresNaoRecusados(numeroEncomenda);
+        if (excluirPagamentoId != null) {
+            ocupado -= pagamentoRepository.findById(excluirPagamentoId)
+                    .filter(p -> p.getVerificationStatus() != VerificationStatus.REJECTED)
+                    .map(p -> p.getValor() != null ? p.getValor() : 0.0)
+                    .orElse(0.0);
+        }
+        double restante = totalFactura - ocupado;
+        if (valor > restante + VALOR_EPSILON) {
+            throw new IllegalArgumentException(
+                    "O valor excede o que ainda pode ser registado nesta factura (restante: "
+                            + String.format(Locale.ROOT, "%.2f", Math.max(0, restante))
+                            + " MZN).");
+        }
     }
 
     public Optional<Pagamento> update(Long id, Pagamento atualizado) {
@@ -94,9 +212,14 @@ public class PagamentoService {
                     if (pagamento.getVerificationStatus() != VerificationStatus.PENDING_BANK) {
                         throw new IllegalStateException("Apenas pagamentos pendentes de banco podem ser confirmados.");
                     }
+                    Long num = pagamento.getEncomenda().getNumeroEncomenda();
+                    Encomenda enc = encomendaRepository.findById(num)
+                            .orElseThrow(() -> new IllegalStateException("Encomenda não encontrada."));
+                    assertSomaPagamentosNaoExcedeFactura(enc, num);
                     pagamento.setVerificationStatus(VerificationStatus.CONFIRMED);
                     Pagamento saved = pagamentoRepository.save(pagamento);
                     recalcularValorPagoEncomenda(saved.getEncomenda().getNumeroEncomenda());
+                    emitirReciboSePagamentoConfirmado(saved);
                     return saved;
                 });
     }
@@ -107,11 +230,25 @@ public class PagamentoService {
                     if (pagamento.getVerificationStatus() != VerificationStatus.PENDING_APPROVAL) {
                         throw new IllegalStateException("Apenas pagamentos em aguardo de aprovação podem ser aprovados.");
                     }
+                    Long num = pagamento.getEncomenda().getNumeroEncomenda();
+                    Encomenda enc = encomendaRepository.findById(num)
+                            .orElseThrow(() -> new IllegalStateException("Encomenda não encontrada."));
+                    assertSomaPagamentosNaoExcedeFactura(enc, num);
                     pagamento.setVerificationStatus(VerificationStatus.CONFIRMED);
                     Pagamento saved = pagamentoRepository.save(pagamento);
                     recalcularValorPagoEncomenda(saved.getEncomenda().getNumeroEncomenda());
+                    emitirReciboSePagamentoConfirmado(saved);
                     return saved;
                 });
+    }
+
+    private void assertSomaPagamentosNaoExcedeFactura(Encomenda enc, Long numeroEncomenda) {
+        double totalFactura = enc.getValorTotal() != null ? enc.getValorTotal() : 0.0;
+        double ocupado = somaValoresNaoRecusados(numeroEncomenda);
+        if (ocupado > totalFactura + VALOR_EPSILON) {
+            throw new IllegalStateException(
+                    "A soma dos pagamentos excede o total da factura; corrija valores ou a factura antes de confirmar.");
+        }
     }
 
     public Optional<Pagamento> recusarPagamentoGestor(Long id, String motivo) {

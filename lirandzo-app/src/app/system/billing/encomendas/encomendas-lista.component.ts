@@ -42,7 +42,7 @@ export class EncomendasListaComponent implements OnInit {
   helpItems: string[] = [
     'Use os filtros e a pesquisa para encontrar encomendas por nº, factura, cliente ou produto.',
     'O estado reflecte o total pago face ao total da factura: pago integral, parcial ou em falta.',
-    'Para emitir a partir de uma cotação aceite, use Facturas → Facturação no menu.',
+    'Para emitir a partir de uma cotação aceite, use Facturas → Facturas pendentes no menu.',
     'Para registar pagamentos (vários por factura), use Facturas → Registar pagamentos. O histórico cotação→pagamento abre em «Histórico» na coluna Acções.'
   ];
 

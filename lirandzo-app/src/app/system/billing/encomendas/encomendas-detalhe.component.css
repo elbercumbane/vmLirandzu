@@ -307,3 +307,19 @@
   flex-wrap: wrap;
   gap: 0.35rem;
 }
+
+.pagamento-campo-alerta {
+  margin: 0.5rem 0 0;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #991b1b;
+  background: rgba(254, 226, 226, 0.95);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  border-radius: 8px;
+}
+
+.pagamento-input-invalido {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.25);
+}

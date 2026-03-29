@@ -43,9 +43,11 @@ public class PagamentoController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createPagamento(@Valid @RequestBody Pagamento pagamento) {
+    public ResponseEntity<?> createPagamento(
+            @Valid @RequestBody Pagamento pagamento,
+            @RequestHeader(value = "X-Lirandzo-Role", required = false) String roleHeader) {
         try {
-            Pagamento saved = pagamentoService.save(pagamento);
+            Pagamento saved = pagamentoService.saveFromClientRequest(pagamento, roleHeader);
             return ResponseEntity.status(HttpStatus.CREATED).body(saved);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

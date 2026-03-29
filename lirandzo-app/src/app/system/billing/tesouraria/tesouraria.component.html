@@ -38,6 +38,7 @@
   </div>
 } @else {
 
+@if (!somenteBaixasPagina) {
 <div class="kpi-grid">
   <div class="kpi-card">
     <div class="kpi-top-line" style="background: var(--success)"></div>
@@ -49,11 +50,20 @@
     <div class="kpi-sub">contabilizado na dívida</div>
   </div>
   <div class="kpi-card">
+    <div class="kpi-top-line" style="background: #3b82f6"></div>
+    <div class="kpi-icon" style="color: #3b82f6">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    </div>
+    <div class="kpi-label">Recibos emitidos</div>
+    <div class="kpi-value" style="color: #2563eb">{{ recibos.length }} <small>doc.</small></div>
+    <div class="kpi-sub">automáticos ao confirmar</div>
+  </div>
+  <div class="kpi-card">
     <div class="kpi-top-line" style="background: #f59e0b"></div>
     <div class="kpi-icon" style="color: #f59e0b">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
     </div>
-    <div class="kpi-label">Aguarda extrato</div>
+    <div class="kpi-label">Pendente extrato</div>
     <div class="kpi-value" style="color: #d97706">{{ totalPendenteConciliacao | number }} <small>MZN</small></div>
     <div class="kpi-sub">{{ pendentesConciliacao.length }} movimento(s)</div>
   </div>
@@ -85,106 +95,173 @@
     <div class="kpi-sub">a cobrar</div>
   </div>
 </div>
+}
 
 <div class="card">
   <div class="toolbar tesouraria-tabs">
-    <button type="button" class="filter-chip" [class.active]="activeTab === 'RECEBIMENTOS'" (click)="activeTab = 'RECEBIMENTOS'">Recebimentos</button>
-    <button type="button" class="filter-chip" [class.badge-warning]="activeTab === 'CONCILIACAO'" [class.active]="activeTab === 'CONCILIACAO'" (click)="activeTab = 'CONCILIACAO'">
-      Conciliação @if (pendentesConciliacao.length) { <span class="badge badge-warning" style="margin-left: 0.35rem;">{{ pendentesConciliacao.length }}</span> }
+    @if (somenteBaixasPagina) {
+      <span class="text-muted" style="font-size:0.9rem;">Conciliação com o extrato</span>
+      <span class="spacer"></span>
+      <a routerLink="/billing/tesouraria" class="btn-secondary">Ver tesouraria completa</a>
+      <a routerLink="/billing/encomendas/pagamentos" class="btn-primary">Registar pagamentos</a>
+    } @else {
+    <button type="button" class="filter-chip" [class.active]="activeTab === 'RECIBOS'" (click)="activeTab = 'RECIBOS'">Recibos</button>
+    <button type="button" class="filter-chip" [class.badge-warning]="activeTab === 'BAIXAS'" [class.active]="activeTab === 'BAIXAS'" (click)="activeTab = 'BAIXAS'">
+      Baixas (conciliação) @if (pendentesConciliacao.length) { <span class="badge badge-warning" style="margin-left: 0.35rem;">{{ pendentesConciliacao.length }}</span> }
     </button>
+    <button type="button" class="filter-chip" [class.active]="activeTab === 'RECEBIMENTOS'" (click)="activeTab = 'RECEBIMENTOS'">Movimentos</button>
     <button type="button" class="filter-chip" [class.active]="activeTab === 'DESPESAS'" (click)="activeTab = 'DESPESAS'">Despesas</button>
     <button type="button" class="filter-chip" [class.active]="activeTab === 'DIVIDAS'" (click)="activeTab = 'DIVIDAS'">Dívidas</button>
     <span class="spacer"></span>
-    <a routerLink="/billing/encomendas" class="btn-primary">Abrir encomendas</a>
-    @if (activeTab === 'DESPESAS') {
-      <button type="button" class="btn-secondary" (click)="mostrarFormDespesa = !mostrarFormDespesa">Registo local</button>
+    <a routerLink="/billing/encomendas/pagamentos" class="btn-primary">Registar pagamentos</a>
     }
   </div>
 
-  @if (activeTab === 'RECEBIMENTOS') {
-    <p class="text-muted" style="padding:0 0 1rem;margin:0;font-size:0.9rem;">
-      Lista de todos os pagamentos lançados nas encomendas. Para novo lançamento, abra a <a routerLink="/billing/encomendas">encomenda</a> e use a secção «Pagamentos».
-    </p>
-    <div class="table-wrapper">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Cliente</th>
-            <th>Factura</th>
-            <th>Ref.</th>
-            <th>Valor</th>
-            <th>Método</th>
-            <th>Encomenda</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (r of recebimentos; track r.id) {
+  @if (activeTab === 'RECIBOS') {
+    <div class="panel-tesouraria panel-tesouraria--recibos">
+      <h3 class="panel-tesouraria-title">Recibos emitidos</h3>
+      <p class="text-muted panel-tesouraria-lead">
+        Cada <strong>pagamento confirmado</strong> na factura gera um recibo numerado. Pode imprimir o recibo ou o extrato do período.
+      </p>
+      <div class="extrato-toolbar">
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Extrato — de</label>
+          <input type="date" class="form-control" [(ngModel)]="extratoDataInicio" name="extIni" />
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">até</label>
+          <input type="date" class="form-control" [(ngModel)]="extratoDataFim" name="extFim" />
+        </div>
+        <button type="button" class="btn-secondary" (click)="imprimirExtratoRecibos()">Extrato do período (imprimir)</button>
+      </div>
+      <div class="table-wrapper" style="margin-top:1rem;">
+        <table class="data-table">
+          <thead>
             <tr>
-              <td>{{ r.data }}</td>
-              <td>{{ r.cliente }}</td>
-              <td style="font-weight:600;color:var(--accent)">{{ r.factura }}</td>
-              <td style="font-family:monospace;font-size:0.8rem;">{{ r.referencia }}</td>
-              <td>{{ r.valor | number }} MZN</td>
-              <td>{{ r.metodo }}</td>
-              <td>{{ r.encomendaLabel }}</td>
-              <td>{{ r.estado }}</td>
+              <th>Recibo</th>
+              <th>Emitido</th>
+              <th>Cliente</th>
+              <th>Factura</th>
+              <th>Valor</th>
+              <th>Meio</th>
+              <th>Acção</th>
             </tr>
-          } @empty {
-            <tr><td colspan="8" class="empty-state">Nenhum pagamento na base.</td></tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (r of recibos; track r.id) {
+              <tr>
+                <td style="font-weight:600;font-family:monospace;font-size:0.9rem;">{{ r.numeroPublico }}</td>
+                <td>{{ formatarDataRecibo(r.dataEmissao) }}</td>
+                <td>{{ r.clienteNome || '—' }}</td>
+                <td style="font-weight:600;color:var(--accent)">{{ r.numeroFactura || '—' }}</td>
+                <td>{{ r.valor | number:'1.2-2' }} MZN</td>
+                <td>{{ r.metodoPagamento || '—' }}</td>
+                <td>
+                  <button type="button" class="btn-primary btn-sm" (click)="imprimirRecibo(r)">Imprimir recibo</button>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="7" class="empty-state">Ainda não há recibos. Confirme um pagamento na factura para gerar o primeiro.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </div>
   }
 
-  @if (activeTab === 'CONCILIACAO') {
-    <p class="text-muted" style="padding:0 0 1rem;margin:0;font-size:0.9rem;">
-      Estes valores foram registados com «aguarda extrato». Quando cruzar com o extrato ou M-Pesa, <strong>só Administrador ou Gestor</strong> confirma para atualizar a dívida do cliente.
-    </p>
-    @if (!podeConfirmarConciliacao) {
-      <p class="fluxo-perfil-aviso">O seu perfil pode ver esta fila, mas não confirmar conciliação. Peça a um administrador ou gestor.</p>
-    }
-    <div class="table-wrapper">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Cliente</th>
-            <th>Factura</th>
-            <th>Ref.</th>
-            <th>Valor</th>
-            <th>Método</th>
-            <th>Encomenda</th>
-            <th>Acção</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (p of pendentesConciliacao; track p.id) {
+  @if (activeTab === 'BAIXAS') {
+    <div class="panel-tesouraria panel-tesouraria--baixas">
+      <h3 class="panel-tesouraria-title">Baixas — conciliação com o extrato</h3>
+      <p class="text-muted panel-tesouraria-lead">
+        Confirme aqui que o dinheiro <strong>entrou na conta</strong> (movimentos antigos «aguarda extrato»). Isto é diferente do recibo: é a validação bancária antes de contabilizar.
+      </p>
+      <p class="text-muted" style="padding:0 0 1rem;margin:0;font-size:0.9rem;">
+        <strong>Só Administrador ou Gestor</strong> pode confirmar. Novos pagamentos devem ser registados em Facturas → Registar pagamentos.
+      </p>
+      @if (!podeConfirmarConciliacao) {
+        <p class="fluxo-perfil-aviso">O seu perfil pode ver esta fila, mas não confirmar conciliação. Peça a um administrador ou gestor.</p>
+      }
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
             <tr>
-              <td>{{ p.dataPagamento ? (p.dataPagamento | date:'dd/MM/yyyy') : '—' }}</td>
-              <td>{{ p.encomenda?.cliente?.nome || '—' }}</td>
-              <td>{{ p.encomenda?.invoiceNumber || '—' }}</td>
-              <td style="font-family:monospace;font-size:0.8rem;">{{ p.referencia || '—' }}</td>
-              <td>{{ p.valor | number }} MZN</td>
-              <td>{{ p.metodoPagamento || '—' }}</td>
-              <td>
-                @if (p.encomenda?.numeroEncomenda) {
-                  <a [routerLink]="['/billing/encomendas', p.encomenda!.numeroEncomenda]">{{ formatarEnc(p.encomenda!.numeroEncomenda) }}</a>
-                } @else { — }
-              </td>
-              <td>
-                <button type="button" class="btn-primary btn-sm" [disabled]="confirmandoId === p.id || !podeConfirmarConciliacao" (click)="confirmarPagamento(p)" [title]="!podeConfirmarConciliacao ? 'Apenas Admin ou Gestor' : ''">
-                  {{ confirmandoId === p.id ? '…' : 'Confirmar' }}
-                </button>
-              </td>
+              <th>Data</th>
+              <th>Cliente</th>
+              <th>Factura</th>
+              <th>Ref.</th>
+              <th>Valor</th>
+              <th>Método</th>
+              <th>Encomenda</th>
+              <th>Acção</th>
             </tr>
-          } @empty {
-            <tr><td colspan="8" class="empty-state">Nenhum pagamento aguarda conciliação.</td></tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (p of pendentesConciliacao; track p.id) {
+              <tr>
+                <td>{{ p.dataPagamento ? (p.dataPagamento | date:'dd/MM/yyyy') : '—' }}</td>
+                <td>{{ p.encomenda?.cliente?.nome || '—' }}</td>
+                <td>{{ p.encomenda?.invoiceNumber || '—' }}</td>
+                <td style="font-family:monospace;font-size:0.8rem;">{{ p.referencia || '—' }}</td>
+                <td>{{ p.valor | number }} MZN</td>
+                <td>{{ p.metodoPagamento || '—' }}</td>
+                <td>
+                  @if (p.encomenda?.numeroEncomenda) {
+                    <a [routerLink]="['/billing/encomendas', p.encomenda!.numeroEncomenda]">{{ formatarEnc(p.encomenda!.numeroEncomenda) }}</a>
+                  } @else { — }
+                </td>
+                <td>
+                  <button type="button" class="btn-primary btn-sm" [disabled]="confirmandoId === p.id || !podeConfirmarConciliacao" (click)="confirmarPagamento(p)" [title]="!podeConfirmarConciliacao ? 'Apenas Admin ou Gestor' : ''">
+                    {{ confirmandoId === p.id ? '…' : 'Confirmar no extrato' }}
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="8" class="empty-state">Nenhum pagamento aguarda conciliação.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  @if (activeTab === 'RECEBIMENTOS') {
+    <div class="panel-tesouraria panel-tesouraria--movimentos">
+      <h3 class="panel-tesouraria-title">Todos os movimentos de pagamento</h3>
+      <p class="text-muted panel-tesouraria-lead">
+        Lista completa das linhas lançadas nas encomendas. Para novo lançamento use <a routerLink="/billing/encomendas/pagamentos">Registar pagamentos</a> ou a ficha da encomenda.
+      </p>
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Cliente</th>
+              <th>Factura</th>
+              <th>Ref.</th>
+              <th>Valor</th>
+              <th>Método</th>
+              <th>Encomenda</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of recebimentos; track r.id) {
+              <tr>
+                <td>{{ r.data }}</td>
+                <td>{{ r.cliente }}</td>
+                <td style="font-weight:600;color:var(--accent)">{{ r.factura }}</td>
+                <td style="font-family:monospace;font-size:0.8rem;">{{ r.referencia }}</td>
+                <td>{{ r.valor | number }} MZN</td>
+                <td>{{ r.metodo }}</td>
+                <td>{{ r.encomendaLabel }}</td>
+                <td>{{ r.estado }}</td>
+              </tr>
+            } @empty {
+              <tr><td colspan="8" class="empty-state">Nenhum pagamento na base.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </div>
   }
 
@@ -198,6 +275,9 @@
         </div>
       </div>
     }
+    <div class="toolbar" style="margin-bottom:1rem;">
+      <button type="button" class="btn-secondary" (click)="mostrarFormDespesa = !mostrarFormDespesa">Registo local</button>
+    </div>
     <div class="table-wrapper">
       <table class="data-table">
         <thead>

@@ -76,6 +76,11 @@ export class AuthService {
   /** Editar dados da factura/encomenda (não confundir com registar pagamento). */
   canEditFacturas(): boolean { return this.isAdmin || this.isGestor; }
 
+  /** Baixas, aprovação de pagamentos de técnicos, recibos e tesouraria — técnico não acede. */
+  canAccessBaixasERecibos(): boolean {
+    return this.isAdmin || this.isGestor;
+  }
+
   constructor() {
     this.restoreFromStorage();
   }

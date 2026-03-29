@@ -136,7 +136,7 @@
           <div class="detail-item" style="margin-top:0.75rem;padding:0.75rem;background:rgba(245,158,11,0.12);border-radius:8px;">
             <span class="detail-label">Pendente confirmação (extrato):</span>
             <span class="detail-value" style="color:var(--warning, #d97706);font-weight:600">{{ valorPendenteExtrato | number:'1.2-2' }} MZN</span>
-            <p style="margin:0.35rem 0 0;font-size:0.8rem;color:var(--text-muted);">Valor registado mas ainda não confirmado no banco / M-Pesa. Confirme na lista abaixo após verificar.</p>
+            <p style="margin:0.35rem 0 0;font-size:0.8rem;color:var(--text-muted);">Valor registado (histórico) ainda não confirmado no extrato. Confirme na lista abaixo após verificar.</p>
           </div>
         }
         @if (valorPendenteAprovacao > 0) {
@@ -154,8 +154,8 @@
         <div>
           <h3 style="margin:0;">Pagamentos</h3>
           <p class="text-muted" style="margin:0.25rem 0 0;font-size:0.85rem;">
-            Use referência do SMS ou extrato para cruzar. Só pagamentos <strong>confirmados</strong> reduzem a dívida.
-            Técnicos: o registo fica <strong>aguarda aprovação</strong> até gestor/admin confirmar (excepto «aguarda extrato»).
+            Use a referência do extrato da transferência para cruzar. Só pagamentos <strong>confirmados</strong> reduzem a dívida.
+            Técnicos: o registo fica <strong>aguarda aprovação</strong> até gestor ou administrador aprovar.
           </p>
         </div>
       </div>
@@ -167,7 +167,7 @@
               <th>Data</th>
               <th>Valor</th>
               <th>Método</th>
-              <th>Ref. banco / M-Pesa</th>
+              <th>Ref. extrato</th>
               <th>Estado</th>
               <th style="min-width:200px;">Acção</th>
             </tr>
@@ -181,10 +181,12 @@
                 <td style="font-family:monospace;font-size:0.85rem;">{{ p.referencia || '—' }}</td>
                 <td><span class="badge" [ngClass]="badgeVerificacao(p.verificationStatus)">{{ labelVerificacao(p.verificationStatus) }}</span></td>
                 <td>
-                  @if (p.verificationStatus === 'PENDING_BANK') {
+                  @if (p.verificationStatus === 'PENDING_BANK' && podeAprovarPagamentos) {
                     <button type="button" class="btn-primary btn-sm" [disabled]="confirmandoId === p.id" (click)="confirmarNoExtrato(p)">
                       {{ confirmandoId === p.id ? '…' : 'Confirmar no extrato' }}
                     </button>
+                  } @else if (p.verificationStatus === 'PENDING_BANK') {
+                    <span class="text-muted" style="font-size:0.8rem;">Aguarda gestor/admin (extrato)</span>
                   } @else if (p.verificationStatus === 'PENDING_APPROVAL' && podeAprovarPagamentos) {
                     <div class="pagamento-acoes-gestor">
                       <button type="button" class="btn-primary btn-sm" [disabled]="processandoAprovacaoId === p.id" (click)="aprovarPagamentoGestor(p)">
@@ -217,7 +219,23 @@
         <div class="form-grid">
           <div class="form-group">
             <label class="form-label">Valor (MZN) *</label>
-            <input type="number" class="form-control" [(ngModel)]="novoPagamento.valor" name="valorPag" min="0.01" step="0.01" />
+            <input
+              type="number"
+              class="form-control"
+              [class.pagamento-input-invalido]="valorDigitadoExcedeMaximo()"
+              [(ngModel)]="novoPagamento.valor"
+              name="valorPag"
+              min="0.01"
+              [max]="maxValorPermitidoNovoPagamento() || null"
+              step="0.01"
+            />
+            <p class="text-muted" style="margin:0.35rem 0 0;font-size:0.8rem;">Máximo a registar: <strong>{{ maxValorPermitidoNovoPagamento() | number:'1.2-2' }} MZN</strong> (total da factura menos lançamentos não recusados).</p>
+            @if (valorDigitadoExcedeMaximo()) {
+              <p class="pagamento-campo-alerta" role="alert">
+                O valor <strong>{{ novoPagamento.valor | number:'1.2-2' }} MZN</strong> ultrapassa o máximo permitido
+                (<strong>{{ maxValorPermitidoNovoPagamento() | number:'1.2-2' }} MZN</strong>). Reduza o valor ou verifique os lançamentos já registados.
+              </p>
+            }
           </div>
           <div class="form-group">
             <label class="form-label">Data</label>
@@ -226,27 +244,41 @@
           <div class="form-group">
             <label class="form-label">Método</label>
             <select class="form-control" [(ngModel)]="novoPagamento.metodoPagamento" name="metodoPag">
-              <option value="">—</option>
               @for (m of metodosPagamento; track m) {
                 <option [value]="m">{{ m }}</option>
               }
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">Ref. extrato / M-Pesa</label>
-            <input type="text" class="form-control" [(ngModel)]="novoPagamento.referencia" name="refPag" placeholder="Ex.: ID da transação" />
+            <label class="form-label">Ref. do extrato *</label>
+            <input
+              type="text"
+              class="form-control"
+              [class.pagamento-input-invalido]="novoPagamento.valor != null && novoPagamento.valor > 0 && !novoPagamento.referencia?.trim()"
+              [(ngModel)]="novoPagamento.referencia"
+              name="refPag"
+              placeholder="Referência no extrato ou do movimento"
+            />
+            @if (novoPagamento.valor != null && novoPagamento.valor > 0 && !novoPagamento.referencia?.trim()) {
+              <p class="pagamento-campo-alerta" role="alert">A referência do extrato ou do movimento é obrigatória.</p>
+            }
           </div>
           <div class="form-group full-width">
             <label class="form-label">Observações</label>
             <input type="text" class="form-control" [(ngModel)]="novoPagamento.observacoes" name="obsPag" />
           </div>
-          <div class="form-group full-width" style="display:flex;align-items:center;gap:0.5rem;">
-            <input type="checkbox" id="aguardaExtrato" [(ngModel)]="novoPagamento.aguardaExtrato" name="aguardaExtrato" />
-            <label for="aguardaExtrato" style="margin:0;font-weight:normal;">Ainda não confirmei no extrato / app — só registar (não contabiliza na dívida até confirmar)</label>
-          </div>
         </div>
         <div class="form-actions">
-          <button type="button" class="btn-primary" [disabled]="aGuardarPagamento" (click)="registarPagamento()">
+          <button
+            type="button"
+            class="btn-primary"
+            [disabled]="
+              aGuardarPagamento ||
+              valorDigitadoExcedeMaximo() ||
+              (novoPagamento.valor != null && novoPagamento.valor > 0 && !novoPagamento.referencia?.trim())
+            "
+            (click)="registarPagamento()"
+          >
             {{ aGuardarPagamento ? 'A guardar…' : 'Registar pagamento' }}
           </button>
         </div>
@@ -501,5 +533,5 @@
   *ngIf="showNotification"
   [message]="notificationMessage"
   [type]="notificationType"
-  [duration]="6000">
+  [duration]="16000">
 </app-notification-popup>

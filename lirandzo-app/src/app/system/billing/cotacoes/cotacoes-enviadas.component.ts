@@ -58,7 +58,7 @@ export class CotacoesEnviadasComponent implements OnInit {
   helpItems: string[] = [
     'Quem pede cotação é um contacto — só passa a «cliente» no sentido de facturação quando existe documento (encomenda/factura).',
     '«Proposta pronta»: ainda pode ajustar valores no ecrã de gerar cotação antes de o contacto aceitar.',
-    '«Registar aceitação»: use quando o contacto confirmou a proposta (telefone, WhatsApp, e-mail). Depois vá a Facturação → Cotações para facturar.',
+    '«Registar aceitação»: use quando o contacto confirmou a proposta (telefone, WhatsApp, e-mail). Depois vá a Facturas → Facturas pendentes para emitir o documento.',
     'Com «Todos», a tabela ordena por estado: propostas prontas no topo; aceites e facturadas vão abaixo (dentro de cada grupo, use a seta em «Entrada» para a data).',
     'No rodapé: primeira/última página, anterior/seguinte, indicador numérico (página / total) e linhas por página.',
     'As cotações expiram automaticamente após a validade definida no sistema.'
@@ -119,9 +119,9 @@ export class CotacoesEnviadasComponent implements OnInit {
 
   private aplicarTextosCabecalho(): void {
     if (this.modoParaFacturar) {
-      this.pageTitle = 'Facturação';
+      this.pageTitle = 'Facturas pendentes';
       this.pageSubtitle = 'Fila de cotações aceites pelo cliente — ainda sem factura. Use «Emitir factura» em cada linha.';
-      this.helpTitle = 'Fila de facturação';
+      this.helpTitle = 'Guia — facturas pendentes';
       this.helpItems = [
         'Só entram aqui cotações com aceitação registada e que ainda não foram facturadas (desaparecem da lista após emitir).',
         'Se precisar de ajustar preços, vá a Cotações → Negociação e ajuste, «Ajustar proposta», e registe de novo a aceitação se necessário.',
@@ -135,7 +135,7 @@ export class CotacoesEnviadasComponent implements OnInit {
       this.helpItems = [
         'Quem pede cotação é um contacto — só passa a «cliente» no sentido de facturação quando existe documento (encomenda/factura).',
         '«Proposta pronta»: ainda pode ajustar valores no ecrã de gerar cotação antes de o contacto aceitar.',
-        '«Registar aceitação»: use quando o contacto confirmou a proposta. A factura emite-se em Facturas → Facturação.',
+        '«Registar aceitação»: use quando o contacto confirmou a proposta. A factura emite-se em Facturas → Facturas pendentes.',
         'Com «Todos», propostas prontas aparecem primeiro; aceites e facturadas listam-se abaixo. Paginação no rodapé com números e primeira/última página.',
         'As cotações expiram automaticamente após a validade definida no sistema.'
       ];
@@ -444,7 +444,7 @@ export class CotacoesEnviadasComponent implements OnInit {
             this.filtroEstado = 'TODOS';
             this.carregarCotacoes();
             this.mostrarNotificacao(
-              'Aceitação pelo cliente registada. Pode emitir a factura em Facturas → Facturação.',
+              'Aceitação pelo cliente registada. Pode emitir a factura em Facturas → Facturas pendentes.',
               'success'
             );
           },
