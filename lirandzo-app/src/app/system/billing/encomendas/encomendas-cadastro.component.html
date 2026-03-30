@@ -1,88 +1,104 @@
 <app-billing-section-header
   [showBack]="true"
-  [backLink]="'/billing/encomendas'"
+  [backLink]="headerBackLink"
   [showHelp]="true"
-  title="Nova Encomenda / Factura"
-  subtitle="Preencha os dados da encomenda conforme a factura"
+  [title]="headerTitle"
+  [subtitle]="headerSubtitle"
   helpTitle="Como registar uma Encomenda"
-  [helpItems]="[
-    'Comece pelos dados do cliente (destinatário) e número de factura.',
-    'Adicione os itens da carga e custos adicionais (transporte, recolha, bill of entry).',
-    'Revise o total geral antes de gravar ou integrar com o módulo de tesouraria.'
-  ]"
+  [helpItems]="headerHelpItems"
 ></app-billing-section-header>
 
-<div class="card">
-  <!-- Invoice header -->
-  <div class="invoice-header">
-    <div class="invoice-from">
+<div class="card" [attr.aria-busy]="carregandoCotacao">
+  <div *ngIf="carregandoCotacao" class="loading-state" style="padding: 1.5rem; text-align: center">
+    A carregar dados da cotação…
+  </div>
+  <ng-container *ngIf="!modoDesdeCotacao || !carregandoCotacao">
+  <p *ngIf="modoDesdeCotacao" class="cotacao-factura-aviso enc-aviso-cotacao">
+    O cliente registado na factura é o da cotação. Para corrigir o contacto, ajuste a cotação antes de facturar.
+  </p>
+
+  <div class="enc-doc-header">
+    <div>
       <div class="invoice-company">VM TRANSPORTES</div>
       <div class="invoice-company-sub">Lirandzo — Transporte de Cargas</div>
     </div>
-    <div class="form-grid" style="max-width: 300px">
-      <div class="form-group">
-        <label class="form-label">Nº Factura</label>
-        <input type="text" class="form-control" [(ngModel)]="encomenda.numeroFactura" placeholder="Ex: 108D">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Data</label>
-        <input type="date" class="form-control" [(ngModel)]="encomenda.data">
-      </div>
+    <div class="enc-doc-title">FACTURA</div>
+  </div>
+
+  <div class="form-grid enc-doc-meta">
+    <div class="form-group">
+      <span class="form-label">Nº da factura</span>
+      <p class="enc-readonly-hint">Atribuído automaticamente ao gravar (formato FAC-AAAA-NNNNNN).</p>
+    </div>
+    <div class="form-group">
+      <span class="form-label">Data</span>
+      <p class="enc-readonly-value">{{ dataFacturaLegivel }}</p>
+      <p class="enc-readonly-sub">Definida automaticamente na gravação (data de hoje).</p>
     </div>
   </div>
 
-  <!-- Client info section -->
+  <h3 *ngIf="modoDesdeCotacao" class="form-section-title">Rota (origem → destino)</h3>
+  <div *ngIf="modoDesdeCotacao" class="form-grid enc-form-grid">
+    <div class="form-group">
+      <label class="form-label">Origem</label>
+      <input type="text" class="form-control" [(ngModel)]="encomenda.origemTransporte" name="origemTr" placeholder="Ex: Maputo">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Destino</label>
+      <input type="text" class="form-control" [(ngModel)]="encomenda.destinoTransporte" name="destinoTr" placeholder="Ex: Tete">
+    </div>
+  </div>
+
   <h3 class="form-section-title">Dados do Cliente (Destinatário)</h3>
-  <div class="form-grid">
+  <div class="enc-client-grid-3x2">
     <div class="form-group">
       <label class="form-label">Nome / Empresa</label>
-      <input type="text" class="form-control" [(ngModel)]="encomenda.clienteNome" placeholder="Ex: SLR Mining, Lda">
+      <input type="text" class="form-control" [(ngModel)]="encomenda.clienteNome" name="cliNome" placeholder="Ex: SLR Mining, Lda">
     </div>
     <div class="form-group">
-      <label class="form-label">NUIT</label>
-      <input type="text" class="form-control" [(ngModel)]="encomenda.clienteNuit" placeholder="Nº contribuinte">
+      <label class="form-label">NUIT <span class="enc-optional">(opcional)</span></label>
+      <input type="text" class="form-control" [(ngModel)]="encomenda.clienteNuit" name="cliNuit" placeholder="Nº contribuinte">
     </div>
-    <div class="form-group full-width">
+    <div class="form-group">
+      <label class="form-label">Telefone</label>
+      <input type="text" class="form-control" [(ngModel)]="encomenda.clienteTelefone" name="cliTel" placeholder="Ex: 847983277">
+    </div>
+    <div class="form-group">
       <label class="form-label">Endereço</label>
-      <input type="text" class="form-control" [(ngModel)]="encomenda.clienteEndereco" placeholder="Ex: Aldeia Napaco Mpupene">
+      <input type="text" class="form-control" [(ngModel)]="encomenda.clienteEndereco" name="cliEnd" placeholder="Ex: Aldeia Napaco Mpupene">
     </div>
     <div class="form-group">
       <label class="form-label">Província</label>
-      <select class="form-control" [(ngModel)]="encomenda.clienteProvincia">
+      <select class="form-control" [(ngModel)]="encomenda.clienteProvincia" name="cliProv">
         <option value="">Seleccionar...</option>
         <option *ngFor="let p of provincias" [value]="p">{{ p }}</option>
       </select>
     </div>
     <div class="form-group">
       <label class="form-label">ATT (Pessoa de Contacto)</label>
-      <input type="text" class="form-control" [(ngModel)]="encomenda.clienteContacto" placeholder="Ex: Sr. Euclides">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Telefone</label>
-      <input type="text" class="form-control" [(ngModel)]="encomenda.clienteTelefone" placeholder="Ex: 847983277">
+      <input type="text" class="form-control" [(ngModel)]="encomenda.clienteContacto" name="cliAtt" placeholder="Ex: Sr. Euclides">
     </div>
   </div>
 
-  <!-- Items table -->
   <h3 class="form-section-title">Itens / Produtos</h3>
-  <div class="table-wrapper">
-    <table class="data-table">
+  <div class="table-wrapper enc-itens-table">
+    <table class="data-table enc-itens-data">
       <thead>
         <tr>
-          <th style="width: 80px">Qtd</th>
+          <th class="enc-col-qtd">Qtd</th>
           <th>Descrição</th>
-          <th style="width: 150px">Preço Unitário</th>
-          <th style="width: 150px">Subtotal</th>
-          <th style="width: 50px"></th>
+          <th class="enc-col-preco">Preço Unitário</th>
+          <th class="enc-col-sub">Subtotal</th>
+          <th class="enc-col-act"></th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let item of itens; let i = index">
-          <td><input type="number" class="form-control" [(ngModel)]="item.quantidade" min="1" style="width: 70px"></td>
-          <td><input type="text" class="form-control" [(ngModel)]="item.descricao" placeholder="Ex: Full load" style="width: 100%"></td>
-          <td><input type="number" class="form-control" [(ngModel)]="item.precoUnitario" placeholder="0.00" style="width: 130px"></td>
-          <td style="font-weight: 600; color: var(--text-primary)">{{ getSubtotalItem(item) | number:'1.2-2' }} MZN</td>
-          <td>
+          <td class="enc-col-qtd"><input type="number" class="form-control enc-input-tight" [(ngModel)]="item.quantidade" [name]="'qtd'+i" min="1"></td>
+          <td><input type="text" class="form-control" [(ngModel)]="item.descricao" [name]="'desc'+i" placeholder="Ex: Full load"></td>
+          <td class="enc-col-preco"><input type="number" class="form-control enc-input-tight" [(ngModel)]="item.precoUnitario" [name]="'preco'+i" placeholder="0.00" step="0.01"></td>
+          <td class="enc-col-sub enc-num">{{ getSubtotalItem(item) | number:'1.2-2' }} MZN</td>
+          <td class="enc-col-act">
             <button type="button" class="action-btn action-btn-danger" (click)="removerItem(i)" *ngIf="itens.length > 1" title="Remover">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
@@ -96,53 +112,230 @@
     Adicionar Item
   </button>
 
-  <!-- Costs section -->
   <h3 class="form-section-title">Custos Adicionais</h3>
-  <div class="form-grid">
+  <div class="form-grid enc-form-grid enc-custos-grid">
     <div class="form-group">
       <label class="form-label">Transporte (MZN)</label>
-      <input type="number" class="form-control" [(ngModel)]="encomenda.custoTransporte" placeholder="0.00">
+      <input type="number" class="form-control" [(ngModel)]="encomenda.custoTransporte" name="custoTr" placeholder="0.00" step="0.01">
     </div>
     <div class="form-group">
       <label class="form-label">Recolha (MZN)</label>
-      <input type="number" class="form-control" [(ngModel)]="encomenda.custoRecolha" placeholder="0.00">
+      <input type="number" class="form-control" [(ngModel)]="encomenda.custoRecolha" name="custoRec" placeholder="0.00" step="0.01">
     </div>
     <div class="form-group">
       <label class="form-label">Bill of Entry (MZN)</label>
-      <input type="number" class="form-control" [(ngModel)]="encomenda.custoBillOfEntry" placeholder="0.00">
+      <input type="number" class="form-control" [(ngModel)]="encomenda.custoBillOfEntry" name="custoBoe" placeholder="0.00" step="0.01">
     </div>
   </div>
 
-  <!-- Totals -->
-  <div class="invoice-totals">
-    <div class="invoice-total-row"><span>Subtotal Itens</span><span>{{ subtotalItens | number:'1.2-2' }} MZN</span></div>
-    <div class="invoice-total-row"><span>Transporte</span><span>{{ (encomenda.custoTransporte || 0) | number:'1.2-2' }} MZN</span></div>
-    <div class="invoice-total-row"><span>Recolha</span><span>{{ (encomenda.custoRecolha || 0) | number:'1.2-2' }} MZN</span></div>
-    <div class="invoice-total-row"><span>Bill of Entry</span><span>{{ (encomenda.custoBillOfEntry || 0) | number:'1.2-2' }} MZN</span></div>
-    <div class="invoice-total-row invoice-total-final"><span>TOTAL</span><span>{{ totalGeral | number:'1.2-2' }} MZN</span></div>
-  </div>
-
-  <!-- Terms -->
-  <h3 class="form-section-title">Termos e Observações</h3>
-  <div class="form-grid">
+  <h3 class="form-section-title">Desconto e IVA</h3>
+  <div class="form-grid enc-form-grid enc-iva-grid">
     <div class="form-group">
-      <label class="form-label">Termos de Pagamento</label>
-      <input type="text" class="form-control" [(ngModel)]="encomenda.termos" placeholder="Ex: M60, Pagamento imediato...">
+      <label class="form-label">Desconto (MZN)</label>
+      <input type="number" class="form-control" [(ngModel)]="encomenda.discountAmount" name="descMzn" placeholder="0.00" step="0.01" min="0">
     </div>
-    <div class="form-group full-width">
-      <label class="form-label">Observações</label>
-      <textarea class="form-control" [(ngModel)]="encomenda.observacoes" placeholder="Ex: Entrega condicionada a Pagamento" rows="3"></textarea>
+    <div class="form-group">
+      <label class="form-label">IVA</label>
+      <div class="iva-toggle">
+        <button type="button" class="iva-toggle-btn" [class.active]="temIva" (click)="setIvaAtivo(true)">Sim</button>
+        <button type="button" class="iva-toggle-btn" [class.active]="!temIva" (click)="setIvaAtivo(false)">Não</button>
+      </div>
     </div>
+    <div class="form-group">
+      <label class="form-label">IVA (%)</label>
+      <div class="enc-readonly-value">{{ temIva ? 16 : 0 }}</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Valor IVA (MZN)</label>
+      <div class="enc-readonly-value enc-num">{{ valorIva | number:'1.2-2' }} MZN</div>
+    </div>
+    <div class="form-group enc-span-2">
+      <label class="form-label">Motivo IVA</label>
+      <input type="text" class="form-control" [value]="motivoIvaLegivel" readonly tabindex="-1">
+    </div>
+  </div>
+
+  <h3 class="form-section-title">Condições de pagamento</h3>
+  <div class="form-grid enc-form-grid">
+    <div class="form-group enc-span-2">
+      <label class="form-label">Forma de pagamento prevista</label>
+      <select class="form-control" [(ngModel)]="encomenda.condicaoPagamento" name="condPag">
+        <option *ngFor="let op of opcoesCondicaoPagamento" [ngValue]="op.value">{{ op.label }}</option>
+      </select>
+      <p class="enc-form-hint">Igual à cotação: o cliente vê esta condição no documento comercial.</p>
+    </div>
+  </div>
+
+  <div class="enc-quote-totals">
+    <div class="enc-quote-total-row"><span>Subtotal Itens</span><span>{{ subtotalItens | number:'1.2-2' }} MZN</span></div>
+    <div class="enc-quote-total-row"><span>Transporte</span><span>{{ (encomenda.custoTransporte || 0) | number:'1.2-2' }} MZN</span></div>
+    <div class="enc-quote-total-row"><span>Recolha</span><span>{{ (encomenda.custoRecolha || 0) | number:'1.2-2' }} MZN</span></div>
+    <div class="enc-quote-total-row"><span>Bill of Entry</span><span>{{ (encomenda.custoBillOfEntry || 0) | number:'1.2-2' }} MZN</span></div>
+    <div class="enc-quote-total-row"><span>Desconto</span><span>{{ descontoAplicado | number:'1.2-2' }} MZN</span></div>
+    <div class="enc-quote-total-row"><span>IVA</span><span>{{ valorIva | number:'1.2-2' }} MZN</span></div>
+    <div class="enc-quote-total-row enc-quote-total-final"><span>TOTAL</span><span>{{ totalFacturavel | number:'1.2-2' }} MZN</span></div>
+  </div>
+
+  <div class="enc-payment-terms-doc">
+    <strong>Condições de pagamento:</strong> {{ textoCondicaoPagamento }}
   </div>
 
   <div class="form-actions">
-    <a routerLink="/billing/encomendas" class="btn-secondary">Cancelar</a>
-    <button type="button" class="btn-primary" (click)="salvar()">Guardar Factura</button>
+    <a *ngIf="!modoDesdeCotacao" routerLink="/billing/encomendas" class="btn-secondary">Cancelar</a>
+    <a *ngIf="modoDesdeCotacao" routerLink="/billing/cotacoes/para-facturar" class="btn-secondary">Cancelar</a>
+    <button
+      *ngIf="!modoDesdeCotacao"
+      type="button"
+      class="btn-primary"
+      (click)="salvar()"
+      [disabled]="carregandoCotacao"
+    >
+      Guardar Factura
+    </button>
+    <button
+      *ngIf="modoDesdeCotacao"
+      type="button"
+      class="btn-primary"
+      (click)="finalizarFacturaDesdeCotacao()"
+      [disabled]="aFinalizarFactura || carregandoCotacao"
+    >
+      {{ aFinalizarFactura ? 'A emitir…' : 'Finalizar factura' }}
+    </button>
+  </div>
+  </ng-container>
+</div>
+
+<!-- PDF off-screen (emitir factura) — mesmo esqueleto visual do preview da cotação (qpdf) -->
+<div *ngIf="ultimaFacturaPdf" id="invoice-pdf-export" class="invoice-pdf-offscreen cotacao-preview" aria-hidden="true">
+  <div class="qpdf-quotation-container">
+    <div class="qpdf-header">
+      <div class="qpdf-company-info">
+        <div class="qpdf-company-name">VM TRANSPORTES</div>
+        <div class="qpdf-company-details">
+          Lirandzo — Transporte de Cargas<br>
+          Boane, Djuba, Celula "D" Q.1, Casa nº07, Matola<br>
+          <strong>NUIT:</strong> 400872473<br>
+          <strong>Cell:</strong> +258 84 841 0008 / 84 831 0348<br>
+          <strong>Email:</strong> vm.lirandzotransportes&#64;gmail.com
+        </div>
+      </div>
+
+      <div class="qpdf-top-right">
+        <div class="qpdf-quotation-ref-line">
+          <span class="qpdf-quotation-ref-label">Factura / Invoice</span>
+          <span class="qpdf-quotation-ref-number">{{ ultimaFacturaPdf.invoiceNumber }}</span>
+        </div>
+        <div class="qpdf-quotation-date-line">Data: {{ formatarDataFacturaPdf(ultimaFacturaPdf.invoiceDateIso) }}</div>
+
+        <div class="qpdf-client-info">
+          <div class="qpdf-section-label">Client</div>
+          <div class="qpdf-client-name">Exmo. Sr. {{ encomenda.clienteNome || 'N/A' }}</div>
+          <div class="qpdf-client-details">
+            <div>{{ encomenda.origemTransporte || '—' }} → {{ encomenda.destinoTransporte || '—' }}</div>
+            <div *ngIf="(encomenda.clienteNuit || '').trim()"><strong>NUIT:</strong> {{ encomenda.clienteNuit }}</div>
+            <div *ngIf="(encomenda.clienteEndereco || '').trim()">
+              <strong>Address / Endereço:</strong> {{ encomenda.clienteEndereco }}
+            </div>
+            <div *ngIf="(encomenda.clienteProvincia || '').trim()">
+              <strong>Province / Província:</strong> {{ encomenda.clienteProvincia }}
+            </div>
+            <div *ngIf="(encomenda.clienteContacto || '').trim()">
+              <strong>ATT:</strong> {{ encomenda.clienteContacto }}
+            </div>
+            <div><strong>Phone:</strong> {{ encomenda.clienteTelefone || '—' }}</div>
+            <div><strong>Email:</strong> {{ encomenda.clienteEmail || '—' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="qpdf-items-section">
+      <div class="qpdf-section-label qpdf-transport-label">transport</div>
+      <table class="qpdf-items-table">
+        <thead>
+          <tr>
+            <th class="qpdf-col-index">#</th>
+            <th class="qpdf-col-description">Description</th>
+            <th class="qpdf-col-qty">Qty</th>
+            <th class="qpdf-col-total">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let item of itens; let i = index">
+            <tr *ngIf="item.descricao?.trim()">
+              <td>{{ i + 1 }}</td>
+              <td>
+                <div class="qpdf-item-description">{{ item.descricao || 'N/A' }}</div>
+                <div class="qpdf-item-route">
+                  {{ encomenda.origemTransporte || '—' }} → {{ encomenda.destinoTransporte || '—' }}
+                </div>
+              </td>
+              <td>{{ item.quantidade }}</td>
+              <td>{{ getSubtotalItem(item) | number:'1.2-2' }} MZN</td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="temIva || descontoAplicado > 0" class="qpdf-items-section" style="padding-top: 0">
+      <div class="qpdf-tax-summary">
+        <div class="qpdf-tax-title">VAT Summary</div>
+        <table class="qpdf-tax-table">
+          <thead>
+            <tr>
+              <th>Tax</th>
+              <th>Base</th>
+              <th>Value</th>
+              <th>Exemption reason</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>VAT</td>
+              <td>{{ baseAposDesconto | number:'1.2-2' }} MT</td>
+              <td>{{ valorIva | number:'1.2-2' }} MT</td>
+              <td>{{ motivoIvaLegivel || 'ISENTO' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="qpdf-tax-lines">
+          <div class="qpdf-tax-line"><span>Discounts</span><span>{{ descontoAplicado | number:'1.2-2' }} MT</span></div>
+          <div class="qpdf-tax-line"><span>Total VAT</span><span>{{ valorIva | number:'1.2-2' }} MT</span></div>
+          <div class="qpdf-tax-line qpdf-tax-grand">
+            <span>Total (MT)</span><span>{{ totalFacturavel | number:'1.2-2' }} MT</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="qpdf-summary-section">
+      <div class="qpdf-summary-box">
+        <div class="qpdf-summary-row"><span>Subtotal Itens</span><span>{{ subtotalItens | number:'1.2-2' }} MZN</span></div>
+        <div class="qpdf-summary-row"><span>Transporte</span><span>{{ (encomenda.custoTransporte || 0) | number:'1.2-2' }} MZN</span></div>
+        <div class="qpdf-summary-row"><span>Recolha</span><span>{{ (encomenda.custoRecolha || 0) | number:'1.2-2' }} MZN</span></div>
+        <div class="qpdf-summary-row"><span>Bill of Entry</span><span>{{ (encomenda.custoBillOfEntry || 0) | number:'1.2-2' }} MZN</span></div>
+        <div class="qpdf-summary-row"><span>Desconto</span><span>{{ descontoAplicado | number:'1.2-2' }} MZN</span></div>
+        <div class="qpdf-summary-row"><span>IVA</span><span>{{ valorIva | number:'1.2-2' }} MZN</span></div>
+        <div class="qpdf-summary-row qpdf-summary-total"><span>TOTAL</span><span>{{ totalFacturavel | number:'1.2-2' }} MZN</span></div>
+      </div>
+    </div>
+
+    <div class="qpdf-payment-terms" style="margin:1rem 0;padding:0.65rem 0;border-top:1px solid #ddd;font-size:10pt;page-break-inside:avoid">
+      <strong>Payment terms / Condições de pagamento:</strong> {{ textoCondicaoPagamento }}
+    </div>
+
+    <div class="qpdf-validity-section">
+      <strong>Nota:</strong> Documento para conferência de valores e pagamentos; conserve para o seu arquivo.
+    </div>
+
+    <div class="qpdf-footer">
+      Processed by computer • VM-Lirandzo Transportes
+    </div>
   </div>
 </div>
 
-<!-- Popup de Notificação -->
-<app-notification-popup 
+<app-notification-popup
   *ngIf="showNotification"
   [message]="notificationMessage"
   [type]="notificationType"

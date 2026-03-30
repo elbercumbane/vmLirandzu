@@ -1,0 +1,154 @@
+<div class="preview-modal-overlay" (click)="fechar()">
+  <div class="preview-modal" (click)="$event.stopPropagation()">
+    <div class="preview-modal-header">
+      <h3>Pré-visualização da cotação</h3>
+      <button type="button" class="preview-modal-close" (click)="fechar()" aria-label="Fechar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    @if (loading) {
+      <div class="preview-modal-body preview-modal-loading">
+        <p>A carregar documento…</p>
+      </div>
+    } @else if (loadError) {
+      <div class="preview-modal-body preview-modal-loading">
+        <p>{{ loadError }}</p>
+        <button type="button" class="btn-secondary" (click)="fechar()">Fechar</button>
+      </div>
+    } @else {
+      <div class="preview-modal-body">
+        <div id="cotacao-preview-content-enviadas" class="cotacao-preview">
+          <div class="qpdf-quotation-container">
+            <div class="qpdf-header">
+              <div class="qpdf-company-info">
+                <div class="qpdf-company-name">VM TRANSPORTES</div>
+                <div class="qpdf-company-details">
+                  Lirandzo — Transporte de Cargas<br>
+                  Boane, Djuba, Celula "D" Q.1, Casa nº07, Matola<br>
+                  <strong>NUIT:</strong> 400872473<br>
+                  <strong>Cell:</strong> +258 84 841 0008 / 84 831 0348<br>
+                  <strong>Email:</strong> vm.lirandzotransportes&#64;gmail.com
+                </div>
+              </div>
+
+              <div class="qpdf-top-right">
+                <div class="qpdf-quotation-ref-line">
+                  <span class="qpdf-quotation-ref-label">Quotation</span>
+                  <span class="qpdf-quotation-ref-number">{{ cotacao.referencia || 'N/A' }}</span>
+                </div>
+                <div class="qpdf-quotation-date-line">Data: {{ formatarData(cotacao.data) }}</div>
+
+                <div class="qpdf-client-info">
+                  <div class="qpdf-section-label">Client</div>
+                  <div class="qpdf-client-name">Exmo. Sr. {{ cotacao.clienteNome || 'N/A' }}</div>
+                  <div class="qpdf-client-details">
+                    <div>{{ cotacao.origem || '—' }} → {{ cotacao.destino || '—' }}</div>
+                    @if ((cotacao.clienteNuit || '').trim()) {
+                      <div><strong>NUIT:</strong> {{ cotacao.clienteNuit }}</div>
+                    }
+                    @if ((cotacao.clienteEndereco || '').trim()) {
+                      <div><strong>Address / Endereço:</strong> {{ cotacao.clienteEndereco }}</div>
+                    }
+                    @if ((cotacao.clienteProvincia || '').trim()) {
+                      <div><strong>Province / Província:</strong> {{ cotacao.clienteProvincia }}</div>
+                    }
+                    @if ((cotacao.clientePessoaContacto || '').trim()) {
+                      <div><strong>ATT:</strong> {{ cotacao.clientePessoaContacto }}</div>
+                    }
+                    <div><strong>Phone:</strong> {{ cotacao.clienteTelefone || '—' }}</div>
+                    <div><strong>Email:</strong> {{ cotacao.clienteEmail || '—' }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="qpdf-items-section">
+              <div class="qpdf-section-label qpdf-transport-label">transport</div>
+              <table class="qpdf-items-table">
+                <thead>
+                  <tr>
+                    <th class="qpdf-col-index">#</th>
+                    <th class="qpdf-col-description">Description</th>
+                    <th class="qpdf-col-qty">Qty</th>
+                    <th class="qpdf-col-total">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of itens; track $index) {
+                    @if (item.descricao) {
+                      <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>
+                          <div class="qpdf-item-description">{{ item.descricao || 'N/A' }}</div>
+                          <div class="qpdf-item-route">
+                            {{ cotacao.origem || '—' }} → {{ cotacao.destino || '—' }}
+                          </div>
+                        </td>
+                        <td>{{ item.quantidade }} {{ item.unidade || '' }}</td>
+                        <td>{{ getSubtotalItem(item) | number:'1.2-2' }} MZN</td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            @if (ivaAtivoPreview || (cotacao.discountAmount || 0) > 0) {
+              <div class="qpdf-tax-summary">
+                <div class="qpdf-tax-title">VAT Summary</div>
+                <table class="qpdf-tax-table">
+                  <thead>
+                    <tr>
+                      <th>Tax</th>
+                      <th>Base</th>
+                      <th>Value</th>
+                      <th>Exemption reason</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>VAT</td>
+                      <td>{{ ((totalGeral || 0) - (cotacao.discountAmount || 0)) | number:'1.2-2' }} MT</td>
+                      <td>{{ (vatAmountPreview || 0) | number:'1.2-2' }} MT</td>
+                      <td>{{ vatReasonPreview || 'ISENTO' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="qpdf-tax-lines">
+                  <div class="qpdf-tax-line"><span>Discounts</span><span>{{ (cotacao.discountAmount || 0) | number:'1.2-2' }} MT</span></div>
+                  <div class="qpdf-tax-line"><span>Total VAT</span><span>{{ (vatAmountPreview || 0) | number:'1.2-2' }} MT</span></div>
+                  <div class="qpdf-tax-line qpdf-tax-grand"><span>Total (MT)</span><span>{{ ((totalGeral || 0) - (cotacao.discountAmount || 0) + (vatAmountPreview || 0)) | number:'1.2-2' }} MT</span></div>
+              </div>
+            </div>
+          }
+
+            <div
+              class="qpdf-payment-terms"
+              style="margin:1rem 0;padding:0.65rem 0;border-top:1px solid #ddd;font-size:10pt;page-break-inside:avoid"
+            >
+              <strong>Payment terms / Condições de pagamento:</strong> {{ textoCondicaoPagamentoCotacao }}
+            </div>
+
+            <div class="qpdf-validity-section">
+              <strong>Note:</strong> This quotation is valid for 7 days from the issue date.
+            </div>
+
+            <div class="qpdf-footer">
+              Processed by computer • VM-Lirandzo Transportes
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="preview-modal-footer">
+        <button type="button" class="btn-secondary" (click)="fechar()">Fechar</button>
+        <button type="button" class="btn-primary" (click)="baixarPdf()">Baixar PDF</button>
+      </div>
+    }
+  </div>
+</div>

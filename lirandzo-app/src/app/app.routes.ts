@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
+import { billingFinanceiroGuard } from './shared/guards/billing-financeiro.guard';
 import { configuracoesGuard } from './shared/guards/configuracoes.guard';
+import { facturaEditarGuard } from './shared/guards/factura-editar.guard';
 import { systemAuthGuard } from './shared/guards/system-auth.guard';
 
 export const routes: Routes = [
@@ -24,6 +26,7 @@ export const routes: Routes = [
     path: 'billing',
     loadComponent: () => import('./system/billing/layout/billing-layout.component').then(m => m.BillingLayoutComponent),
     canActivate: [systemAuthGuard],
+    canActivateChild: [systemAuthGuard],
     children: [
       { path: '', loadComponent: () => import('./system/billing/dashboard/billing-dashboard.component').then(m => m.BillingDashboardComponent) },
       { path: 'viaturas', loadComponent: () => import('./system/billing/viaturas/viaturas-lista.component').then(m => m.ViaturasListaComponent) },
@@ -40,9 +43,22 @@ export const routes: Routes = [
       { path: 'motoristas/destaques', loadComponent: () => import('./system/billing/motoristas/motoristas-destaque.component').then(m => m.MotoristasDestaqueComponent) },
       { path: 'encomendas', loadComponent: () => import('./system/billing/encomendas/encomendas-lista.component').then(m => m.EncomendasListaComponent) },
       { path: 'encomendas/nova', loadComponent: () => import('./system/billing/encomendas/encomendas-cadastro.component').then(m => m.EncomendasCadastroComponent) },
-      { path: 'encomendas/pagas', loadComponent: () => import('./system/billing/encomendas/encomendas-lista.component').then(m => m.EncomendasListaComponent) },
+      {
+        path: 'encomendas/pagamentos',
+        loadComponent: () =>
+          import('./system/billing/encomendas/encomendas-pagamentos.component').then((m) => m.EncomendasPagamentosComponent)
+      },
+      { path: 'encomendas/pagas', redirectTo: 'encomendas?estado=pago', pathMatch: 'full' },
+      {
+        path: 'encomendas/:id/historico',
+        loadComponent: () => import('./system/billing/encomendas/encomendas-historico.component').then(m => m.EncomendasHistoricoComponent)
+      },
+      {
+        path: 'encomendas/:id/editar',
+        loadComponent: () => import('./system/billing/encomendas/encomendas-editar.component').then(m => m.EncomendasEditarComponent),
+        canActivate: [facturaEditarGuard]
+      },
       { path: 'encomendas/:id', loadComponent: () => import('./system/billing/encomendas/encomendas-detalhe.component').then(m => m.EncomendasDetalheComponent) },
-      { path: 'encomendas/:id/editar', loadComponent: () => import('./system/billing/encomendas/encomendas-editar.component').then(m => m.EncomendasEditarComponent) },
       { path: 'cotacoes', loadComponent: () => import('./system/billing/cotacoes/cotacoes-lista.component').then(m => m.CotacoesListaComponent) },
       { path: 'cotacoes/gerar/:id', loadComponent: () => import('./system/billing/cotacoes/cotacoes-cadastro.component').then(m => m.CotacoesCadastroComponent) },
       { path: 'cotacoes/gerar', loadComponent: () => import('./system/billing/cotacoes/cotacoes-cadastro.component').then(m => m.CotacoesCadastroComponent) },
@@ -68,8 +84,22 @@ export const routes: Routes = [
       { path: 'manutencao', loadComponent: () => import('./system/billing/manutencao/manutencao-lista.component').then(m => m.ManutencaoListaComponent) },
       { path: 'manutencao/nova', loadComponent: () => import('./system/billing/manutencao/manutencao-cadastro.component').then(m => m.ManutencaoCadastroComponent) },
       { path: 'manutencao/:id/editar', loadComponent: () => import('./system/billing/manutencao/manutencao-editar.component').then(m => m.ManutencaoEditarComponent) },
-      { path: 'baixas', loadComponent: () => import('./system/billing/tesouraria/tesouraria.component').then(m => m.TesourariaComponent), data: { tesourariaModoBaixas: true } },
-      { path: 'tesouraria', loadComponent: () => import('./system/billing/tesouraria/tesouraria.component').then(m => m.TesourariaComponent) },
+      {
+        path: 'baixas',
+        loadComponent: () => import('./system/billing/tesouraria/tesouraria.component').then((m) => m.TesourariaComponent),
+        canActivate: [billingFinanceiroGuard],
+        data: {
+          tesourariaModoBaixas: true,
+          tesourariaSomenteBaixas: true,
+          tesourariaAbaInicial: 'BAIXAS'
+        }
+      },
+      {
+        path: 'tesouraria',
+        loadComponent: () => import('./system/billing/tesouraria/tesouraria.component').then((m) => m.TesourariaComponent),
+        canActivate: [billingFinanceiroGuard],
+        data: { tesourariaAbaInicial: 'RECIBOS' }
+      },
       { path: 'meu-perfil', loadComponent: () => import('./system/billing/meu-perfil/meu-perfil.component').then(m => m.MeuPerfilComponent) },
       { path: 'relatorios', loadComponent: () => import('./system/billing-reports/billing-reports.component').then(m => m.BillingReportsComponent) },
       { path: 'configuracoes', loadComponent: () => import('./system/billing-settings/billing-settings.component').then(m => m.BillingSettingsComponent), canActivate: [configuracoesGuard] },

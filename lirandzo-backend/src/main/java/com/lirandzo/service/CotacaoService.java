@@ -4,6 +4,7 @@ import com.lirandzo.dto.CotacaoPortalRequestDTO;
 import com.lirandzo.entity.Cliente;
 import com.lirandzo.entity.Cotacao;
 import com.lirandzo.entity.Cotacao.StatusCotacao;
+import com.lirandzo.entity.CondicaoPagamentoCotacao;
 import com.lirandzo.repository.ClienteRepository;
 import com.lirandzo.repository.CotacaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -66,6 +68,10 @@ public class CotacaoService {
             cliente.setTelefone(dto.telefone1() != null && !dto.telefone1().isBlank()
                     ? dto.telefone1()
                     : dto.telefone2());
+            aplicarDadosClientePortal(cliente, dto);
+            cliente = clienteRepository.save(cliente);
+        } else {
+            aplicarDadosClientePortal(cliente, dto);
             cliente = clienteRepository.save(cliente);
         }
 
@@ -81,7 +87,46 @@ public class CotacaoService {
         cotacao.setTipoServico(dto.tipoServico() != null && !dto.tipoServico().isBlank()
                 ? dto.tipoServico().toUpperCase() : "TRANSPORTE");
 
+        parseCondicaoPagamentoTexto(dto.condicaoPagamento()).ifPresent(cotacao::setCondicaoPagamento);
+
         cotacaoRepository.save(cotacao);
+    }
+
+    /** Preenche NUIT, morada, província e contacto quando o portal envia (todos opcionais). */
+    private static void aplicarDadosClientePortal(Cliente cliente, CotacaoPortalRequestDTO dto) {
+        if (dto.nuit() != null && !dto.nuit().isBlank()) {
+            cliente.setNif(truncar(dto.nuit().trim(), 50));
+        }
+        if (dto.endereco() != null && !dto.endereco().isBlank()) {
+            cliente.setEndereco(truncar(dto.endereco().trim(), 200));
+        }
+        if (dto.provincia() != null && !dto.provincia().isBlank()) {
+            cliente.setProvincia(truncar(dto.provincia().trim(), 100));
+        }
+        if (dto.pessoaContacto() != null && !dto.pessoaContacto().isBlank()) {
+            cliente.setPessoaContacto(truncar(dto.pessoaContacto().trim(), 200));
+        }
+    }
+
+    private static String truncar(String s, int max) {
+        if (s == null) {
+            return null;
+        }
+        if (s.length() <= max) {
+            return s;
+        }
+        return s.substring(0, max);
+    }
+
+    private Optional<CondicaoPagamentoCotacao> parseCondicaoPagamentoTexto(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(CondicaoPagamentoCotacao.valueOf(raw.trim().toUpperCase(Locale.ROOT)));
+        } catch (IllegalArgumentException ignored) {
+            return Optional.empty();
+        }
     }
 
     public Optional<Cotacao> update(Long id, Cotacao cotacaoAtualizada) {
@@ -151,6 +196,9 @@ public class CotacaoService {
                     cotacao.setStatus(cotacaoAtualizada.getStatus());
                     cotacao.setObservacoes(cotacaoAtualizada.getObservacoes());
                     cotacao.setCondicoes(cotacaoAtualizada.getCondicoes());
+                    if (cotacaoAtualizada.getCondicaoPagamento() != null) {
+                        cotacao.setCondicaoPagamento(cotacaoAtualizada.getCondicaoPagamento());
+                    }
                     cotacao.setOperador(cotacaoAtualizada.getOperador());
                     cotacao.setFormaEnvioPreferida(cotacaoAtualizada.getFormaEnvioPreferida());
                     cotacao.setFormaEnvioRealizada(cotacaoAtualizada.getFormaEnvioRealizada());

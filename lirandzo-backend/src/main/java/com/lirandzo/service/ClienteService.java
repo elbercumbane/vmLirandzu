@@ -36,6 +36,8 @@ public class ClienteService {
                     cliente.setEmail(clienteAtualizado.getEmail());
                     cliente.setEndereco(clienteAtualizado.getEndereco());
                     cliente.setNif(clienteAtualizado.getNif());
+                    cliente.setProvincia(clienteAtualizado.getProvincia());
+                    cliente.setPessoaContacto(clienteAtualizado.getPessoaContacto());
                     return clienteRepository.save(cliente);
                 });
     }

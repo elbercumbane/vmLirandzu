@@ -28,7 +28,8 @@
     <div class="navbar-nav-dropdown" [class.open]="navDropdownOpen === 'encomendas'">
       <button type="button" class="navbar-nav-link navbar-nav-dropdown-trigger" (click)="toggleNavDropdown('encomendas')">Encomendas</button>
       <div class="navbar-nav-dropdown-menu">
-        <a routerLink="/billing/encomendas" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Visualizar</a>
+        <a routerLink="/billing/encomendas" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Visualizar facturas</a>
+        <a routerLink="/billing/encomendas/pagamentos" routerLinkActive="active" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Registar pagamentos</a>
         <a routerLink="/billing/encomendas/nova" routerLinkActive="active" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Nova Factura</a>
       </div>
     </div>
@@ -37,7 +38,7 @@
       <div class="navbar-nav-dropdown-menu">
         <a routerLink="/billing/cotacoes" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Pedidos Recebidos</a>
         <a routerLink="/billing/cotacoes/gerar" routerLinkActive="active" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Gerar Cotação</a>
-        <a routerLink="/billing/cotacoes/enviadas" routerLinkActive="active" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Cotações Enviadas</a>
+        <a routerLink="/billing/cotacoes/enviadas" routerLinkActive="active" class="navbar-nav-dropdown-item" (click)="closeNavDropdown()">Negociação e ajuste</a>
       </div>
     </div>
     <div class="navbar-nav-dropdown" [class.open]="navDropdownOpen === 'viagens'">

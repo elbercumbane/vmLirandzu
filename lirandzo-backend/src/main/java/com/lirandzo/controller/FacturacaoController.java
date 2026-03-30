@@ -1,5 +1,6 @@
 package com.lirandzo.controller;
 
+import com.lirandzo.dto.EmitirFacturaCotacaoRequest;
 import com.lirandzo.dto.EmitirFacturaResponse;
 import com.lirandzo.service.FacturacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +18,16 @@ public class FacturacaoController {
     private FacturacaoService facturacaoService;
 
     @PostMapping("/cotacao/{cotacaoId}/emitir")
-    public ResponseEntity<?> emitirFacturaDeCotacao(@PathVariable Long cotacaoId) {
+    public ResponseEntity<?> emitirFacturaDeCotacao(
+            @PathVariable Long cotacaoId,
+            @RequestBody(required = false) EmitirFacturaCotacaoRequest body) {
         try {
-            var encomenda = facturacaoService.emitirFacturaDeCotacao(cotacaoId);
-            EmitirFacturaResponse body = new EmitirFacturaResponse(
+            var encomenda = facturacaoService.emitirFacturaDeCotacao(cotacaoId, body);
+            EmitirFacturaResponse resposta = new EmitirFacturaResponse(
                     encomenda.getNumeroEncomenda(),
                     encomenda.getInvoiceNumber(),
                     encomenda.getInvoiceDate());
-            return ResponseEntity.status(HttpStatus.CREATED).body(body);
+            return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
         } catch (IllegalStateException e) {

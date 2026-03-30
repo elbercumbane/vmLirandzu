@@ -90,7 +90,8 @@ export class EncomendasEditarComponent implements OnInit {
           this.encomenda.numeroFactura = encomendaApi.invoiceNumber || String(encomendaApi.numeroEncomenda || '');
           this.encomenda.clienteNome = encomendaApi.cliente?.nome || '';
           this.encomenda.clienteTelefone = encomendaApi.cliente?.telefone || '';
-          this.encomenda.clienteContacto = encomendaApi.cliente?.contacto || '';
+          this.encomenda.clienteContacto =
+            encomendaApi.cliente?.pessoaContacto || encomendaApi.cliente?.contacto || '';
           this.encomenda.clienteNuit = encomendaApi.cliente?.nif || '';
           
           // Separar endereço em endereço e província

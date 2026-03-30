@@ -1,0 +1,57 @@
+<app-billing-section-header
+  [showBack]="true"
+  [backLink]="backLink"
+  [showHelp]="false"
+  title="Histórico do processo"
+  subtitle="Da cotação à factura e pagamentos — todas as datas e etapas"
+></app-billing-section-header>
+
+@if (loading) {
+  <div class="loading-state">
+    <p>A carregar histórico…</p>
+  </div>
+} @else if (error) {
+  <div class="error-state">
+    <p>{{ error }}</p>
+    <a [routerLink]="backLink" class="btn-secondary">Voltar à factura</a>
+  </div>
+} @else if (timeline && timeline.eventos.length > 0) {
+  <div class="card">
+    <div class="rastreamento-card rastreamento-card--standalone">
+      <div class="rastreamento-head">
+        <h4>Linha do tempo</h4>
+        <span class="rastreamento-pct">{{ timeline.progressoPercentual }}%</span>
+      </div>
+      <p class="rastreamento-sub">Pedido, cotação, aceitação, factura e pagamentos (quando existirem).</p>
+      <div class="rastreamento-bar" aria-hidden="true">
+        <div class="rastreamento-bar-fill" [style.width.%]="timeline.progressoPercentual"></div>
+      </div>
+      <ul class="rastreamento-timeline" role="list">
+        @for (ev of timeline.eventos; track $index) {
+          <li
+            class="rastreamento-step"
+            [class.rastreamento-step--done]="ev.concluido"
+            [class.rastreamento-step--pending]="!ev.concluido"
+          >
+            <span class="rastreamento-dot" [attr.data-done]="ev.concluido"></span>
+            <div class="rastreamento-step-body">
+              <strong>{{ ev.titulo }}</strong>
+              @if (ev.detalhe) {
+                <span class="rastreamento-detalhe">{{ ev.detalhe }}</span>
+              }
+              <span class="rastreamento-data">{{ formatarDataHora(ev.dataOcorrencia) }}</span>
+            </div>
+          </li>
+        }
+      </ul>
+    </div>
+    <p class="historico-footer-hint">
+      <a [routerLink]="backLink" class="text-link">← Voltar aos detalhes da factura e pagamentos</a>
+    </p>
+  </div>
+} @else {
+  <div class="card">
+    <p class="text-muted">Ainda não há eventos de histórico para esta encomenda.</p>
+    <a [routerLink]="backLink" class="btn-secondary" style="margin-top: 0.75rem; display: inline-block;">Voltar</a>
+  </div>
+}

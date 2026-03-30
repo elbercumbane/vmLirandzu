@@ -22,6 +22,7 @@ public record EncomendaDetalheDTO(
         LocalDate dataEncomenda,
         String invoiceNumber,
         LocalDate invoiceDate,
+        String trackingCode,
         CotacaoResumoDTO cotacao) {
 
     public record ClienteResumoDTO(Long id, String nome, String telefone, String email, String endereco) {}
@@ -57,6 +58,7 @@ public record EncomendaDetalheDTO(
                 e.getDataEncomenda(),
                 e.getInvoiceNumber(),
                 e.getInvoiceDate(),
+                e.getTrackingCode(),
                 cotDto);
     }
 }

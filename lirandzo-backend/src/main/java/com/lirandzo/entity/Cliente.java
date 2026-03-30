@@ -38,6 +38,12 @@ public class Cliente {
     @Column(name = "tax_id", length = 50)
     private String nif;
 
+    @Column(name = "province", length = 100)
+    private String provincia;
+
+    @Column(name = "contact_person", length = 200)
+    private String pessoaContacto;
+
     @Column(name = "total_invoiced_amount", columnDefinition = "DECIMAL(15,2)")
     private Double valorTotalFaturado = 0.0;
 

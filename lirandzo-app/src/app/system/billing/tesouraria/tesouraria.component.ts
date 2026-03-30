@@ -2,11 +2,14 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from '../../../shared/services/auth.service';
-import { forkJoin } from 'rxjs';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
+import { NotificationPopupComponent } from '../../../shared/components/notification-popup/notification-popup.component';
 import { PagamentoService, PagamentoResponse } from '../../../services/pagamento.service';
 import { EncomendaService, EncomendaResponse } from '../../../services/encomenda.service';
+import { ReciboService, ReciboResponse } from '../../../services/recibo.service';
 
 interface RecebimentoRow {
   id: number;
@@ -30,10 +33,12 @@ interface DividaRow {
   dias: number;
 }
 
+export type TesourariaAba = 'RECIBOS' | 'BAIXAS' | 'RECEBIMENTOS' | 'DESPESAS' | 'DIVIDAS';
+
 @Component({
   selector: 'app-tesouraria',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, BillingSectionHeaderComponent],
+  imports: [CommonModule, FormsModule, RouterLink, BillingSectionHeaderComponent, NotificationPopupComponent],
   templateUrl: './tesouraria.component.html',
   styleUrls: ['../shared/billing-page.css', './tesouraria.component.css']
 })
@@ -41,51 +46,59 @@ export class TesourariaComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private auth = inject(AuthService);
 
-  /** Rota `/billing/baixas`: texto orientado ao operador (fluxo mãe de cobrança). */
   modoFluxoBaixas = false;
-  pageTitle = 'Tesouraria';
-  pageSubtitle = 'Receitas da operação, fila de conciliação com o banco e dívidas';
-  helpTitle = 'Pagamentos sem banco integrado';
-
+  somenteBaixasPagina = false;
+  pageTitle = 'Recibos e movimentos';
+  pageSubtitle = 'Recibos emitidos automaticamente ao confirmar pagamentos, movimentos e conciliação';
+  helpTitle = 'Pagamentos e recibos';
   helpItems = [
-    'Os recebimentos vêm das encomendas: abra cada encomenda e registe o valor com a referência do M-Pesa ou extrato.',
-    'Se ainda não verificou no banco, marque «aguarda extrato»; o valor aparece na aba Conciliação até confirmar.',
-    'Só perfis Administrador e Gestor podem confirmar na conciliação (valida que o dinheiro entrou).',
+    'Cada pagamento confirmado (baixa na factura) gera um recibo numerado (ex.: RCB-2026-00001).',
+    'Na aba Baixas concilia movimentos antigos pendentes de extrato — perfil diferente da lista de recibos.',
+    'Use o extrato na aba Recibos para imprimir um resumo por período.',
     'As despesas mostradas são exemplos locais até existir módulo de despesas na base de dados.'
   ];
 
   fluxoBaixasPassos = [
-    { n: 1, titulo: 'Registar pagamento', texto: 'Na ficha da encomenda, em «Pagamentos», lance valor, método e referência.' },
-    { n: 2, titulo: 'Aguarda extrato?', texto: 'Se ainda não cruzou com o banco/M-Pesa, o movimento vem para a aba Conciliação.' },
-    { n: 3, titulo: 'Confirmar (Admin / Gestor)', texto: 'Quem valida o extrato confirma; a dívida do cliente actualiza-se automaticamente.' },
-    { n: 4, titulo: 'Acompanhar dívidas', texto: 'Use a aba Dívidas para quem deve; pagamento total antecipado, parcial ou zero fica visível na lista de facturas.' }
+    {
+      n: 1,
+      titulo: 'Registar pagamento',
+      texto: 'Em Facturas → Registar pagamentos ou na ficha da encomenda: valor, referência e método. Admin/gestor confirma na hora; técnico fica em aprovação.'
+    },
+    {
+      n: 2,
+      titulo: 'Recibo automático',
+      texto: 'Ao confirmar o pagamento (ou aprovar o do técnico), o sistema emite o recibo com número único — consulte na aba Recibos.'
+    },
+    {
+      n: 3,
+      titulo: 'Baixas / conciliação',
+      texto: 'Movimentos antigos «aguarda extrato» são confirmados aqui (aba Baixas) por Admin ou Gestor após verificar o banco.'
+    },
+    {
+      n: 4,
+      titulo: 'Extrato e dívidas',
+      texto: 'Na aba Recibos use «Extrato do período» para impressão. A aba Dívidas lista facturas por pagar.'
+    }
   ];
 
-  activeTab: 'RECEBIMENTOS' | 'CONCILIACAO' | 'DESPESAS' | 'DIVIDAS' = 'RECEBIMENTOS';
-  mostrarFormRecebimento = false;
+  activeTab: TesourariaAba = 'RECIBOS';
   mostrarFormDespesa = false;
 
   loading = true;
   erro: string | null = null;
 
-  novoRecebimento = {
-    data: '',
-    cliente: '',
-    referencia: '',
-    valor: null as number | null,
-    metodo: '',
-    encomenda: '',
-    observacao: ''
-  };
-
   novaDespesa = { data: '', descricao: '', categoria: '', valor: null as number | null, viatura: '', observacao: '' };
 
-  metodosPagamento = ['Transferência Bancária', 'M-Pesa', 'e-Mola', 'Depósito', 'Numerário', 'Cheque'];
   categoriasDespesa = ['Combustível', 'Manutenção', 'Pneus', 'Portagem', 'Multa', 'Seguro', 'Lavagem', 'Peças', 'Salários', 'Outros'];
 
   recebimentos: RecebimentoRow[] = [];
   pendentesConciliacao: PagamentoResponse[] = [];
+  pendentesAprovacao: PagamentoResponse[] = [];
   dividasPendentes: DividaRow[] = [];
+  recibos: ReciboResponse[] = [];
+
+  extratoDataInicio = '';
+  extratoDataFim = '';
 
   confirmandoId: number | null = null;
 
@@ -95,7 +108,8 @@ export class TesourariaComponent implements OnInit {
 
   constructor(
     private pagamentoService: PagamentoService,
-    private encomendaService: EncomendaService
+    private encomendaService: EncomendaService,
+    private reciboService: ReciboService
   ) {}
 
   get podeConfirmarConciliacao(): boolean {
@@ -104,19 +118,33 @@ export class TesourariaComponent implements OnInit {
 
   ngOnInit(): void {
     this.modoFluxoBaixas = !!this.route.snapshot.data['tesourariaModoBaixas'];
-    if (this.modoFluxoBaixas) {
-      this.pageTitle = 'Baixas & tesouraria';
-      this.pageSubtitle = 'Fluxo de cobrança: registar → conciliar → confirmar → controlar dívidas';
-      this.helpTitle = 'Como usar as baixas';
-      this.helpItems = [
-        'Pense na factura como documento único: pagamentos parciais são vários lançamentos na mesma encomenda, não uma segunda factura.',
-        'Quem opera regista o pagamento; só Admin ou Gestor confirma quando o banco bate certo.',
-        'Cliente em dívida aparece na aba Dívidas e na lista de facturas com filtro «Não pago» ou «Parcial».'
-      ];
+    this.somenteBaixasPagina = !!this.route.snapshot.data['tesourariaSomenteBaixas'];
+    const abaInicial = this.route.snapshot.data['tesourariaAbaInicial'] as TesourariaAba | undefined;
+    if (abaInicial === 'BAIXAS' || this.modoFluxoBaixas) {
+      this.activeTab = 'BAIXAS';
+    } else if (abaInicial === 'RECEBIMENTOS') {
       this.activeTab = 'RECEBIMENTOS';
+    } else {
+      this.activeTab = 'RECIBOS';
     }
-    const hoje = new Date().toISOString().split('T')[0];
-    this.novoRecebimento.data = hoje;
+
+    if (this.modoFluxoBaixas) {
+      this.pageTitle = 'Baixas e recibos';
+      this.pageSubtitle = 'Conciliação com o banco e recibos emitidos ao confirmar pagamentos';
+      this.helpTitle = 'Como usar baixas e recibos';
+      this.helpItems = [
+        'A aba Baixas é só para confirmar movimentos antigos no extrato (Admin/Gestor). O formulário é distinto da lista de recibos.',
+        'Cada pagamento confirmado gera um recibo — veja a aba Recibos ou abra «Recibos e movimentos» no menu.',
+        'Pense na factura como documento único: vários pagamentos parciais geram vários recibos na mesma factura.',
+        'Cliente em dívida aparece na aba Dívidas e na lista de facturas.'
+      ];
+    }
+
+    const hoje = new Date();
+    const ini = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+    this.extratoDataInicio = ini.toISOString().split('T')[0];
+    this.extratoDataFim = hoje.toISOString().split('T')[0];
+
     this.carregarDados();
   }
 
@@ -127,17 +155,21 @@ export class TesourariaComponent implements OnInit {
     forkJoin({
       pagamentos: this.pagamentoService.listarTodos(),
       pendentes: this.pagamentoService.listarPendentesConciliacao(),
-      encomendas: this.encomendaService.listarEncomendas()
+      aprovacao: this.pagamentoService.listarPendentesAprovacao().pipe(catchError(() => of([] as PagamentoResponse[]))),
+      encomendas: this.encomendaService.listarEncomendas(),
+      recibos: this.reciboService.listar().pipe(catchError(() => of([] as ReciboResponse[])))
     }).subscribe({
-      next: ({ pagamentos, pendentes, encomendas }) => {
+      next: ({ pagamentos, pendentes, aprovacao, encomendas, recibos }) => {
+        this.pendentesAprovacao = aprovacao;
         this.pendentesConciliacao = pendentes;
         this.recebimentos = pagamentos.map((p) => this.mapearRecebimento(p));
         this.dividasPendentes = this.mapearDividas(encomendas);
+        this.recibos = recibos;
         this.loading = false;
       },
       error: (e) => {
         console.error(e);
-        this.erro = 'Não foi possível carregar dados da tesouraria.';
+        this.erro = 'Não foi possível carregar dados.';
         this.loading = false;
       }
     });
@@ -229,13 +261,7 @@ export class TesourariaComponent implements OnInit {
     });
   }
 
-  registarRecebimento(): void {
-    console.log('Formulário de recebimento sem encomenda: use a página da encomenda para lançar pagamentos.');
-    this.mostrarFormRecebimento = false;
-  }
-
   registarDespesa(): void {
-    console.log('Nova despesa:', this.novaDespesa);
     this.mostrarFormDespesa = false;
   }
 
@@ -243,4 +269,95 @@ export class TesourariaComponent implements OnInit {
     if (num == null) return '—';
     return `VML-${String(num).padStart(4, '0')}`;
   }
+
+  formatarDataRecibo(iso: string): string {
+    if (!iso) return '—';
+    return new Date(iso).toLocaleString('pt-MZ', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  imprimirRecibo(r: ReciboResponse): void {
+    const w = window.open('', '_blank');
+    if (!w) return;
+    const titulo = escapeHtml(r.numeroPublico);
+    const corpo =
+      `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Recibo ${titulo}</title>
+<style>
+  body { font-family: system-ui, sans-serif; padding: 2rem; max-width: 560px; margin: 0 auto; color: #111; }
+  h1 { font-size: 1.25rem; margin: 0 0 0.5rem; }
+  .num { font-size: 1.1rem; font-weight: 700; color: #0f172a; }
+  table { width: 100%; border-collapse: collapse; margin-top: 1.25rem; font-size: 0.95rem; }
+  td { padding: 0.35rem 0; border-bottom: 1px solid #e5e7eb; }
+  td:first-child { color: #64748b; width: 42%; }
+  .valor { font-size: 1.35rem; font-weight: 700; margin-top: 1rem; }
+  @media print { body { padding: 1rem; } }
+</style></head><body>
+  <h1>Recibo de pagamento</h1>
+  <p class="num">${escapeHtml(r.numeroPublico)}</p>
+  <p style="margin:0.25rem 0 0;font-size:0.9rem;color:#64748b">Emitido em ${escapeHtml(this.formatarDataRecibo(r.dataEmissao))}</p>
+  <table>
+    <tr><td>Cliente</td><td>${escapeHtml(r.clienteNome || '—')}</td></tr>
+    <tr><td>Factura</td><td>${escapeHtml(r.numeroFactura || '—')}</td></tr>
+    <tr><td>Referência do pagamento</td><td>${escapeHtml(r.referenciaPagamento || '—')}</td></tr>
+    <tr><td>Meio</td><td>${escapeHtml(r.metodoPagamento || '—')}</td></tr>
+  </table>
+  <p class="valor">${(r.valor ?? 0).toLocaleString('pt-MZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MZN</p>
+  <p style="font-size:0.8rem;color:#64748b;margin-top:2rem;">Documento gerado automaticamente pelo sistema ao confirmar o pagamento.</p>
+` +
+      '<script>window.onload=function(){window.print();}<\/script></body></html>';
+    w.document.write(corpo);
+    w.document.close();
+  }
+
+  private recibosFiltradosExtrato(): ReciboResponse[] {
+    const ini = this.extratoDataInicio ? new Date(this.extratoDataInicio + 'T00:00:00').getTime() : 0;
+    const fim = this.extratoDataFim ? new Date(this.extratoDataFim + 'T23:59:59').getTime() : Number.MAX_SAFE_INTEGER;
+    return this.recibos.filter((r) => {
+      const t = r.dataEmissao ? new Date(r.dataEmissao).getTime() : 0;
+      return t >= ini && t <= fim;
+    });
+  }
+
+  imprimirExtratoRecibos(): void {
+    const lista = this.recibosFiltradosExtrato();
+    const total = lista.reduce((s, r) => s + (r.valor || 0), 0);
+    const linhas = lista
+      .map(
+        (r) =>
+          `<tr><td>${escapeHtml(this.formatarDataRecibo(r.dataEmissao))}</td><td>${escapeHtml(r.numeroPublico)}</td><td>${escapeHtml(r.clienteNome || '—')}</td><td>${escapeHtml(r.numeroFactura || '—')}</td><td style="text-align:right">${(r.valor ?? 0).toLocaleString('pt-MZ', { minimumFractionDigits: 2 })}</td></tr>`
+      )
+      .join('');
+    const w = window.open('', '_blank');
+    if (!w) return;
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Extrato de recibos</title>
+<style>
+body{font-family:system-ui,sans-serif;padding:1.5rem;color:#111}
+h1{font-size:1.15rem;margin:0 0 .5rem}
+table{width:100%;border-collapse:collapse;font-size:0.88rem;margin-top:1rem}
+th,td{padding:0.45rem 0.35rem;border-bottom:1px solid #e5e7eb;text-align:left}
+th{background:#f8fafc;font-weight:600}
+.tot{font-weight:700;margin-top:1rem;text-align:right}
+</style></head><body>
+<h1>Extrato de recibos</h1>
+<p style="margin:0;color:#64748b;font-size:0.9rem">Período: ${escapeHtml(this.extratoDataInicio || '—')} a ${escapeHtml(this.extratoDataFim || '—')}</p>
+<table><thead><tr><th>Data</th><th>Recibo</th><th>Cliente</th><th>Factura</th><th style="text-align:right">Valor (MZN)</th></tr></thead>
+<tbody>${linhas || '<tr><td colspan="5">Nenhum recibo neste período.</td></tr>'}</tbody></table>
+<p class="tot">Total: ${total.toLocaleString('pt-MZ', { minimumFractionDigits: 2 })} MZN (${lista.length} recibo(s))</p>
+` +
+      '<script>window.onload=function(){window.print();}<\/script></body></html>');
+    w.document.close();
+  }
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }

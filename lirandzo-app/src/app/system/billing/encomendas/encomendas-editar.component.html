@@ -24,76 +24,81 @@
   </div>
 } @else {
   <div class="card">
-    <!-- Invoice header -->
-    <div class="invoice-header">
-      <div class="invoice-from">
+    <div class="enc-doc-header">
+      <div>
         <div class="invoice-company">VM TRANSPORTES</div>
         <div class="invoice-company-sub">Lirandzo — Transporte de Cargas</div>
       </div>
-      <div class="form-grid" style="max-width: 300px">
-        <div class="form-group">
-          <label class="form-label">Nº Factura</label>
-          <input type="text" class="form-control" [(ngModel)]="encomenda.numeroFactura" placeholder="Ex: 108D" readonly>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Data</label>
-          <input type="date" class="form-control" [(ngModel)]="encomenda.data">
-        </div>
+      <div class="enc-doc-title">FACTURA</div>
+    </div>
+
+    <div class="form-grid enc-doc-meta">
+      <div class="form-group">
+        <label class="form-label">Nº Factura</label>
+        <input type="text" class="form-control" [(ngModel)]="encomenda.numeroFactura" name="numFact" placeholder="Ex: 108D" readonly>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data</label>
+        <input type="date" class="form-control" [(ngModel)]="encomenda.data" name="dataEnc">
       </div>
     </div>
 
-    <!-- Client info section -->
     <h3 class="form-section-title">Dados do Cliente (Destinatário)</h3>
-    <div class="form-grid">
+    <div class="enc-client-grid-3x2">
       <div class="form-group">
         <label class="form-label">Nome / Empresa</label>
-        <input type="text" class="form-control" [(ngModel)]="encomenda.clienteNome" placeholder="Ex: SLR Mining, Lda">
+        <input type="text" class="form-control" [(ngModel)]="encomenda.clienteNome" name="cliNome" placeholder="Ex: SLR Mining, Lda">
       </div>
       <div class="form-group">
         <label class="form-label">NUIT</label>
-        <input type="text" class="form-control" [(ngModel)]="encomenda.clienteNuit" placeholder="Nº contribuinte">
+        <input type="text" class="form-control" [(ngModel)]="encomenda.clienteNuit" name="cliNuit" placeholder="Nº contribuinte">
       </div>
-      <div class="form-group full-width">
+      <div class="form-group">
+        <label class="form-label">Telefone</label>
+        <input type="text" class="form-control" [(ngModel)]="encomenda.clienteTelefone" name="cliTel" placeholder="Ex: 847983277">
+      </div>
+      <div class="form-group">
         <label class="form-label">Endereço</label>
-        <input type="text" class="form-control" [(ngModel)]="encomenda.clienteEndereco" placeholder="Ex: Aldeia Napaco Mpupene">
+        <input type="text" class="form-control" [(ngModel)]="encomenda.clienteEndereco" name="cliEnd" placeholder="Ex: Aldeia Napaco Mpupene">
       </div>
       <div class="form-group">
         <label class="form-label">Província</label>
-        <select class="form-control" [(ngModel)]="encomenda.clienteProvincia">
+        <select class="form-control" [(ngModel)]="encomenda.clienteProvincia" name="cliProv">
           <option value="">Seleccionar...</option>
           <option *ngFor="let p of provincias" [value]="p">{{ p }}</option>
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">ATT (Pessoa de Contacto)</label>
-        <input type="text" class="form-control" [(ngModel)]="encomenda.clienteContacto" placeholder="Ex: Sr. Euclides">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Telefone</label>
-        <input type="text" class="form-control" [(ngModel)]="encomenda.clienteTelefone" placeholder="Ex: 847983277">
+        <input type="text" class="form-control" [(ngModel)]="encomenda.clienteContacto" name="cliAtt" placeholder="Ex: Sr. Euclides">
       </div>
     </div>
 
-    <!-- Items table -->
     <h3 class="form-section-title">Itens / Produtos</h3>
-    <div class="table-wrapper">
-      <table class="data-table">
+    <div class="table-wrapper enc-itens-table">
+      <table class="data-table enc-itens-data">
         <thead>
           <tr>
-            <th style="width: 80px">Qtd</th>
+            <th class="enc-col-qtd">Qtd</th>
             <th>Descrição</th>
-            <th style="width: 150px">Preço Unitário</th>
-            <th style="width: 150px">Subtotal</th>
-            <th style="width: 50px"></th>
+            <th class="enc-col-preco">Preço Unitário</th>
+            <th class="enc-col-sub">Subtotal</th>
+            <th class="enc-col-act"></th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let item of itens; let i = index">
-            <td><input type="number" class="form-control" [(ngModel)]="item.quantidade" min="1" style="width: 70px"></td>
-            <td><input type="text" class="form-control" [(ngModel)]="item.descricao" placeholder="Ex: Full load" style="width: 100%"></td>
-            <td><input type="number" class="form-control" [(ngModel)]="item.precoUnitario" placeholder="0.00" style="width: 130px"></td>
-            <td style="font-weight: 600; color: var(--text-primary)">{{ getSubtotalItem(item) | number:'1.2-2' }} MZN</td>
+            <td class="enc-col-qtd">
+              <input type="number" class="form-control enc-input-tight" [(ngModel)]="item.quantidade" [name]="'qtd'+i" min="1">
+            </td>
             <td>
+              <input type="text" class="form-control" [(ngModel)]="item.descricao" [name]="'desc'+i" placeholder="Ex: Full load">
+            </td>
+            <td class="enc-col-preco">
+              <input type="number" class="form-control enc-input-tight" [(ngModel)]="item.precoUnitario" [name]="'preco'+i" placeholder="0.00" step="0.01">
+            </td>
+            <td class="enc-col-sub enc-num">{{ getSubtotalItem(item) | number:'1.2-2' }} MZN</td>
+            <td class="enc-col-act">
               <button type="button" class="action-btn action-btn-danger" (click)="removerItem(i)" *ngIf="itens.length > 1" title="Remover">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
@@ -107,42 +112,39 @@
       Adicionar Item
     </button>
 
-    <!-- Costs section -->
     <h3 class="form-section-title">Custos Adicionais</h3>
-    <div class="form-grid">
+    <div class="form-grid enc-form-grid enc-custos-grid">
       <div class="form-group">
         <label class="form-label">Transporte (MZN)</label>
-        <input type="number" class="form-control" [(ngModel)]="encomenda.custoTransporte" placeholder="0.00">
+        <input type="number" class="form-control" [(ngModel)]="encomenda.custoTransporte" name="custoTr" placeholder="0.00" step="0.01">
       </div>
       <div class="form-group">
         <label class="form-label">Recolha (MZN)</label>
-        <input type="number" class="form-control" [(ngModel)]="encomenda.custoRecolha" placeholder="0.00">
+        <input type="number" class="form-control" [(ngModel)]="encomenda.custoRecolha" name="custoRec" placeholder="0.00" step="0.01">
       </div>
       <div class="form-group">
         <label class="form-label">Bill of Entry (MZN)</label>
-        <input type="number" class="form-control" [(ngModel)]="encomenda.custoBillOfEntry" placeholder="0.00">
+        <input type="number" class="form-control" [(ngModel)]="encomenda.custoBillOfEntry" name="custoBe" placeholder="0.00" step="0.01">
       </div>
     </div>
 
-    <!-- Totals -->
-    <div class="invoice-totals">
-      <div class="invoice-total-row"><span>Subtotal Itens</span><span>{{ subtotalItens | number:'1.2-2' }} MZN</span></div>
-      <div class="invoice-total-row"><span>Transporte</span><span>{{ (encomenda.custoTransporte || 0) | number:'1.2-2' }} MZN</span></div>
-      <div class="invoice-total-row"><span>Recolha</span><span>{{ (encomenda.custoRecolha || 0) | number:'1.2-2' }} MZN</span></div>
-      <div class="invoice-total-row"><span>Bill of Entry</span><span>{{ (encomenda.custoBillOfEntry || 0) | number:'1.2-2' }} MZN</span></div>
-      <div class="invoice-total-row invoice-total-final"><span>TOTAL</span><span>{{ totalGeral | number:'1.2-2' }} MZN</span></div>
+    <div class="enc-quote-totals">
+      <div class="enc-quote-total-row"><span>Subtotal Itens</span><span>{{ subtotalItens | number:'1.2-2' }} MZN</span></div>
+      <div class="enc-quote-total-row"><span>Transporte</span><span>{{ (encomenda.custoTransporte || 0) | number:'1.2-2' }} MZN</span></div>
+      <div class="enc-quote-total-row"><span>Recolha</span><span>{{ (encomenda.custoRecolha || 0) | number:'1.2-2' }} MZN</span></div>
+      <div class="enc-quote-total-row"><span>Bill of Entry</span><span>{{ (encomenda.custoBillOfEntry || 0) | number:'1.2-2' }} MZN</span></div>
+      <div class="enc-quote-total-row enc-quote-total-final"><span>TOTAL</span><span>{{ totalGeral | number:'1.2-2' }} MZN</span></div>
     </div>
 
-    <!-- Terms -->
     <h3 class="form-section-title">Termos e Observações</h3>
     <div class="form-grid">
       <div class="form-group">
         <label class="form-label">Termos de Pagamento</label>
-        <input type="text" class="form-control" [(ngModel)]="encomenda.termos" placeholder="Ex: M60, Pagamento imediato...">
+        <input type="text" class="form-control" [(ngModel)]="encomenda.termos" name="termos" placeholder="Ex: M60, Pagamento imediato...">
       </div>
       <div class="form-group full-width">
         <label class="form-label">Observações</label>
-        <textarea class="form-control" [(ngModel)]="encomenda.observacoes" placeholder="Ex: Entrega condicionada a Pagamento" rows="3"></textarea>
+        <textarea class="form-control" [(ngModel)]="encomenda.observacoes" name="obs" placeholder="Ex: Entrega condicionada a Pagamento" rows="3"></textarea>
       </div>
     </div>
 
@@ -153,7 +155,6 @@
   </div>
 }
 
-<!-- Popup de Notificação -->
 <app-notification-popup
   *ngIf="showNotification"
   [message]="notificationMessage"

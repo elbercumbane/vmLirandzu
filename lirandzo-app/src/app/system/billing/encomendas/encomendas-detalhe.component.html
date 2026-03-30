@@ -3,7 +3,7 @@
   [showHelp]="false"
   [backLink]="'/billing/encomendas'"
   title="Detalhes da Encomenda"
-  subtitle="Visualização completa da factura"
+  subtitle="Factura, valores e pagamentos — o histórico da cotação está numa página à parte"
 ></app-billing-section-header>
 
 @if (loading) {
@@ -27,18 +27,23 @@
         @if (encomenda.cotacao?.referencia) {
           <p class="text-muted">Cotação origem: <a [routerLink]="['/billing/cotacoes/gerar', encomenda.cotacao!.id]">{{ encomenda.cotacao!.referencia }}</a></p>
         }
+        @if (encomenda.trackingCode) {
+          <p class="text-muted">Código de rastreio: <strong style="font-family:monospace;letter-spacing:0.04em;">{{ encomenda.trackingCode }}</strong></p>
+        }
       </div>
       <div>
         <span [class]="'badge ' + getStatusClass(encomenda.status)">
           {{ formatarStatus(encomenda.status) }}
         </span>
-        <button type="button" class="btn-primary" (click)="editar()" style="margin-left: 1rem;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="margin-right: 0.5rem;">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-          </svg>
-          Editar
-        </button>
+        @if (podeEditarFactura) {
+          <button type="button" class="btn-primary" (click)="editar()" style="margin-left: 1rem;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="margin-right: 0.5rem;">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            Editar
+          </button>
+        }
         <button type="button" class="btn-secondary" (click)="abrirPdfPreview()" style="margin-left: 0.5rem;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="margin-right: 0.5rem;">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -51,12 +56,25 @@
       </div>
     </div>
 
+    @if (encomendaId) {
+      <div class="historico-cta-bar">
+        <a [routerLink]="['/billing/encomendas', encomendaId, 'historico']" class="btn-secondary btn-sm historico-cta-link">
+          Ver histórico completo (cotação → factura → pagamentos)
+        </a>
+        <span class="historico-cta-hint">Abre uma página só com a linha do tempo e datas.</span>
+      </div>
+    }
+
     <div class="detail-grid">
       <div class="detail-section">
         <h4>Informações do Cliente</h4>
         <div class="detail-item">
           <span class="detail-label">Nome:</span>
           <span class="detail-value">{{ encomenda.cliente?.nome || 'Não especificado' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">NUIT:</span>
+          <span class="detail-value">{{ encomenda.cliente?.nif || 'Não especificado' }}</span>
         </div>
         <div class="detail-item">
           <span class="detail-label">Telefone:</span>
@@ -69,6 +87,14 @@
         <div class="detail-item">
           <span class="detail-label">Endereço:</span>
           <span class="detail-value">{{ encomenda.cliente?.endereco || 'Não especificado' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Província:</span>
+          <span class="detail-value">{{ encomenda.cliente?.provincia || 'Não especificado' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">ATT:</span>
+          <span class="detail-value">{{ encomenda.cliente?.pessoaContacto || 'Não especificado' }}</span>
         </div>
       </div>
 
@@ -110,7 +136,14 @@
           <div class="detail-item" style="margin-top:0.75rem;padding:0.75rem;background:rgba(245,158,11,0.12);border-radius:8px;">
             <span class="detail-label">Pendente confirmação (extrato):</span>
             <span class="detail-value" style="color:var(--warning, #d97706);font-weight:600">{{ valorPendenteExtrato | number:'1.2-2' }} MZN</span>
-            <p style="margin:0.35rem 0 0;font-size:0.8rem;color:var(--text-muted);">Valor registado mas ainda não confirmado no banco / M-Pesa. Confirme na lista abaixo após verificar.</p>
+            <p style="margin:0.35rem 0 0;font-size:0.8rem;color:var(--text-muted);">Valor registado (histórico) ainda não confirmado no extrato. Confirme na lista abaixo após verificar.</p>
+          </div>
+        }
+        @if (valorPendenteAprovacao > 0) {
+          <div class="detail-item" style="margin-top:0.75rem;padding:0.75rem;background:rgba(59,130,246,0.1);border-radius:8px;">
+            <span class="detail-label">Aguarda aprovação (gestão):</span>
+            <span class="detail-value" style="color:var(--accent, #2563eb);font-weight:600">{{ valorPendenteAprovacao | number:'1.2-2' }} MZN</span>
+            <p style="margin:0.35rem 0 0;font-size:0.8rem;color:var(--text-muted);">Registado por um técnico — gestor ou admin deve aprovar na tabela abaixo para contabilizar na dívida.</p>
           </div>
         }
       </div>
@@ -121,8 +154,8 @@
         <div>
           <h3 style="margin:0;">Pagamentos</h3>
           <p class="text-muted" style="margin:0.25rem 0 0;font-size:0.85rem;">
-            Sem ligação ao banco: use a referência do SMS ou do extrato para cruzar manualmente.
-            Só os pagamentos <strong>confirmados</strong> reduzem a dívida.
+            Use a referência do extrato da transferência para cruzar. Só pagamentos <strong>confirmados</strong> reduzem a dívida.
+            Técnicos: o registo fica <strong>aguarda aprovação</strong> até gestor ou administrador aprovar.
           </p>
         </div>
       </div>
@@ -134,9 +167,9 @@
               <th>Data</th>
               <th>Valor</th>
               <th>Método</th>
-              <th>Ref. banco / M-Pesa</th>
+              <th>Ref. extrato</th>
               <th>Estado</th>
-              <th style="width:120px;">Acção</th>
+              <th style="min-width:200px;">Acção</th>
             </tr>
           </thead>
           <tbody>
@@ -148,11 +181,28 @@
                 <td style="font-family:monospace;font-size:0.85rem;">{{ p.referencia || '—' }}</td>
                 <td><span class="badge" [ngClass]="badgeVerificacao(p.verificationStatus)">{{ labelVerificacao(p.verificationStatus) }}</span></td>
                 <td>
-                  @if (p.verificationStatus === 'PENDING_BANK') {
+                  @if (p.verificationStatus === 'PENDING_BANK' && podeAprovarPagamentos) {
                     <button type="button" class="btn-primary btn-sm" [disabled]="confirmandoId === p.id" (click)="confirmarNoExtrato(p)">
-                      {{ confirmandoId === p.id ? '…' : 'Confirmar' }}
+                      {{ confirmandoId === p.id ? '…' : 'Confirmar no extrato' }}
                     </button>
-                  } @else { — }
+                  } @else if (p.verificationStatus === 'PENDING_BANK') {
+                    <span class="text-muted" style="font-size:0.8rem;">Aguarda gestor/admin (extrato)</span>
+                  } @else if (p.verificationStatus === 'PENDING_APPROVAL' && podeAprovarPagamentos) {
+                    <div class="pagamento-acoes-gestor">
+                      <button type="button" class="btn-primary btn-sm" [disabled]="processandoAprovacaoId === p.id" (click)="aprovarPagamentoGestor(p)">
+                        {{ processandoAprovacaoId === p.id ? '…' : 'Aprovar' }}
+                      </button>
+                      <button type="button" class="btn-secondary btn-sm" [disabled]="processandoAprovacaoId === p.id" (click)="recusarPagamentoGestor(p)">
+                        Recusar
+                      </button>
+                    </div>
+                  } @else if (p.verificationStatus === 'PENDING_APPROVAL') {
+                    <span class="text-muted" style="font-size:0.8rem;">Aguarda gestor/admin</span>
+                  } @else if (p.verificationStatus === 'REJECTED') {
+                    <span class="text-muted" style="font-size:0.8rem;">—</span>
+                  } @else {
+                    —
+                  }
                 </td>
               </tr>
             } @empty {
@@ -169,7 +219,23 @@
         <div class="form-grid">
           <div class="form-group">
             <label class="form-label">Valor (MZN) *</label>
-            <input type="number" class="form-control" [(ngModel)]="novoPagamento.valor" name="valorPag" min="0.01" step="0.01" />
+            <input
+              type="number"
+              class="form-control"
+              [class.pagamento-input-invalido]="valorDigitadoExcedeMaximo()"
+              [(ngModel)]="novoPagamento.valor"
+              name="valorPag"
+              min="0.01"
+              [max]="maxValorPermitidoNovoPagamento() || null"
+              step="0.01"
+            />
+            <p class="text-muted" style="margin:0.35rem 0 0;font-size:0.8rem;">Máximo a registar: <strong>{{ maxValorPermitidoNovoPagamento() | number:'1.2-2' }} MZN</strong> (total da factura menos lançamentos não recusados).</p>
+            @if (valorDigitadoExcedeMaximo()) {
+              <p class="pagamento-campo-alerta" role="alert">
+                O valor <strong>{{ novoPagamento.valor | number:'1.2-2' }} MZN</strong> ultrapassa o máximo permitido
+                (<strong>{{ maxValorPermitidoNovoPagamento() | number:'1.2-2' }} MZN</strong>). Reduza o valor ou verifique os lançamentos já registados.
+              </p>
+            }
           </div>
           <div class="form-group">
             <label class="form-label">Data</label>
@@ -178,27 +244,41 @@
           <div class="form-group">
             <label class="form-label">Método</label>
             <select class="form-control" [(ngModel)]="novoPagamento.metodoPagamento" name="metodoPag">
-              <option value="">—</option>
               @for (m of metodosPagamento; track m) {
                 <option [value]="m">{{ m }}</option>
               }
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">Ref. extrato / M-Pesa</label>
-            <input type="text" class="form-control" [(ngModel)]="novoPagamento.referencia" name="refPag" placeholder="Ex.: ID da transação" />
+            <label class="form-label">Ref. do extrato *</label>
+            <input
+              type="text"
+              class="form-control"
+              [class.pagamento-input-invalido]="novoPagamento.valor != null && novoPagamento.valor > 0 && !novoPagamento.referencia?.trim()"
+              [(ngModel)]="novoPagamento.referencia"
+              name="refPag"
+              placeholder="Referência no extrato ou do movimento"
+            />
+            @if (novoPagamento.valor != null && novoPagamento.valor > 0 && !novoPagamento.referencia?.trim()) {
+              <p class="pagamento-campo-alerta" role="alert">A referência do extrato ou do movimento é obrigatória.</p>
+            }
           </div>
           <div class="form-group full-width">
             <label class="form-label">Observações</label>
             <input type="text" class="form-control" [(ngModel)]="novoPagamento.observacoes" name="obsPag" />
           </div>
-          <div class="form-group full-width" style="display:flex;align-items:center;gap:0.5rem;">
-            <input type="checkbox" id="aguardaExtrato" [(ngModel)]="novoPagamento.aguardaExtrato" name="aguardaExtrato" />
-            <label for="aguardaExtrato" style="margin:0;font-weight:normal;">Ainda não confirmei no extrato / app — só registar (não contabiliza na dívida até confirmar)</label>
-          </div>
         </div>
         <div class="form-actions">
-          <button type="button" class="btn-primary" [disabled]="aGuardarPagamento" (click)="registarPagamento()">
+          <button
+            type="button"
+            class="btn-primary"
+            [disabled]="
+              aGuardarPagamento ||
+              valorDigitadoExcedeMaximo() ||
+              (novoPagamento.valor != null && novoPagamento.valor > 0 && !novoPagamento.referencia?.trim())
+            "
+            (click)="registarPagamento()"
+          >
             {{ aGuardarPagamento ? 'A guardar…' : 'Registar pagamento' }}
           </button>
         </div>
@@ -304,6 +384,26 @@
               <div style="font-size:13px; color:#111111; padding:6px 10px;
                           background:#f9fafb; border:1px solid #e5e7eb; border-radius:6px;">
                 {{ encomenda.cliente?.endereco || '—' }}
+              </div>
+            </div>
+
+            <!-- Província -->
+            <div>
+              <div style="font-size:10px; font-weight:600; color:#6b7280; text-transform:uppercase;
+                          letter-spacing:0.04em; margin-bottom:3px;">Província</div>
+              <div style="font-size:13px; color:#111111; padding:6px 10px;
+                          background:#f9fafb; border:1px solid #e5e7eb; border-radius:6px;">
+                {{ encomenda.cliente?.provincia || '—' }}
+              </div>
+            </div>
+
+            <!-- ATT (pessoa de contacto) -->
+            <div>
+              <div style="font-size:10px; font-weight:600; color:#6b7280; text-transform:uppercase;
+                          letter-spacing:0.04em; margin-bottom:3px;">ATT</div>
+              <div style="font-size:13px; color:#111111; padding:6px 10px;
+                          background:#f9fafb; border:1px solid #e5e7eb; border-radius:6px;">
+                {{ encomenda.cliente?.pessoaContacto || '—' }}
               </div>
             </div>
 
@@ -433,5 +533,5 @@
   *ngIf="showNotification"
   [message]="notificationMessage"
   [type]="notificationType"
-  [duration]="6000">
+  [duration]="16000">
 </app-notification-popup>

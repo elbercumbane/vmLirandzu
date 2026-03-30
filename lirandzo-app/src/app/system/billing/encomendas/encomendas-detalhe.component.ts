@@ -7,8 +7,9 @@ import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
 import { EncomendaService, EncomendaResponse } from '../../../services/encomenda.service';
-import { PagamentoService, PagamentoResponse } from '../../../services/pagamento.service';
+import { PagamentoService, PagamentoResponse, VerificationStatusApi } from '../../../services/pagamento.service';
 import { NotificationPopupComponent } from '../../../shared/components/notification-popup/notification-popup.component';
+import { AuthService } from '../../../shared/services/auth.service';
 
 @Component({
   selector: 'app-encomendas-detalhe',
@@ -28,25 +29,35 @@ export class EncomendasDetalheComponent implements OnInit {
     valor: null as number | null,
     dataPagamento: '',
     referencia: '',
-    metodoPagamento: '',
-    observacoes: '',
-    aguardaExtrato: false
+    metodoPagamento: 'Transferência Bancária',
+    observacoes: ''
   };
 
-  metodosPagamento = ['Transferência Bancária', 'M-Pesa', 'e-Mola', 'Depósito', 'Numerário', 'Cheque'];
+  metodosPagamento = ['Transferência Bancária'];
 
   showNotification = false;
   notificationMessage = '';
   notificationType: 'success' | 'error' = 'success';
   aGuardarPagamento = false;
   confirmandoId: number | null = null;
+  /** Aprovação / recusa de pagamento PENDING_APPROVAL (gestor/admin) */
+  processandoAprovacaoId: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private encomendaService: EncomendaService,
-    private pagamentoService: PagamentoService
+    private pagamentoService: PagamentoService,
+    private auth: AuthService
   ) {}
+
+  get podeAprovarPagamentos(): boolean {
+    return this.auth.isAdmin || this.auth.isGestor;
+  }
+
+  get podeEditarFactura(): boolean {
+    return this.auth.canEditFacturas();
+  }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -101,13 +112,51 @@ export class EncomendasDetalheComponent implements OnInit {
       .reduce((s, p) => s + (p.valor || 0), 0);
   }
 
+  get valorPendenteAprovacao(): number {
+    return this.pagamentos
+      .filter((p) => p.verificationStatus === 'PENDING_APPROVAL')
+      .reduce((s, p) => s + (p.valor || 0), 0);
+  }
+
+  /** Tecto para novo lançamento: total da factura menos todos os pagamentos não recusados. */
+  maxValorPermitidoNovoPagamento(): number {
+    if (!this.encomenda) return 0;
+    const total = this.encomenda.valorTotal ?? 0;
+    const ocupado = this.pagamentos
+      .filter((p) => p.verificationStatus !== 'REJECTED')
+      .reduce((s, p) => s + (p.valor || 0), 0);
+    return Math.max(0, Math.round((total - ocupado) * 100) / 100);
+  }
+
+  valorDigitadoExcedeMaximo(): boolean {
+    if (!this.encomenda) return false;
+    const v = this.novoPagamento.valor;
+    if (v == null || v <= 0) return false;
+    return v > this.maxValorPermitidoNovoPagamento() + 0.004;
+  }
+
   registarPagamento(): void {
     if (!this.encomendaId || !this.novoPagamento.valor || this.novoPagamento.valor <= 0) {
       this.mostrarNotificacao('Indique um valor válido.', 'error');
       return;
     }
+    if (!this.novoPagamento.referencia?.trim()) {
+      this.mostrarNotificacao('Indique a referência do extrato ou do movimento.', 'error');
+      return;
+    }
+    const max = this.maxValorPermitidoNovoPagamento();
+    if (this.novoPagamento.valor > max + 0.004) {
+      this.mostrarNotificacao(
+        `O valor não pode exceder ${max.toFixed(2)} MZN (soma dos lançamentos não pode ultrapassar o total da factura).`,
+        'error'
+      );
+      return;
+    }
 
     this.aGuardarPagamento = true;
+    const verificationStatus: VerificationStatusApi =
+      this.auth.isAdmin || this.auth.isGestor ? 'CONFIRMED' : 'PENDING_APPROVAL';
+
     const payload = {
       encomenda: { numeroEncomenda: this.encomendaId },
       valor: this.novoPagamento.valor,
@@ -115,7 +164,7 @@ export class EncomendasDetalheComponent implements OnInit {
       referencia: this.novoPagamento.referencia?.trim() || undefined,
       observacoes: this.novoPagamento.observacoes?.trim() || undefined,
       metodoPagamento: this.novoPagamento.metodoPagamento || undefined,
-      verificationStatus: this.novoPagamento.aguardaExtrato ? ('PENDING_BANK' as const) : ('CONFIRMED' as const)
+      verificationStatus
     };
 
     this.pagamentoService.criar(payload).subscribe({
@@ -125,16 +174,14 @@ export class EncomendasDetalheComponent implements OnInit {
           valor: null,
           dataPagamento: new Date().toISOString().split('T')[0],
           referencia: '',
-          metodoPagamento: '',
-          observacoes: '',
-          aguardaExtrato: false
+          metodoPagamento: 'Transferência Bancária',
+          observacoes: ''
         };
-        this.mostrarNotificacao(
-          payload.verificationStatus === 'PENDING_BANK'
-            ? 'Pagamento registado. Confirme no extrato quando verificar o valor.'
-            : 'Pagamento registado e contabilizado na dívida.',
-          'success'
-        );
+        const msg =
+          payload.verificationStatus === 'PENDING_APPROVAL'
+            ? 'Pedido de pagamento enviado. Um gestor ou administrador deve aprovar antes de contabilizar na dívida.'
+            : 'Pagamento registado e contabilizado na dívida.';
+        this.mostrarNotificacao(msg, 'success');
         this.carregarTudo();
       },
       error: (err: unknown) => {
@@ -167,6 +214,51 @@ export class EncomendasDetalheComponent implements OnInit {
     });
   }
 
+  aprovarPagamentoGestor(p: PagamentoResponse): void {
+    this.processandoAprovacaoId = p.id;
+    this.pagamentoService.aprovarPagamentoGestor(p.id).subscribe({
+      next: () => {
+        this.processandoAprovacaoId = null;
+        this.mostrarNotificacao('Pagamento aprovado e contabilizado na dívida.', 'success');
+        this.carregarTudo();
+      },
+      error: (err: unknown) => {
+        this.processandoAprovacaoId = null;
+        const msg =
+          err && typeof err === 'object' && 'error' in err
+            ? (err as { error?: { error?: string } }).error?.error
+            : null;
+        this.mostrarNotificacao(msg || 'Erro ao aprovar.', 'error');
+      }
+    });
+  }
+
+  recusarPagamentoGestor(p: PagamentoResponse): void {
+    const motivo = typeof window !== 'undefined' ? window.prompt('Motivo da recusa:', '') : null;
+    if (motivo === null) return;
+    const trimmed = (motivo || '').trim();
+    if (!trimmed) {
+      this.mostrarNotificacao('Indique um motivo para recusar.', 'error');
+      return;
+    }
+    this.processandoAprovacaoId = p.id;
+    this.pagamentoService.recusarPagamentoGestor(p.id, trimmed).subscribe({
+      next: () => {
+        this.processandoAprovacaoId = null;
+        this.mostrarNotificacao('Pagamento recusado.', 'success');
+        this.carregarTudo();
+      },
+      error: (err: unknown) => {
+        this.processandoAprovacaoId = null;
+        const msg =
+          err && typeof err === 'object' && 'error' in err
+            ? (err as { error?: { error?: string } }).error?.error
+            : null;
+        this.mostrarNotificacao(msg || 'Erro ao recusar.', 'error');
+      }
+    });
+  }
+
   private mostrarNotificacao(message: string, type: 'success' | 'error'): void {
     this.notificationMessage = message;
     this.notificationType = type;
@@ -174,11 +266,30 @@ export class EncomendasDetalheComponent implements OnInit {
   }
 
   labelVerificacao(status: string): string {
-    return status === 'PENDING_BANK' ? 'Aguarda extrato' : 'Confirmado';
+    switch (status) {
+      case 'PENDING_BANK':
+        return 'Aguarda extrato';
+      case 'PENDING_APPROVAL':
+        return 'Aguarda aprovação';
+      case 'REJECTED':
+        return 'Recusado';
+      case 'CONFIRMED':
+      default:
+        return 'Confirmado';
+    }
   }
 
   badgeVerificacao(status: string): string {
-    return status === 'PENDING_BANK' ? 'badge-warning' : 'badge-success';
+    switch (status) {
+      case 'PENDING_BANK':
+      case 'PENDING_APPROVAL':
+        return 'badge-warning';
+      case 'REJECTED':
+        return 'badge-danger';
+      case 'CONFIRMED':
+      default:
+        return 'badge-success';
+    }
   }
 
   formatarData(data: string): string {
