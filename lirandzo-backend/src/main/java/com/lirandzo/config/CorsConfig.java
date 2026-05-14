@@ -32,7 +32,7 @@ public class CorsConfig {
                 .map(String::trim)
                 .filter(StringUtils::hasText)
                 .collect(Collectors.toList());
-        config.setAllowedOrigins(allowedOrigins);
+        config.setAllowedOriginPatterns(allowedOrigins);
         
         // Permitir métodos HTTP
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
