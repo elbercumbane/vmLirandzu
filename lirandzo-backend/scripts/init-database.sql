@@ -178,12 +178,14 @@ CREATE TABLE IF NOT EXISTS orders (
     trip_id BIGINT REFERENCES trips(id) ON DELETE SET NULL,
     invoice_number VARCHAR(50),
     invoice_date DATE,
+    tracking_code VARCHAR(50),
     quotation_id BIGINT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_orders_invoice_number ON orders(invoice_number) WHERE invoice_number IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_orders_tracking_code ON orders(tracking_code) WHERE tracking_code IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_orders_quotation_id ON orders(quotation_id);
 
 -- Payments table

@@ -5,6 +5,7 @@ import com.lirandzo.entity.Encomenda.StatusPagamento;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -38,4 +39,9 @@ public interface EncomendaRepository extends JpaRepository<Encomenda, Long> {
     @EntityGraph(attributePaths = {"cliente"})
     @Override
     java.util.Optional<Encomenda> findById(Long id);
+
+    /** Carrega cliente, cotação e viagem para construir a linha temporal de rastreio. */
+    @EntityGraph(attributePaths = {"cliente", "cotacao", "viagem"})
+    @Query("SELECT e FROM Encomenda e WHERE e.numeroEncomenda = :id")
+    Optional<Encomenda> findWithRastreamentoById(@Param("id") Long id);
 }

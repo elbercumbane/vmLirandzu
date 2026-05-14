@@ -10,6 +10,8 @@ export interface Cliente {
   email?: string;
   endereco?: string;
   nif?: string;
+  provincia?: string;
+  pessoaContacto?: string;
   valorTotalFaturado?: number;
   valorEmDivida?: number;
   numeroEncomendas?: number;

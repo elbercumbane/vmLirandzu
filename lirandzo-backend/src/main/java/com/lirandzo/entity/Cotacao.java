@@ -100,6 +100,11 @@ public class Cotacao {
     @Column(name = "terms", length = 500)
     private String condicoes;
 
+    /** Condição de pagamento comercial (PDF); distinto de {@link #condicoes} (flags internas). */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_terms", length = 40)
+    private CondicaoPagamentoCotacao condicaoPagamento;
+
     @Column(name = "operator", length = 200)
     private String operador;
 

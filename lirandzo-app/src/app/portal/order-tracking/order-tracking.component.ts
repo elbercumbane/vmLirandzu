@@ -1,3 +1,8 @@
+/**
+ * Rastreio público (/rastreio): apenas dados de demonstração no frontend.
+ * A API de rastreio real (por código TRK- / factura) será ligada aqui mais tarde;
+ * a linha temporal completa está disponível na área interna — detalhe da encomenda (facturação).
+ */
 import { Component, AfterViewInit, ViewChild, ElementRef, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';

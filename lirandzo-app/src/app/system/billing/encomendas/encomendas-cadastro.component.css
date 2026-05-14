@@ -1,27 +1,210 @@
-.invoice-header {
+.enc-client-grid-3x2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem 1.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.enc-client-grid-3x2 .form-group {
+  min-width: 0;
+}
+
+.enc-optional {
+  font-weight: 400;
+  font-size: 0.82rem;
+  opacity: 0.8;
+}
+
+@media (max-width: 960px) {
+  .enc-client-grid-3x2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .enc-client-grid-3x2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* NUNCA z-index negativo: html2canvas/html2pdf captura canvas vazio.
+   Mantém fora do ecrã à esquerda mas acima do fundo da página. */
+.invoice-pdf-offscreen {
+  position: fixed;
+  left: -12000px;
+  top: 0;
+  width: 210mm;
+  max-width: 210mm;
+  background: #fff;
+  z-index: 2147483646;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.enc-aviso-cotacao {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.enc-doc-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 2rem;
+  gap: 1rem;
   padding-bottom: 1.5rem;
   border-bottom: 2px solid var(--border-primary);
   margin-bottom: 1rem;
 }
 
-.invoice-company {
-  font-size: 1.5rem;
+.enc-doc-header .invoice-company {
+  font-size: 1.25rem;
   font-weight: 800;
-  color: var(--accent);
-  letter-spacing: 0.05em;
+  color: var(--accent, #dc2626);
+  letter-spacing: 0.04em;
 }
 
-.invoice-company-sub {
-  font-size: 0.85rem;
-  color: var(--text-muted);
+.enc-doc-header .invoice-company-sub {
   margin-top: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
 }
 
-.invoice-totals {
+.enc-doc-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.45rem 1.1rem;
+  border: 2px solid var(--border-primary);
+  border-radius: 0.5rem;
+  flex-shrink: 0;
+}
+
+.enc-doc-meta {
+  max-width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.enc-readonly-hint {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.enc-readonly-value {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.enc-readonly-sub {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.enc-form-grid {
+  gap: 1rem 1.25rem;
+}
+
+.enc-form-grid .form-group {
+  min-width: 0;
+}
+
+.enc-span-2 {
+  grid-column: 1 / -1;
+}
+
+.enc-custos-grid,
+.enc-iva-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 720px) {
+  .enc-custos-grid,
+  .enc-iva-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.enc-form-hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  opacity: 0.88;
+  color: var(--text-secondary);
+}
+
+.enc-itens-table {
+  overflow-x: auto;
+}
+
+.enc-itens-data {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.enc-itens-data .enc-col-qtd {
+  width: 6.75rem;
+  min-width: 6.5rem;
+}
+
+.enc-itens-data .enc-col-preco {
+  width: 7.5rem;
+}
+
+.enc-itens-data .enc-col-sub {
+  width: 7rem;
+}
+
+.enc-itens-data .enc-col-act {
+  width: 2.75rem;
+}
+
+.enc-itens-data .enc-input-tight {
+  width: 100%;
+  min-width: 0;
+}
+
+.enc-itens-data .enc-col-qtd .enc-input-tight {
+  min-width: 5.25rem;
+  font-size: 0.95rem;
+  padding-left: 0.45rem;
+  padding-right: 0.45rem;
+}
+
+.enc-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.iva-toggle {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.iva-toggle-btn {
+  padding: 0.45rem 0.9rem;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  font-weight: 700;
+  color: #111827;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.iva-toggle-btn.active {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #fff;
+}
+
+.enc-quote-totals {
   margin-top: 1.5rem;
   padding: 1.25rem;
   background: var(--bg-card-inner);
@@ -31,19 +214,28 @@
   margin-left: auto;
 }
 
-.invoice-total-row {
+.enc-quote-total-row {
   display: flex;
   justify-content: space-between;
+  gap: 1rem;
   padding: 0.4rem 0;
   font-size: 0.88rem;
   color: var(--text-secondary);
 }
 
-.invoice-total-final {
+.enc-quote-total-final {
   margin-top: 0.5rem;
   padding-top: 0.75rem;
   border-top: 2px solid var(--accent);
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--text-primary);
+}
+
+.enc-payment-terms-doc {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border, #e5e7eb);
+  font-size: 0.95rem;
+  color: var(--text-secondary);
 }

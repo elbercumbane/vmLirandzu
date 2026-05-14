@@ -1,19 +1,28 @@
-import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
-import { CotacaoService, CotacaoRequest, CotacaoResponse } from '../../../services/cotacao.service';
+import {
+  CondicaoPagamentoCotacao,
+  CotacaoService,
+  CotacaoRequest,
+  CotacaoResponse
+} from '../../../services/cotacao.service';
+import {
+  CONDICAO_PAGAMENTO_OPCOES,
+  labelCondicaoPagamentoPt,
+  normalizeCondicaoPagamento
+} from './cotacao-condicao-pagamento.util';
 import { ClienteService, Cliente } from '../../../services/cliente.service';
 import { NotificationPopupComponent } from '../../../shared/components/notification-popup/notification-popup.component';
+import { AuthService } from '../../../shared/services/auth.service';
 import html2pdf from 'html2pdf.js';
-
-interface ItemCotacao {
-  descricao: string;
-  quantidade: number;
-  unidade: 'kg' | 'toneladas' | '';
-  precoUnitario: number | null;
-}
+import {
+  ItemCotacao,
+  parseDescricaoCarga,
+  repartirValorTotalNosItensSeNecessario
+} from './cotacao-descricao-itens.util';
 
 @Component({
   selector: 'app-cotacoes-cadastro',
@@ -36,6 +45,10 @@ export class CotacoesCadastroComponent implements OnInit {
     clienteNome: '',
     clienteTelefone: '',
     clienteEmail: '',
+    clienteNuit: '',
+    clienteEndereco: '',
+    clienteProvincia: '',
+    clientePessoaContacto: '',
     origem: '',
     destino: '',
     tipoVeiculo: '',
@@ -49,15 +62,33 @@ export class CotacoesCadastroComponent implements OnInit {
     vatReason: 'ISENTO',
     // Nesta tela, "observacoes" será usado como "Origem" automática (PORTAL / MANUAL)
     observacoes: 'MANUAL',
-    formaEnvioPreferida: 'whatsapp' as string
+    formaEnvioPreferida: 'whatsapp' as string,
+    condicaoPagamento: 'TOTALIDADE' as CondicaoPagamentoCotacao
   };
+
+  readonly opcoesCondicaoPagamento = CONDICAO_PAGAMENTO_OPCOES;
 
   itens: ItemCotacao[] = [
     { descricao: '', quantidade: 1, unidade: '', precoUnitario: null }
   ];
 
-  operadores = ['Ana Silva', 'João Macuácua', 'Alberto Chissano', 'Mário Tembe'];
   tiposVeiculo = ['Camião Pesado (+16t)', 'Camião Médio (7.5-16t)', 'Camião Leve (até 7.5t)', 'Semi-Reboque'];
+
+  readonly provincias = [
+    'Maputo Cidade',
+    'Maputo Província',
+    'Gaza',
+    'Inhambane',
+    'Sofala',
+    'Manica',
+    'Tete',
+    'Zambézia',
+    'Nampula',
+    'Niassa',
+    'Cabo Delgado'
+  ];
+
+  private readonly auth = inject(AuthService);
 
   // Notificação
   showNotification: boolean = false;
@@ -96,6 +127,7 @@ export class CotacoesCadastroComponent implements OnInit {
     // Modo manual: data = hoje e validade = +3 dias (os inputs serão bloqueados)
     this.cotacao.validade = this.calcularValidadeISO(this.cotacao.data);
     this.cotacao.observacoes = 'MANUAL';
+    this.cotacao.operador = this.nomeOperadorLogado();
 
     this.route.queryParams.subscribe((params) => {
       this.modoPdfOnly = params['pdfOnly'] === '1';
@@ -110,14 +142,25 @@ export class CotacoesCadastroComponent implements OnInit {
         this.carregarDadosPedido(Number(pedidoId));
       } else {
         this.statusBackendCarregado = null;
+        this.modoPortal = false;
+        this.cotacao.operador = this.nomeOperadorLogado();
       }
     });
+  }
+
+  /** Nome do utilizador com sessão iniciada (gravado como operador na cotação). */
+  private nomeOperadorLogado(): string {
+    return this.auth.currentUser()?.nome?.trim() || '';
   }
 
   get tituloPaginaCotacao(): string {
     if (this.modoPdfOnly && this.modoAutoPdf) return 'A gerar documento';
     if (this.modoPdfOnly) return 'Documento da cotação';
     return this.edicaoCotacaoExistente ? 'Ajustar cotação' : 'Criar Cotação';
+  }
+
+  get textoCondicaoPagamentoCotacao(): string {
+    return labelCondicaoPagamentoPt(this.cotacao.condicaoPagamento);
   }
 
   get subtituloPaginaCotacao(): string {
@@ -165,29 +208,6 @@ export class CotacoesCadastroComponent implements OnInit {
     };
   }
 
-  /**
-   * Quando o backend tem valor total mas as linhas vieram só com texto (sem preços), reparte o valor pelos itens.
-   */
-  private repartirValorTotalNosItensSeNecessario(cotacao: CotacaoResponse): void {
-    const valorRef = cotacao.valorTotal;
-    if (valorRef == null || valorRef <= 0 || !this.itens.length) return;
-
-    const somaLinhas = this.itens.reduce((acc, i) => acc + (i.precoUnitario ?? 0), 0);
-    if (somaLinhas > 0.01) return;
-
-    const recolha = cotacao.custoRecolha ?? 0;
-    const baseItens = Math.max(0, valorRef - recolha);
-    if (baseItens <= 0) return;
-
-    const n = this.itens.length;
-    const porLinha = Math.round((baseItens / n) * 100) / 100;
-    let resto = baseItens - porLinha * (n - 1);
-    this.itens = this.itens.map((it, idx) => ({
-      ...it,
-      precoUnitario: idx === n - 1 ? Math.round(resto * 100) / 100 : porLinha
-    }));
-  }
-
   carregarDadosPedido(pedidoId: number): void {
     const qp = this.route.snapshot.queryParamMap;
     this.modoPdfOnly = qp.get('pdfOnly') === '1';
@@ -203,6 +223,10 @@ export class CotacoesCadastroComponent implements OnInit {
           this.cotacao.clienteNome = cotacao.cliente.nome || '';
           this.cotacao.clienteTelefone = cotacao.cliente.telefone || '';
           this.cotacao.clienteEmail = cotacao.cliente.email || '';
+          this.cotacao.clienteNuit = cotacao.cliente.nif || '';
+          this.cotacao.clienteEndereco = cotacao.cliente.endereco || '';
+          this.cotacao.clienteProvincia = cotacao.cliente.provincia || '';
+          this.cotacao.clientePessoaContacto = cotacao.cliente.pessoaContacto || '';
           this.clienteIdAtual = cotacao.cliente.id || null;
         }
         
@@ -233,7 +257,7 @@ export class CotacoesCadastroComponent implements OnInit {
         this.cotacao.custoRecolha = cotacao.custoRecolha ?? null;
         this.cotacao.custoTransporte = cotacao.custoTransporte ?? null;
         this.cotacao.custoBillOfEntry = cotacao.custoBillOfEntry ?? null;
-        this.cotacao.operador = cotacao.operador || '';
+        this.cotacao.operador = (cotacao.operador || '').trim() || this.nomeOperadorLogado();
 
         // Garantir coerência no preview quando o operador alterar desconto.
         this.recalcularCamposFinanceiros();
@@ -245,13 +269,13 @@ export class CotacoesCadastroComponent implements OnInit {
         
         // Preencher descrição da carga (mensagem do pedido) — parsear quantidades e unidades
         if (cotacao.descricaoCarga) {
-          this.itens = this.parseDescricaoCarga(cotacao.descricaoCarga);
+          this.itens = parseDescricaoCarga(cotacao.descricaoCarga);
           if (this.itens.length === 0) {
             this.itens = [{ descricao: cotacao.descricaoCarga, quantidade: 1, unidade: '', precoUnitario: null }];
           }
         }
 
-        this.repartirValorTotalNosItensSeNecessario(cotacao);
+        this.itens = repartirValorTotalNosItensSeNecessario(this.itens, cotacao);
         
         // Origem automática: PORTAL ou MANUAL
         const fonte = (cotacao.fontePedido || '').toUpperCase();
@@ -265,6 +289,9 @@ export class CotacoesCadastroComponent implements OnInit {
 
         // Preferência de envio deve vir do portal (para alimentar a coluna na lista)
         this.cotacao.formaEnvioPreferida = (cotacao.formaEnvioPreferida || cotacao.formaEnvioRealizada || this.cotacao.formaEnvioPreferida || 'whatsapp');
+
+        const condNorm = normalizeCondicaoPagamento(cotacao.condicaoPagamento);
+        this.cotacao.condicaoPagamento = condNorm ?? 'TOTALIDADE';
         
         // Guardar o ID da cotação para atualização posterior
         this.ultimaCotacaoId = cotacao.id;
@@ -304,75 +331,6 @@ export class CotacoesCadastroComponent implements OnInit {
     this.itens.push({ descricao: '', quantidade: 1, unidade: '', precoUnitario: null });
   }
 
-  /**
-   * Parseia o texto da descrição da carga e extrai quantidades e unidades.
-   * Reconhece: 500kg, 500 kilos, 100 toneladas, 3 toneldas (typo), kg porco (unidade primeiro), etc.
-   * Quando não reconhece, define quantidade 1 para permitir edição manual.
-   */
-  private parseDescricaoCarga(texto: string): ItemCotacao[] {
-    const itens: ItemCotacao[] = [];
-    // Suporte a separador por vírgula (formato antigo) e por nova linha (formato novo)
-    const linhas = texto.includes('\n')
-      ? texto.split(/\r?\n/)
-      : texto.split(/,(?![^\[]*\])/).map(s => s.trim()); // split por vírgula fora de [...]
-
-    const linhasFiltradas = linhas.map(l => l.trim()).filter(l => l.length > 0);
-
-    // Padrão 1: número + unidade + descrição (ex: 50 kg porco, 3 toneldas de ferramentas)
-    const numUnidadeRegex = /^([\d.,]+)\s*(kgs?|kilos?|quilos?|toneladas?|toneldas?|tonneladas?|t)\b\s*(?:de\s+)?(.*)$/i;
-    // Padrão 2: unidade + descrição sem número (ex: kg porco, toneladas feijao)
-    const unidadeDescricaoRegex = /^(kgs?|kilos?|quilos?|toneladas?|toneldas?|tonneladas?|t)\b\s+(.+)$/i;
-    // Padrão de preço embutido: [PRECO:12345.67]
-    const precoRegex = /\[PRECO:([\d.]+)\]/;
-
-    const normalizarUnidade = (raw: string): 'kg' | 'toneladas' | '' => {
-      const r = raw.toLowerCase();
-      if (/^(kg|kgs|kilo|kilos|quilo|quilos)$/.test(r)) return 'kg';
-      if (/^(tonelada|toneladas|toneldas?|tonneladas?|t)$/.test(r)) return 'toneladas';
-      return '';
-    };
-
-    const extrairPreco = (linha: string): { texto: string; preco: number | null } => {
-      const m = linha.match(precoRegex);
-      if (m) {
-        return { texto: linha.replace(precoRegex, '').trim(), preco: parseFloat(m[1]) };
-      }
-      return { texto: linha, preco: null };
-    };
-
-    for (const linha of linhasFiltradas) {
-      const { texto: linhaLimpa, preco } = extrairPreco(linha);
-      const limpa = linhaLimpa.replace(/^\s*\d+[.)]\s*/, '').trim();
-      const matchNum = limpa.match(numUnidadeRegex);
-      const matchUnidade = limpa.match(unidadeDescricaoRegex);
-
-      if (matchNum) {
-        const numStr = (matchNum[1] || '').replace(',', '.');
-        const quantidade = parseFloat(numStr) || 1;
-        const unidade = normalizarUnidade(matchNum[2] || '');
-        const descResto = (matchNum[3] || '').trim();
-        itens.push({
-          descricao: descResto || limpa,
-          quantidade: Math.round(quantidade) === quantidade ? quantidade : Math.round(quantidade * 100) / 100,
-          unidade,
-          precoUnitario: preco
-        });
-      } else if (matchUnidade) {
-        const unidade = normalizarUnidade(matchUnidade[1] || '');
-        const descResto = (matchUnidade[2] || '').trim();
-        itens.push({
-          descricao: descResto || limpa,
-          quantidade: 1,
-          unidade,
-          precoUnitario: preco
-        });
-      } else {
-        itens.push({ descricao: limpa || linhaLimpa, quantidade: 1, unidade: '', precoUnitario: preco });
-      }
-    }
-    return itens;
-  }
-
   removerItem(i: number): void {
     if (this.itens.length > 1) this.itens.splice(i, 1);
   }
@@ -397,7 +355,7 @@ export class CotacoesCadastroComponent implements OnInit {
   }
 
   /**
-   * Gera uma cotação e envia o utilizador para a página de "Cotações Enviadas".
+   * Gera uma cotação e envia o utilizador para «Negociação e ajuste».
    * Marca a cotação com status COTACAO_GERADA para aparecer na lista.
    */
   gerarCotacao(): void {
@@ -441,7 +399,8 @@ export class CotacoesCadastroComponent implements OnInit {
         status: this.edicaoCotacaoExistente ? this.statusAoGravarRascunho() : this.STATUS_PENDENTE_BACKEND,
         observacoes: this.cotacao.observacoes || undefined,
         formaEnvioPreferida: this.cotacao.formaEnvioPreferida || undefined,
-        operador: this.cotacao.operador || undefined
+        operador: this.cotacao.operador || undefined,
+        condicaoPagamento: this.cotacao.condicaoPagamento || undefined
       };
 
       const handleSuccess = (res: CotacaoResponse) => {
@@ -481,7 +440,7 @@ export class CotacoesCadastroComponent implements OnInit {
    * Finaliza a geração:
    *  - atualiza status para QUOTATION_GENERATED
    *  - baixa o PDF automaticamente
-   *  - redireciona para Cotações Enviadas
+   *  - redireciona para Negociação e ajuste
    */
   async finalizarGeracao(): Promise<void> {
     if (!this.ultimaCotacaoId) {
@@ -530,7 +489,8 @@ export class CotacoesCadastroComponent implements OnInit {
           ? ((this.statusBackendCarregado || '').toUpperCase() === 'RESPONDED' || (this.statusBackendCarregado || '').toUpperCase() === 'RESPONDIDO'
               ? 'AJUSTE_APOS_ACEITE'
               : 'AJUSTE_PRECO')
-          : undefined
+          : undefined,
+        condicaoPagamento: this.cotacao.condicaoPagamento || undefined
       };
 
       await new Promise<void>((resolve, reject) => {
@@ -613,7 +573,8 @@ export class CotacoesCadastroComponent implements OnInit {
         dataValidade: this.cotacao.validade || undefined,
         status: this.STATUS_PENDENTE_BACKEND,
         observacoes: this.cotacao.observacoes || undefined,
-        operador: this.cotacao.operador || undefined
+        operador: this.cotacao.operador || undefined,
+        condicaoPagamento: this.cotacao.condicaoPagamento || undefined
       };
 
       // Se já existe uma cotação (vindo de um pedido), atualizar em vez de criar nova
@@ -668,7 +629,7 @@ export class CotacoesCadastroComponent implements OnInit {
   }
 
   /**
-   * Confirma o envio da cotação: guarda se necessário, marca como enviada e redireciona para Cotações Enviadas.
+   * Confirma o envio da cotação: guarda se necessário, marca como enviada e redireciona para Negociação e ajuste.
    */
   confirmarEnvio(): void {
     if (!this.cotacao.clienteNome || !this.cotacao.origem || !this.cotacao.destino) {
@@ -701,7 +662,8 @@ export class CotacoesCadastroComponent implements OnInit {
           dataValidade: this.cotacao.validade || undefined,
           status: this.STATUS_PENDENTE_BACKEND,
           observacoes: this.cotacao.observacoes || undefined,
-          operador: this.cotacao.operador || undefined
+          operador: this.cotacao.operador || undefined,
+          condicaoPagamento: this.cotacao.condicaoPagamento || undefined
         };
 
         this.cotacaoService.criarCotacao(payload).subscribe({
@@ -760,7 +722,8 @@ export class CotacoesCadastroComponent implements OnInit {
         status: this.STATUS_COTACAO_GERADA_BACKEND,
         observacoes: this.cotacao.observacoes || undefined,
         operador: this.cotacao.operador || undefined,
-        formaEnvioRealizada: formaEnvio
+        formaEnvioRealizada: formaEnvio,
+        condicaoPagamento: this.cotacao.condicaoPagamento || undefined
       };
 
       // Obter formaEnvioPreferida da cotação existente se existir
@@ -777,7 +740,7 @@ export class CotacoesCadastroComponent implements OnInit {
               const mensagem = mensagemSucesso || 'Cotação enviada e guardada com sucesso!';
               this.mostrarNotificacao(mensagem, 'success');
               
-              // Redirecionar para cotações enviadas após 1.5 segundos
+              // Redirecionar para Negociação e ajuste após 1.5 segundos
               setTimeout(() => {
                 this.router.navigate(['/billing/cotacoes/enviadas']);
               }, 1500);
@@ -796,7 +759,7 @@ export class CotacoesCadastroComponent implements OnInit {
               const mensagem = mensagemSucesso || 'Cotação enviada e guardada com sucesso!';
               this.mostrarNotificacao(mensagem, 'success');
               
-              // Redirecionar para cotações enviadas após 1.5 segundos
+              // Redirecionar para Negociação e ajuste após 1.5 segundos
               setTimeout(() => {
                 this.router.navigate(['/billing/cotacoes/enviadas']);
               }, 1500);
@@ -825,7 +788,8 @@ export class CotacoesCadastroComponent implements OnInit {
     texto += `*Referência:* ${ref}\n`;
     texto += `*Data:* ${data}\n`;
     texto += `*Rota:* ${this.cotacao.origem} → ${this.cotacao.destino}\n`;
-    texto += `\n*Valor Total:* ${total} MZN\n\n`;
+    texto += `\n*Valor Total:* ${total} MZN\n`;
+    texto += `*Condições de pagamento:* ${this.textoCondicaoPagamentoCotacao}\n\n`;
     texto += `Agradecemos a preferência!\n\nVM Transportes - Lirandzo`;
 
     return texto;
@@ -1075,8 +1039,10 @@ export class CotacoesCadastroComponent implements OnInit {
         nome: this.cotacao.clienteNome,
         telefone: this.cotacao.clienteTelefone || '',
         email: this.cotacao.clienteEmail || '',
-        endereco: this.cotacao.origem || '',
-        nif: ''
+        endereco: (this.cotacao.clienteEndereco || this.cotacao.origem || '').trim(),
+        nif: (this.cotacao.clienteNuit || '').trim(),
+        provincia: (this.cotacao.clienteProvincia || '').trim(),
+        pessoaContacto: (this.cotacao.clientePessoaContacto || '').trim()
       };
 
       this.clienteService.criarCliente(clienteData).subscribe({

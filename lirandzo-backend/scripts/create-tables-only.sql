@@ -55,6 +55,8 @@ CREATE TABLE IF NOT EXISTS customers (
     email VARCHAR(100),
     address VARCHAR(200),
     tax_id VARCHAR(50),
+    province VARCHAR(100),
+    contact_person VARCHAR(200),
     total_invoiced_amount DECIMAL(15,2) DEFAULT 0.0,
     debt_amount DECIMAL(15,2) DEFAULT 0.0,
     order_count INTEGER DEFAULT 0,
@@ -172,12 +174,14 @@ CREATE TABLE IF NOT EXISTS orders (
     trip_id BIGINT REFERENCES trips(id) ON DELETE SET NULL,
     invoice_number VARCHAR(50),
     invoice_date DATE,
+    tracking_code VARCHAR(50),
     quotation_id BIGINT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_orders_invoice_number ON orders(invoice_number) WHERE invoice_number IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_orders_tracking_code ON orders(tracking_code) WHERE tracking_code IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_orders_quotation_id ON orders(quotation_id);
 
 -- Payments table
@@ -236,6 +240,24 @@ CREATE INDEX IF NOT EXISTS idx_orders_trip ON orders(trip_id);
 CREATE INDEX IF NOT EXISTS idx_payments_order ON payments(order_id);
 CREATE INDEX IF NOT EXISTS idx_payments_payment_date ON payments(payment_date);
 
+-- Receipts (recibos) — one per confirmed payment
+CREATE TABLE IF NOT EXISTS recibos (
+    id BIGSERIAL PRIMARY KEY,
+    payment_id BIGINT NOT NULL UNIQUE REFERENCES payments(id) ON DELETE CASCADE,
+    public_number VARCHAR(32) NOT NULL UNIQUE,
+    ano INTEGER NOT NULL,
+    sequencia INTEGER NOT NULL,
+    issued_at TIMESTAMP NOT NULL,
+    amount DECIMAL(15,2) NOT NULL,
+    customer_name VARCHAR(200),
+    invoice_number VARCHAR(80),
+    payment_reference VARCHAR(100),
+    payment_method VARCHAR(50)
+);
+
+CREATE INDEX IF NOT EXISTS idx_recibos_issued ON recibos(issued_at DESC);
+CREATE INDEX IF NOT EXISTS idx_recibos_ano_seq ON recibos(ano, sequencia);
+
 -- ============================================================================
 -- QUOTATIONS MANAGEMENT
 -- ============================================================================
@@ -262,6 +284,7 @@ CREATE TABLE IF NOT EXISTS quotations (
     status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     notes VARCHAR(500),
     terms VARCHAR(500),
+    payment_terms VARCHAR(40),
     operator VARCHAR(200),
     preferred_delivery_method VARCHAR(50),
     actual_delivery_method VARCHAR(50),

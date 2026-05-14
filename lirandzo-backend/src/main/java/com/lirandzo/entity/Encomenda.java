@@ -81,6 +81,10 @@ public class Encomenda {
     @Column(name = "invoice_date")
     private LocalDate invoiceDate;
 
+    /** Código público futuro para rastreio (ex.: TRK-XXXXXXXXXX). Único por encomenda. */
+    @Column(name = "tracking_code", length = 50, unique = true)
+    private String trackingCode;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "quotation_id")
     // Evita erro de serialização do proxy do Hibernate (ByteBuddyInterceptor)

@@ -46,7 +46,9 @@ public class Pagamento {
 
     /**
      * CONFIRMED: contabiliza na dívida da encomenda.
-     * PENDING_BANK: cliente indicou pagamento; aguarda confirmação no extrato / app M-Pesa.
+     * PENDING_BANK: aguarda confirmação no extrato / app (valor ainda não contabilizado).
+     * PENDING_APPROVAL: técnico registou; gestor/admin deve aprovar antes de contabilizar.
+     * REJECTED: recusado pela gestão (não contabiliza).
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "verification_status", nullable = false, length = 30)
@@ -68,6 +70,8 @@ public class Pagamento {
 
     public enum VerificationStatus {
         CONFIRMED,
-        PENDING_BANK
+        PENDING_BANK,
+        PENDING_APPROVAL,
+        REJECTED
     }
 }

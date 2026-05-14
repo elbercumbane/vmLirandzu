@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 import { BillingSectionHeaderComponent } from '../shared/billing-section-header.component';
 import { CotacaoService, CotacaoResponse } from '../../../services/cotacao.service';
 
@@ -18,20 +17,16 @@ interface PedidoCotacaoDisplay {
   horaEntrada: string;
   estado: string;
   operador: string;
-  dataResposta: string;
-  tempoResposta: string;
 }
 
 @Component({
   selector: 'app-cotacoes-lista',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, BillingSectionHeaderComponent],
+  imports: [CommonModule, RouterLink, BillingSectionHeaderComponent],
   templateUrl: './cotacoes-lista.component.html',
   styleUrls: ['../shared/billing-page.css', './cotacoes-lista.component.css']
 })
 export class CotacoesListaComponent implements OnInit {
-  filtro = '';
-  filtroEstado = 'TODOS';
   pedidos: PedidoCotacaoDisplay[] = [];
   loading = true;
   error: string | null = null;
@@ -87,26 +82,6 @@ export class CotacoesListaComponent implements OnInit {
         })
       : '';
 
-    const dataResposta = c.dataResposta
-      ? new Date(c.dataResposta).toLocaleString('pt-MZ', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        })
-      : '';
-
-    let tempoResposta = '—';
-    const statusUpperTempo = c.status?.toUpperCase() || '';
-    const isRespondido = statusUpperTempo === 'RESPONDIDO' || statusUpperTempo === 'RESPONDED';
-    if (c.dataCriacao && c.dataResposta && isRespondido) {
-      const inicioMs = new Date(c.dataCriacao).getTime();
-      const fimMs = new Date(c.dataResposta).getTime();
-      const diffMs = fimMs - inicioMs;
-      tempoResposta = diffMs >= 0 ? this.formatarDuracao(diffMs) : '—';
-    }
-
     // Mapeamento do status vindo do backend (enum em inglês) para UI em PT.
     const statusUpper = c.status?.toUpperCase() || '';
     let estado = 'PENDENTE';
@@ -149,44 +124,14 @@ export class CotacoesListaComponent implements OnInit {
       dataEntrada,
       horaEntrada,
       estado,
-      operador: c.operador || '',
-      dataResposta,
-      tempoResposta: tempoResposta || '—'
+      operador: c.operador || ''
     };
   }
 
-  private formatarDuracao(diffMs: number): string {
-    const totalSeconds = Math.floor(diffMs / 1000);
-    if (totalSeconds <= 0) return '—';
-
-    const dias = Math.floor(totalSeconds / 86400);
-    const horas = Math.floor((totalSeconds % 86400) / 3600);
-    const minutos = Math.floor((totalSeconds % 3600) / 60);
-    const segundos = totalSeconds % 60;
-
-    const pluralDia = dias === 1 ? 'dia' : 'dias';
-    const pluralMin = minutos === 1 ? 'minuto' : 'minutos';
-
-    if (dias > 0) {
-      const partes: string[] = [`${dias} ${pluralDia}`];
-      if (horas > 0) partes.push(`${horas}h`);
-      if (minutos > 0) partes.push(`${minutos} ${pluralMin}`);
-      partes.push(`${segundos}s`);
-      return partes.join(' e ');
-    }
-
-    const mm = String(minutos).padStart(2, '0');
-    return `${horas}h:${mm} e ${segundos}s`;
-  }
-
   get pedidosFiltrados() {
-    // Esta página mostra apenas pedidos NÃO respondidos.
+    // Esta página mostra apenas pedidos NÃO respondidos (aceites saem da fila desta vista).
     return this.pedidos.filter(p => p.estado !== 'RESPONDIDO');
   }
-
-  get totalPendentes() { return this.pedidosFiltrados.filter(p => p.estado === 'PENDENTE').length; }
-  get totalRespondidos() { return 0; }
-  get totalGerados() { return this.pedidosFiltrados.filter(p => p.estado === 'COTAÇÃO GERADA').length; }
 
   getBadgeClass(estado: string): string {
     switch (estado) {

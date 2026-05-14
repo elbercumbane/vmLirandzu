@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 export class NotificationPopupComponent implements OnInit, OnDestroy {
   @Input() message: string = '';
   @Input() type: 'success' | 'error' = 'success';
-  @Input() duration: number = 7000; // 7 segundos por padrão
+  @Input() duration: number = 14000; // tempo de leitura confortável (sobrescrever por página se precisar)
 
   show: boolean = false;
   private timeoutId: any;

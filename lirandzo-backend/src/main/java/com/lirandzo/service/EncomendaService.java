@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -38,10 +39,13 @@ public class EncomendaService {
 
     public Optional<Encomenda> findById(Long id) {
         Optional<Encomenda> encomenda = encomendaRepository.findById(id);
-        // Ensure customer is loaded
         encomenda.ifPresent(e -> {
             if (e.getCliente() != null) {
-                e.getCliente().getId(); // Force lazy loading
+                e.getCliente().getId();
+            }
+            if (e.getTrackingCode() == null || e.getTrackingCode().isBlank()) {
+                e.setTrackingCode(gerarCodigoRastreamento());
+                encomendaRepository.save(e);
             }
         });
         return encomenda;
@@ -56,12 +60,21 @@ public class EncomendaService {
             saved.setInvoiceDate(dataRef);
             saved = encomendaRepository.save(saved);
         }
+        if (saved.getTrackingCode() == null || saved.getTrackingCode().isBlank()) {
+            saved.setTrackingCode(gerarCodigoRastreamento());
+            saved = encomendaRepository.save(saved);
+        }
         atualizarEstatisticasCliente(saved.getCliente().getId());
         return saved;
     }
 
     private static String gerarNumeroFactura(int ano, long numeroEncomenda) {
         return String.format("FAC-%d-%06d", ano, numeroEncomenda);
+    }
+
+    /** Código único para rastreio interno / futuro portal (TRK- + 12 hex). */
+    private static String gerarCodigoRastreamento() {
+        return "TRK-" + UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase();
     }
 
     public Optional<Encomenda> update(Long id, Encomenda encomendaAtualizada) {

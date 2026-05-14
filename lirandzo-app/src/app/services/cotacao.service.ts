@@ -3,6 +3,13 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
 
+/** Condição de pagamento na proposta (alinhado ao enum backend). */
+export type CondicaoPagamentoCotacao =
+  | 'TOTALIDADE'
+  | 'ADIANTADO_TOTAL'
+  | 'DUAS_PRESTACOES'
+  | 'PARCIAL';
+
 export interface CotacaoRequest {
   cliente: { id: number };
   origem: string;
@@ -23,6 +30,7 @@ export interface CotacaoRequest {
   status?: string;
   observacoes?: string;
   condicoes?: string;
+  condicaoPagamento?: CondicaoPagamentoCotacao;
   operador?: string;
   formaEnvioPreferida?: string;
   formaEnvioRealizada?: string;
@@ -47,6 +55,7 @@ export interface CotacaoResponse {
   observacoes?: string;
   fontePedido?: string;
   condicoes?: string;
+  condicaoPagamento?: CondicaoPagamentoCotacao;
   operador?: string;
   dataResposta?: string;
   formaEnvioPreferida?: string;
@@ -70,6 +79,12 @@ export interface CotacaoPortalRequest {
   mensagem?: string;
   formaEnvioPreferida: 'whatsapp' | 'email' | 'pdf' | 'chamada';
   tipoServico?: 'TRANSPORTE' | 'COMPRA_TRANSPORTE';
+  condicaoPagamento?: CondicaoPagamentoCotacao;
+  /** Opcional — alinhado à factura */
+  nuit?: string;
+  endereco?: string;
+  provincia?: string;
+  pessoaContacto?: string;
 }
 
 @Injectable({
