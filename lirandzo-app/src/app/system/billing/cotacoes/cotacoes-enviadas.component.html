@@ -204,6 +204,16 @@
                     Registar aceitação
                   </button>
                 }
+                @if (podeConfirmarFactura(c.estado)) {
+                  <button type="button" class="btn-primary btn-sm ce-acao-btn" (click)="confirmarParaFactura(c)">
+                    Confirmar factura
+                  </button>
+                }
+                @if (aguardaConfirmacao(c.estado) && !auth.canEmitirFactura()) {
+                  <span class="badge badge-warning ce-acao-btn" title="Aguarda confirmação do administrador">
+                    Aguarda confirmação
+                  </span>
+                }
                 @if (podeEmitirFactura(c.estado)) {
                   <a
                     class="btn-primary btn-sm cotacao-acoes-link ce-acao-btn"

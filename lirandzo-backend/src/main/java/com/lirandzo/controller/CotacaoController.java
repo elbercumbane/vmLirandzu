@@ -54,6 +54,13 @@ public class CotacaoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/{id}/confirmar")
+    public ResponseEntity<Cotacao> confirmarCotacao(@PathVariable Long id) {
+        return cotacaoService.confirmarParaFactura(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCotacao(@PathVariable Long id) {
         cotacaoService.deleteById(id);

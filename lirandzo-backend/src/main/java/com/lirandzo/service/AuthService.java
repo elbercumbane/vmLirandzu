@@ -7,7 +7,10 @@ import com.lirandzo.repository.UsuarioRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthService {
@@ -40,6 +43,17 @@ public class AuthService {
                 usuario.getEmail(),
                 role
         );
+    }
+
+    public List<Map<String, Object>> listarUsuariosAtivos() {
+        return usuarioRepository.findAll().stream()
+                .filter(u -> Boolean.TRUE.equals(u.getAtivo()))
+                .map(u -> Map.<String, Object>of(
+                        "id", u.getId(),
+                        "nome", u.getNome(),
+                        "role", mapRolesToFrontendLabel(u)
+                ))
+                .collect(Collectors.toList());
     }
 
     private String mapRolesToFrontendLabel(Usuario usuario) {

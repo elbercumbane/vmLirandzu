@@ -89,6 +89,7 @@ export class CotacoesCadastroComponent implements OnInit {
   ];
 
   private readonly auth = inject(AuthService);
+  listaUsuarios: { id: number; nome: string; role: string }[] = [];
 
   // Notificação
   showNotification: boolean = false;
@@ -124,6 +125,11 @@ export class CotacoesCadastroComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.auth.listarUsuarios().subscribe({
+      next: (lista) => { this.listaUsuarios = lista; },
+      error: () => { this.listaUsuarios = []; }
+    });
+
     // Modo manual: data = hoje e validade = +3 dias (os inputs serão bloqueados)
     this.cotacao.validade = this.calcularValidadeISO(this.cotacao.data);
     this.cotacao.observacoes = 'MANUAL';

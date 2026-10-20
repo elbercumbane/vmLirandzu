@@ -76,6 +76,9 @@ export class AuthService {
   /** Editar dados da factura/encomenda (não confundir com registar pagamento). */
   canEditFacturas(): boolean { return this.isAdmin || this.isGestor; }
 
+  /** Emitir factura a partir de cotação aceite — técnico não pode, aguarda admin/gestor. */
+  canEmitirFactura(): boolean { return this.isAdmin || this.isGestor; }
+
   /** Baixas, aprovação de pagamentos de técnicos, recibos e tesouraria — técnico não acede. */
   canAccessBaixasERecibos(): boolean {
     return this.isAdmin || this.isGestor;
@@ -143,6 +146,10 @@ export class AuthService {
         return profile;
       })
     );
+  }
+
+  listarUsuarios(): Observable<{ id: number; nome: string; role: string }[]> {
+    return this.http.get<{ id: number; nome: string; role: string }[]>(`${this.apiUrl}/auth/usuarios`);
   }
 
   canAccessSistema(): boolean {

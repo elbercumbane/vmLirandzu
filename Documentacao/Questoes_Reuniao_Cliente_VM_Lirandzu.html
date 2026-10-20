@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: Calibri, Arial, sans-serif;
+      font-size: 11pt;
+      margin: 2.5cm 3cm;
+      color: #1a1a1a;
+      line-height: 1.6;
+    }
+
+    h1 {
+      font-size: 18pt;
+      color: #1a3c6e;
+      text-align: center;
+      margin-bottom: 4px;
+      border-bottom: 3px solid #1a3c6e;
+      padding-bottom: 8px;
+    }
+
+    .subtitulo {
+      text-align: center;
+      font-size: 10pt;
+      color: #555;
+      margin-top: 0;
+      margin-bottom: 30px;
+    }
+
+    .intro {
+      background-color: #f0f4fb;
+      border-left: 5px solid #1a3c6e;
+      padding: 12px 16px;
+      margin-bottom: 28px;
+      font-size: 10.5pt;
+      color: #333;
+    }
+
+    h2 {
+      font-size: 13pt;
+      color: #ffffff;
+      background-color: #1a3c6e;
+      padding: 7px 12px;
+      margin-top: 30px;
+      margin-bottom: 10px;
+      border-radius: 3px;
+    }
+
+    h3 {
+      font-size: 11pt;
+      color: #1a3c6e;
+      margin-top: 18px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid #c8d8f0;
+      padding-bottom: 3px;
+    }
+
+    ol {
+      margin: 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin-bottom: 8px;
+      font-size: 10.5pt;
+    }
+
+    .destaque {
+      background-color: #fff8e1;
+      border: 1px solid #f5c518;
+      border-left: 5px solid #f5c518;
+      padding: 12px 16px;
+      margin-top: 16px;
+      border-radius: 3px;
+    }
+
+    .destaque strong {
+      font-size: 10.5pt;
+      color: #7a5700;
+    }
+
+    .destaque p {
+      margin: 6px 0 0 0;
+      font-style: italic;
+      color: #444;
+      font-size: 10.5pt;
+    }
+
+    .rodape {
+      margin-top: 40px;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+      font-size: 9pt;
+      color: #888;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 10pt;
+    }
+
+    th {
+      background-color: #1a3c6e;
+      color: white;
+      padding: 8px 10px;
+      text-align: left;
+    }
+
+    td {
+      padding: 7px 10px;
+      border: 1px solid #d0d8e8;
+    }
+
+    tr:nth-child(even) td {
+      background-color: #f4f7fc;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>QUESTÕES PARA REUNIÃO COM O CLIENTE</h1>
+  <p class="subtitulo">Sistema de Gestão VM Lirandzu &nbsp;|&nbsp; Abril 2026</p>
+
+  <div class="intro">
+    Este documento reúne as questões mais pertinentes a colocar ao cliente na reunião de apresentação e acompanhamento do sistema.
+    O sistema encontra-se em <strong>modo de teste</strong>, com as funcionalidades de <strong>cotações, facturas, portal do cliente e métricas do dashboard</strong> já operacionais.
+    As questões estão organizadas em duas secções: o que já está funcional e o que ainda está por desenvolver.
+  </div>
+
+
+  <!-- PARTE 1 — FUNCIONAL -->
+  <h2>PARTE 1 — O QUE JÁ ESTÁ EM FUNCIONAMENTO</h2>
+
+  <h3>Portal do Cliente</h3>
+  <ol>
+    <li>Conseguiu aceder ao portal sem dificuldade? O processo de login foi intuitivo?</li>
+    <li>Ao pedir uma cotação pelo portal, o processo foi claro? Sabia o que preencher em cada campo?</li>
+    <li>Consegue ver as suas encomendas e facturas na área privada? A informação está organizada de forma útil?</li>
+    <li>Os seus clientes já acederam ao portal? O que acharam da experiência?</li>
+  </ol>
+
+  <h3>Fluxo de Cotações</h3>
+  <ol start="5">
+    <li>Quando recebe uma cotação, o formato é profissional? Transmite confiança ao seu cliente?</li>
+    <li>Os valores calculados automaticamente — IVA, descontos, total — estão correctos para o vosso modelo de negócio?</li>
+    <li>O processo de aprovar ou rejeitar uma cotação é simples para a vossa equipa usar no dia-a-dia?</li>
+    <li>O controlo de estados (pedido → proposta enviada → confirmado) está a funcionar como esperado?</li>
+  </ol>
+
+  <h3>Facturas e Pagamentos</h3>
+  <ol start="9">
+    <li>A factura gerada tem todos os dados necessários? NUIT, logótipo, dados da empresa, itens discriminados?</li>
+    <li>O PDF da factura está pronto para entregar directamente ao cliente sem ajustes adicionais?</li>
+    <li>Registar um pagamento parcial ou total é simples de fazer para a vossa equipa?</li>
+    <li>O fluxo completo — cotação → factura → pagamento → recibo — está a ser usado? Ou continuam a usar papel/Excel em paralelo?</li>
+  </ol>
+
+  <h3>Dashboard e Métricas</h3>
+  <ol start="13">
+    <li>As métricas apresentadas no dashboard são as que realmente usa para tomar decisões de negócio?</li>
+    <li>O resumo financeiro reflecte bem a realidade da empresa? Há algum indicador que considera essencial e que não está visível?</li>
+    <li>A lista de clientes com dívidas em atraso é útil no dia-a-dia? É fácil de interpretar?</li>
+  </ol>
+
+  <div class="destaque">
+    <strong>Questão-chave sobre o que está funcional:</strong>
+    <p>"Se amanhã fossem usar isto a sério — não em teste — o que teria de mudar primeiro?"</p>
+  </div>
+
+
+  <!-- PARTE 2 — FUTURO -->
+  <h2>PARTE 2 — FUNCIONALIDADES FUTURAS</h2>
+
+  <h3>Gestão de Clientes</h3>
+  <ol>
+    <li>Têm uma lista organizada dos vossos clientes activos? Ou está dispersa em telemóveis e papéis?</li>
+    <li>Alguma vez perderam um cliente por falta de seguimento? Um sistema que avise quem deve há mais de X dias seria útil?</li>
+    <li>Precisam de distinguir clientes empresariais de particulares? Têm tratamentos comerciais diferentes?</li>
+  </ol>
+
+  <h3>Gestão de Viaturas</h3>
+  <ol start="4">
+    <li>Sabem em tempo real quais as viaturas disponíveis e quais estão em viagem? Ou têm de ligar ao motorista para saber?</li>
+    <li>Já tiveram problemas por enviar uma viatura que estava em manutenção? Acontece com frequência?</li>
+    <li>Controlam as revisões e inspecções das viaturas? Há documentos a vencer que possam passar despercebidos?</li>
+    <li>Quantas viaturas têm actualmente na frota?</li>
+  </ol>
+
+  <h3>Gestão de Motoristas</h3>
+  <ol start="8">
+    <li>As cartas de condução e licenças dos motoristas estão sempre actualizadas? Têm forma de saber quando vencem?</li>
+    <li>Como avaliam o desempenho de um motorista hoje? É subjectivo ou têm algum critério definido?</li>
+    <li>Já tiveram problemas com um motorista sem documentação válida durante uma fiscalização?</li>
+    <li>Quantos motoristas activos têm actualmente?</li>
+  </ol>
+
+  <h3>Gestão de Viagens</h3>
+  <ol start="12">
+    <li>Como planeiam uma viagem hoje? Quanto tempo demora desde o pedido até a viatura sair?</li>
+    <li>Conseguem saber qual o custo real de uma viagem específica — combustível, motorista, viatura — tudo junto?</li>
+    <li>Os clientes pedem actualizações sobre onde está a encomenda? Com que frequência isso acontece?</li>
+  </ol>
+
+  <h3>Controlo de Combustível</h3>
+  <ol start="15">
+    <li>O combustível é o maior custo operacional da empresa? Sabem quanto gastam por mês por viatura?</li>
+    <li>Já suspeitaram de consumo anormal numa viatura? Têm como provar ou refutar?</li>
+    <li>Os abastecimentos são pagos em dinheiro ou através de conta da empresa? Isso afecta como vão registar.</li>
+  </ol>
+
+  <h3>Relatórios</h3>
+  <ol start="18">
+    <li>No final do mês, quanto tempo demora a preparar um relatório financeiro? É feito manualmente?</li>
+    <li>Têm sócios ou investidores que pedem relatórios regularmente? Em que formato preferem receber?</li>
+    <li>O que querem saber que hoje não conseguem ver facilmente? Isso define exactamente o que construir.</li>
+  </ol>
+
+  <h3>Notificações (Email e WhatsApp)</h3>
+  <ol start="21">
+    <li>Com que frequência os vossos clientes pedem actualizações por WhatsApp ou telefone?</li>
+    <li>Seria útil o sistema enviar automaticamente uma mensagem quando a cotação fica pronta, a factura é emitida ou o pagamento é confirmado?</li>
+    <li>Preferem notificações por email, WhatsApp ou ambos?</li>
+  </ol>
+
+  <div class="destaque">
+    <strong>Questão estratégica final — a mais importante da reunião:</strong>
+    <p>"Se pudesse ter apenas UMA destas funcionalidades prontas no próximo mês, qual escolheria — e porquê?"</p>
+  </div>
+
+
+  <!-- RESUMO -->
+  <h2>RESUMO DAS PARTES E VALORES</h2>
+
+  <table>
+    <tr>
+      <th>#</th>
+      <th>Funcionalidade</th>
+      <th>Estado</th>
+      <th>Valor (MZN)</th>
+    </tr>
+    <tr><td>1</td><td>Website + Portal do Cliente</td><td>Entregue</td><td>90.000</td></tr>
+    <tr><td>2</td><td>Dashboard e Métricas</td><td>Entregue</td><td>45.000</td></tr>
+    <tr><td>3</td><td>Fluxo de Cotações</td><td>Entregue</td><td>55.000</td></tr>
+    <tr><td>4</td><td>Facturas e Pagamentos</td><td>Entregue</td><td>55.000</td></tr>
+    <tr><td>5</td><td>Gestão de Clientes</td><td>Em desenvolvimento</td><td>35.000</td></tr>
+    <tr><td>6</td><td>Gestão de Viaturas</td><td>Em desenvolvimento</td><td>35.000</td></tr>
+    <tr><td>7</td><td>Gestão de Motoristas</td><td>Em desenvolvimento</td><td>40.000</td></tr>
+    <tr><td>8</td><td>Gestão de Viagens</td><td>Em desenvolvimento</td><td>45.000</td></tr>
+    <tr><td>9</td><td>Controlo de Combustível</td><td>Em desenvolvimento</td><td>28.000</td></tr>
+    <tr><td>10</td><td>Relatórios</td><td>Em desenvolvimento</td><td>45.000</td></tr>
+    <tr><td>—</td><td>Notificações Email + WhatsApp</td><td>Opcional</td><td>60.000</td></tr>
+  </table>
+
+
+  <div class="rodape">
+    Documento preparado para reunião com cliente &nbsp;|&nbsp; Sistema VM Lirandzu &nbsp;|&nbsp; Abril 2026
+  </div>
+
+</body>
+</html>

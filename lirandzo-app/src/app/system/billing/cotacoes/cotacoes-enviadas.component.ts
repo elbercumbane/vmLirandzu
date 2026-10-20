@@ -7,10 +7,12 @@ import { BillingSectionHeaderComponent } from '../shared/billing-section-header.
 import { CotacaoService, CotacaoResponse } from '../../../services/cotacao.service';
 import { NotificationPopupComponent } from '../../../shared/components/notification-popup/notification-popup.component';
 import { CotacaoPreviewModalComponent } from './cotacao-preview-modal.component';
+import { AuthService } from '../../../shared/services/auth.service';
 
 /** Estados apresentados na UI (mapeados a partir do backend). */
 export const ESTADO_PROPOSTA_PRONTA = 'PROPOSTA PRONTA';
 export const ESTADO_ACEITE_CLIENTE = 'Aceite pelo cliente';
+export const ESTADO_CONFIRMADA = 'Confirmada';
 export const ESTADO_FACTURADA = 'FACTURADA';
 export const ESTADO_CANCELADA = 'CANCELADA';
 
@@ -88,13 +90,15 @@ export class CotacoesEnviadasComponent implements OnInit {
   readonly estados = {
     propostaPronta: ESTADO_PROPOSTA_PRONTA,
     aceite: ESTADO_ACEITE_CLIENTE,
+    confirmada: ESTADO_CONFIRMADA,
     facturada: ESTADO_FACTURADA,
     cancelada: ESTADO_CANCELADA
   };
 
   constructor(
     private cotacaoService: CotacaoService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    readonly auth: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -150,10 +154,10 @@ export class CotacoesEnviadasComponent implements OnInit {
       next: (cotacoes: CotacaoResponse[]) => {
         let enviadas: CotacaoResponse[];
         if (this.modoParaFacturar) {
-          // Fila: só aceites ainda por facturar (INVOICED não entra)
+          // Fila: aceites (aguarda confirmação) + confirmadas (prontas para emitir)
           enviadas = cotacoes.filter((c) => {
             const statusUpper = (c.status || '').toUpperCase();
-            return statusUpper === 'RESPONDED' || statusUpper === 'RESPONDIDO';
+            return statusUpper === 'RESPONDED' || statusUpper === 'RESPONDIDO' || statusUpper === 'ACCEPTED';
           });
         } else {
           enviadas = cotacoes.filter((c) => {
@@ -164,6 +168,7 @@ export class CotacoesEnviadasComponent implements OnInit {
               statusUpper === 'COTACAO GERADA' ||
               statusUpper === 'RESPONDED' ||
               statusUpper === 'RESPONDIDO' ||
+              statusUpper === 'ACCEPTED' ||
               statusUpper === 'INVOICED' ||
               statusUpper === 'FACTURADA' ||
               statusUpper === 'CANCELLED' ||
@@ -220,6 +225,7 @@ export class CotacoesEnviadasComponent implements OnInit {
       QUOTATION_GENERATED: ESTADO_PROPOSTA_PRONTA,
       COTACAO_GERADA: ESTADO_PROPOSTA_PRONTA,
       'COTACAO GERADA': ESTADO_PROPOSTA_PRONTA,
+      ACCEPTED: ESTADO_CONFIRMADA,
       INVOICED: ESTADO_FACTURADA,
       FACTURADA: ESTADO_FACTURADA,
       CANCELLED: ESTADO_CANCELADA,
@@ -283,10 +289,12 @@ export class CotacoesEnviadasComponent implements OnInit {
         return 0;
       case ESTADO_ACEITE_CLIENTE:
         return 1;
-      case ESTADO_FACTURADA:
+      case ESTADO_CONFIRMADA:
         return 2;
-      case ESTADO_CANCELADA:
+      case ESTADO_FACTURADA:
         return 3;
+      case ESTADO_CANCELADA:
+        return 4;
       default:
         return 9;
     }
@@ -386,6 +394,8 @@ export class CotacoesEnviadasComponent implements OnInit {
         return 'badge badge-warning';
       case ESTADO_ACEITE_CLIENTE:
         return 'badge badge-info';
+      case ESTADO_CONFIRMADA:
+        return 'badge badge-success';
       case ESTADO_FACTURADA:
         return 'badge badge-success';
       case ESTADO_CANCELADA:
@@ -395,9 +405,29 @@ export class CotacoesEnviadasComponent implements OnInit {
     }
   }
 
+  /** Aguarda confirmação do admin: aceite mas ainda não confirmada. */
+  aguardaConfirmacao(estado: string): boolean {
+    return this.modoParaFacturar && (estado || '').trim() === ESTADO_ACEITE_CLIENTE;
+  }
+
+  /** Admin pode confirmar: cotação aceite pelo cliente. */
+  podeConfirmarFactura(estado: string): boolean {
+    return this.aguardaConfirmacao(estado) && this.auth.canEmitirFactura();
+  }
+
+  /** Emitir factura disponível para todos após confirmação do admin. */
   podeEmitirFactura(estado: string): boolean {
-    const aceite = (estado || '').trim() === ESTADO_ACEITE_CLIENTE;
-    return this.modoParaFacturar && aceite;
+    return this.modoParaFacturar && (estado || '').trim() === ESTADO_CONFIRMADA;
+  }
+
+  confirmarParaFactura(c: CotacaoEnviadaDisplay): void {
+    this.cotacaoService.confirmarParaFactura(c.id).subscribe({
+      next: () => {
+        c.estado = ESTADO_CONFIRMADA;
+        this.mostrarNotificacao('Factura confirmada. Já pode ser emitida.', 'success');
+      },
+      error: () => this.mostrarNotificacao('Erro ao confirmar a factura.', 'error')
+    });
   }
 
   abrirPrevisualizar(c: CotacaoEnviadaDisplay): void {

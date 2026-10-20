@@ -123,6 +123,10 @@ export class CotacaoService {
     return this.http.put<CotacaoResponse>(`${this.apiUrl}/cotacoes/${id}`, cotacao);
   }
 
+  confirmarParaFactura(id: number): Observable<CotacaoResponse> {
+    return this.http.post<CotacaoResponse>(`${this.apiUrl}/cotacoes/${id}/confirmar`, {});
+  }
+
   excluirCotacao(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/cotacoes/${id}`);
   }

@@ -221,4 +221,12 @@ public class CotacaoService {
     public List<Cotacao> findByClienteId(Long clienteId) {
         return cotacaoRepository.findByClienteId(clienteId);
     }
+
+    public Optional<Cotacao> confirmarParaFactura(Long id) {
+        return cotacaoRepository.findById(id)
+                .map(c -> {
+                    c.setStatus(StatusCotacao.ACCEPTED);
+                    return cotacaoRepository.save(c);
+                });
+    }
 }

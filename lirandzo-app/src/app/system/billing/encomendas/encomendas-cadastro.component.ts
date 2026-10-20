@@ -357,7 +357,7 @@ export class EncomendasCadastroComponent implements OnInit {
           this.router.navigate(['/billing/encomendas']);
           return;
         }
-        if (st !== 'RESPONDED' && st !== 'RESPONDIDO') {
+        if (st !== 'RESPONDED' && st !== 'RESPONDIDO' && st !== 'ACCEPTED') {
           this.mostrarNotificacao('Só pode emitir factura com cotação aceite pelo cliente.', 'error');
           this.router.navigate(['/billing/cotacoes/para-facturar']);
           return;
@@ -575,19 +575,23 @@ export class EncomendasCadastroComponent implements OnInit {
     clone.removeAttribute('id');
     clone.classList.remove('invoice-pdf-offscreen');
     clone.setAttribute('aria-hidden', 'true');
+    // Posicionar no viewport (0,0) para html2canvas capturar correctamente.
+    // left negativo causa PDF em branco em alguns browsers.
     Object.assign(clone.style, {
       position: 'fixed',
-      left: '-20000px',
+      left: '0',
       top: '0',
-      width: '210mm',
-      maxWidth: '210mm',
+      width: '794px',
+      maxWidth: '794px',
       background: '#ffffff',
       zIndex: '2147483647',
       pointerEvents: 'none',
       overflow: 'visible'
     });
     document.body.appendChild(clone);
+    // Forçar layout e aguardar render completo
     void clone.offsetHeight;
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
     const opt = {
       margin: [10, 10, 10, 10] as [number, number, number, number],
@@ -596,8 +600,10 @@ export class EncomendasCadastroComponent implements OnInit {
       html2canvas: {
         scale: 2,
         useCORS: true,
+        allowTaint: true,
         logging: false,
         backgroundColor: '#ffffff',
+        windowWidth: 794,
         scrollX: 0,
         scrollY: 0
       },

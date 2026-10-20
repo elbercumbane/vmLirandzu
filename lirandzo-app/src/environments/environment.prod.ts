@@ -5,5 +5,5 @@ export const environment = {
    * pedidos POST disparam preflight OPTIONS; o proxy /api do Vercel devolve 403 em OPTIONS.
    * Ajusta em produção se o domínio do Railway mudar.
    */
-  apiUrl: 'https://lirandzo-backend-production.up.railway.app/api'
+  apiUrl: 'https://vmlirandzu-backend-production.up.railway.app/api'
 };

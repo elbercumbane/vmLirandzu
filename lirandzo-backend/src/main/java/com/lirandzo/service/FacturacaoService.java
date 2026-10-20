@@ -45,10 +45,10 @@ public class FacturacaoService {
         if (st == StatusCotacao.CANCELLED || st == StatusCotacao.EXPIRED || st == StatusCotacao.INVOICED) {
             throw new IllegalStateException("Não é possível facturar cotações canceladas, expiradas ou já facturadas.");
         }
-        // Só após «Registar aceitação» (RESPONDED). Propostas em ajuste (PENDING / QUOTATION_GENERATED) não entram na facturação.
-        if (st != StatusCotacao.RESPONDED) {
+        // Só após confirmação pelo admin (ACCEPTED) ou aceitação registada (RESPONDED).
+        if (st != StatusCotacao.RESPONDED && st != StatusCotacao.ACCEPTED) {
             throw new IllegalStateException(
-                    "Só pode emitir factura depois de registar a aceitação do contacto (estado aceite).");
+                    "Só pode emitir factura depois de o administrador confirmar a cotação.");
         }
 
         double total = aplicarTotalFacturavel(cot, pedido);
